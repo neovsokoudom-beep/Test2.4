@@ -1,69 +1,167 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Attendance Check-In/Out</title>
     <style>
-      body { font-family: Arial, sans-serif; margin: 40px; }
-      label { display: block; margin-top: 10px; }
-      button { margin: 10px 5px; padding: 10px 20px; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        button {
+            margin: 10px 5px;
+            padding: 10px 20px;
+        }
+
+        .container {
+            width: 100%;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
     </style>
-  </head>
-  <body>
+</head>
+
+<body>
+
     <h2>Attendance System</h2>
-    
+
     <!-- Employee ID Dropdown -->
-    <label for="empID">Employee ID:</label>
-    <select id="empID">
-      <option value="EMP-001">EMP-001</option>
-      <option value="EMP-002">EMP-002</option>
-      <option value="EMP-003">EMP-003</option>
-      <option value="EMP-004">EMP-004</option>
-      <option value="EMP-005">EMP-005</option>
-      <option value="EMP-006">EMP-006</option>
-      <option value="EMP-007">EMP-007</option>
-      <option value="EMP-008">EMP-008</option>
-      <option value="EMP-009">EMP-009</option>
-      <option value="EMP-010">EMP-010</option>
-    </select>
-
-    <!-- Branch ID Dropdown -->
-    <label for="branch">Branch ID:</label>
-    <select id="branch">
-      <option value="PP-01">PP-01 (Phnom Penh)</option>
-      <option value="SR-001">SR-001 (Siem Reap)</option>
-      <option value="KPC-001">KPC-001 (Kampong Cham)</option>
-      <option value="PP-02">PP-02 (Phnom Penh)</option>
-      <option value="SR-002">SR-002 (Siem Reap)</option>
-      <option value="KPC-002">KPC-002 (Kampong Cham)</option>
-      <option value="PP-03">PP-03 (Phnom Penh)</option>
-      <option value="SR-003">SR-003 (Siem Reap)</option>
-      <option value="KPC-003">KPC-003 (Kampong Cham)</option>
-      <option value="PP-04">PP-04 (Phnom Penh)</option>
-    </select>
-
-    <!-- Buttons -->
-    <div>
-      <button onclick="submitAttendance('Check-In')">Check-In</button>
-      <button onclick="submitAttendance('Check-Out')">Check-Out</button>
+    <div class="form-group">
+        <label for="empID">Employee ID:</label>
+        <select id="empID">
+            <option value="EMP-001">EMP-001</option>
+            <option value="EMP-002">EMP-002</option>
+            <option value="EMP-003">EMP-003</option>
+            <option value="EMP-004">EMP-004</option>
+            <option value="EMP-005">EMP-005</option>
+            <option value="EMP-006">EMP-006</option>
+            <option value="EMP-007">EMP-007</option>
+            <option value="EMP-008">EMP-008</option>
+            <option value="EMP-009">EMP-009</option>
+            <option value="EMP-010">EMP-010</option>
+        </select>
     </div>
 
-    <p id="result"></p>
+    <!-- Branch ID Dropdown -->
+    <div class="form-group">
+        <label for="branch">Branch ID:</label>
+        <select id="branch">
+            <option value="PP-01">PP-01 (Phnom Penh)</option>
+            <option value="SR-001">SR-001 (Siem Reap)</option>
+            <option value="KPC-001">KPC-001 (Kampong Cham)</option>
+            <option value="PP-02">PP-02 (Phnom Penh)</option>
+            <option value="SR-002">SR-002 (Siem Reap)</option>
+            <option value="KPC-002">KPC-002 (Kampong Cham)</option>
+            <option value="PP-03">PP-03 (Phnom Penh)</option>
+            <option value="SR-003">SR-003 (Siem Reap)</option>
+            <option value="KPC-003">KPC-003 (Kampong Cham)</option>
+            <option value="PP-04">PP-04 (Phnom Penh)</option>
+        </select>
+    </div>
+
+    <!-- Check-In/Check-Out Buttons -->
+    <div class="form-group">
+        <button onclick="submitAttendance('Check-In')">Check-In</button>
+        <button onclick="submitAttendance('Check-Out')">Check-Out</button>
+    </div>
+
+    <!-- Display Result -->
+    <p id="result" class="result"></p>
 
     <script>
-      function submitAttendance(action) {
-        var empID = document.getElementById("empID").value;
-        var branch = document.getElementById("branch").value;
-        
-        var url = "https://script.google.com/macros/s/AKfycbwsFqbfK-tm5Cyk8DForGaCqWWpnc1H62SrSTmw6E2BvQoLOl09Q-yKS2BLqnVJugLnow/exec"
-                  + "?action=" + encodeURIComponent(action)
-                  + "&empID=" + encodeURIComponent(empID)
-                  + "&branch=" + encodeURIComponent(branch);
+        const allowedLocation = {
+            latitude: 13.3595514, // Latitude of the branch
+            longitude: 103.8584329, // Longitude of the branch
+            radius: 5 // Radius in meters (5 km)
+        };
 
-        fetch(url)
-          .then(response => response.text())
-          .then(text => document.getElementById("result").innerText = text)
-          .catch(err => document.getElementById("result").innerText = "Error: " + err);
-      }
+        // Function to submit attendance
+        function submitAttendance(action) {
+            var empID = document.getElementById("empID").value;
+            var branch = document.getElementById("branch").value;
+
+            // Get the user's current location
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const userLat = position.coords.latitude;
+                    const userLon = position.coords.longitude;
+
+                    const distance = calculateDistance(userLat, userLon, allowedLocation.latitude, allowedLocation.longitude);
+
+                    if (distance <= allowedLocation.radius) {
+                        // Construct the URL to send data to Google Apps Script
+                        var url = "https://script.google.com/macros/s/AKfycbwsFqbfK-tm5Cyk8DForGaCqWWpnc1H62SrSTmw6E2BvQoLOl09Q-yKS2BLqnVJugLnow/exec" +
+                            "?action=" + encodeURIComponent(action) +
+                            "&empID=" + encodeURIComponent(empID) +
+                            "&branch=" + encodeURIComponent(branch);
+
+                        // Send the data via Fetch API
+                        fetch(url)
+                            .then(response => response.text())
+                            .then(text => {
+                                // Display the response text in the result section
+                                document.getElementById("result").innerText = text;
+                            })
+                            .catch(err => {
+                                // Handle any errors and display the message
+                                document.getElementById("result").innerText = "Error: " + err;
+                            });
+                    } else {
+                        document.getElementById("result").innerText = "You are outside the allowed area for check-in.";
+                    }
+                }, showError);
+            } else {
+                document.getElementById("result").innerText = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        // Calculate the distance using the Haversine formula
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the Earth in kilometers
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const distance = R * c * 1000; // Distance in meters
+            return distance;
+        }
+
+        // Show error messages if geolocation fails
+        function showError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    document.getElementById("result").innerText = "User denied the request for Geolocation.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    document.getElementById("result").innerText = "Location information is unavailable.";
+                    break;
+                case error.TIMEOUT:
+                    document.getElementById("result").innerText = "The request to get user location timed out.";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    document.getElementById("result").innerText = "An unknown error occurred.";
+                    break;
+            }
+        }
     </script>
-  </body>
+
+</body>
+
 </html>
