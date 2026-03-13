@@ -6,22 +6,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Attendance Check-In/Out</title>
     <style>
+        /* Define the custom font */
+        @font-face {
+            font-family: 'KhmerMPTC';
+            src: url('fonts/KhmerMPTC (2).otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'KhmerMPTC', Arial, sans-serif; /* Apply the custom font */
             margin: 40px;
-            font-size: 18px; /* Increased font size */
+            font-size: 22px;
         }
 
         label {
             display: block;
-            margin-top: 20px;
-            font-size: 20px; /* Larger font for labels */
+            margin-top: 30px;
+            font-size: 26px;
         }
 
         button {
-            margin: 20px 10px;
-            padding: 15px 30px; /* Larger button size */
-            font-size: 18px; /* Larger font size on buttons */
+            margin: 30px 15px;
+            padding: 20px 40px;
+            font-size: 24px;
         }
 
         .container {
@@ -29,25 +37,25 @@
         }
 
         .form-group {
-            margin-bottom: 30px; /* Increased space between form elements */
+            margin-bottom: 40px;
         }
 
         .result {
-            margin-top: 30px;
+            margin-top: 40px;
             font-weight: bold;
-            font-size: 22px; /* Larger text for results */
+            font-size: 30px;
         }
     </style>
 </head>
 
 <body>
 
-    <h2>Attendance System</h2>
+    <h2>ប្រព័ន្ធចុះវត្តមាន</h2> <!-- Attendance System in Khmer -->
 
     <!-- Employee ID Dropdown -->
     <div class="form-group">
-        <label for="empID">Employee ID:</label>
-        <select id="empID">
+        <label for="empID">លេខសម្គាល់បុគ្គលិក:</label>
+        <select id="empID" style="font-size: 24px; padding: 10px;">
             <option value="EMP-001">EMP-001</option>
             <option value="EMP-002">EMP-002</option>
             <option value="EMP-003">EMP-003</option>
@@ -63,25 +71,25 @@
 
     <!-- Branch ID Dropdown -->
     <div class="form-group">
-        <label for="branch">Branch ID:</label>
-        <select id="branch">
-            <option value="PP-01">PP-01 (Phnom Penh)</option>
-            <option value="SR-001">SR-001 (Siem Reap)</option>
-            <option value="KPC-001">KPC-001 (Kampong Cham)</option>
-            <option value="PP-02">PP-02 (Phnom Penh)</option>
-            <option value="SR-002">SR-002 (Siem Reap)</option>
-            <option value="KPC-002">KPC-002 (Kampong Cham)</option>
-            <option value="PP-03">PP-03 (Phnom Penh)</option>
-            <option value="SR-003">SR-003 (Siem Reap)</option>
-            <option value="KPC-003">KPC-003 (Kampong Cham)</option>
-            <option value="PP-04">PP-04 (Phnom Penh)</option>
+        <label for="branch">លេខសាខា:</label>
+        <select id="branch" style="font-size: 24px; padding: 10px;">
+            <option value="PP-01">PP-01 (ភ្នំពេញ)</option>
+            <option value="SR-001">SR-001 (សៀមរាប)</option>
+            <option value="KPC-001">KPC-001 (កំពង់ចាម)</option>
+            <option value="PP-02">PP-02 (ភ្នំពេញ)</option>
+            <option value="SR-002">SR-002 (សៀមរាប)</option>
+            <option value="KPC-002">KPC-002 (កំពង់ចាម)</option>
+            <option value="PP-03">PP-03 (ភ្នំពេញ)</option>
+            <option value="SR-003">SR-003 (សៀមរាប)</option>
+            <option value="KPC-003">KPC-003 (កំពង់ចាម)</option>
+            <option value="PP-04">PP-04 (ភ្នំពេញ)</option>
         </select>
     </div>
 
     <!-- Check-In/Check-Out Buttons -->
     <div class="form-group">
-        <button onclick="submitAttendance('Check-In')">Check-In</button>
-        <button onclick="submitAttendance('Check-Out')">Check-Out</button>
+        <button onclick="submitAttendance('Check-In')">វត្តមានចូល</button>
+        <button onclick="submitAttendance('Check-Out')">វត្តមានចេញ</button>
     </div>
 
     <!-- Display Result -->
@@ -89,17 +97,15 @@
 
     <script>
         const allowedLocation = {
-            latitude: 13.3595514, // Latitude of the branch
-            longitude: 103.8584329, // Longitude of the branch
-            radius: 5 // Radius in meters (5 km)
+            latitude: 13.3595514,
+            longitude: 103.8584329,
+            radius: 5
         };
 
-        // Function to submit attendance
         function submitAttendance(action) {
             var empID = document.getElementById("empID").value;
             var branch = document.getElementById("branch").value;
 
-            // Get the user's current location
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(position => {
                     const userLat = position.coords.latitude;
@@ -108,59 +114,53 @@
                     const distance = calculateDistance(userLat, userLon, allowedLocation.latitude, allowedLocation.longitude);
 
                     if (distance <= allowedLocation.radius) {
-                        // Construct the URL to send data to Google Apps Script
                         var url = "https://script.google.com/macros/s/AKfycbwsFqbfK-tm5Cyk8DForGaCqWWpnc1H62SrSTmw6E2BvQoLOl09Q-yKS2BLqnVJugLnow/exec" +
                             "?action=" + encodeURIComponent(action) +
                             "&empID=" + encodeURIComponent(empID) +
                             "&branch=" + encodeURIComponent(branch);
 
-                        // Send the data via Fetch API
                         fetch(url)
                             .then(response => response.text())
                             .then(text => {
-                                // Display the response text in the result section
                                 document.getElementById("result").innerText = text;
                             })
                             .catch(err => {
-                                // Handle any errors and display the message
                                 document.getElementById("result").innerText = "Error: " + err;
                             });
                     } else {
-                        document.getElementById("result").innerText = "You are outside the allowed area for check-in.";
+                        document.getElementById("result").innerText = "អ្នកនៅក្រៅតំបន់ដែលអនុញ្ញាតសម្រាប់ការចុះវត្តមាន។";
                     }
                 }, showError);
             } else {
-                document.getElementById("result").innerText = "Geolocation is not supported by this browser.";
+                document.getElementById("result").innerText = "ប្រព័ន្ធ Geolocation មិនត្រូវបានគាំទ្រដោយកម្មវិធីរុករកនេះទេ។";
             }
         }
 
-        // Calculate the distance using the Haversine formula
         function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Radius of the Earth in kilometers
+            const R = 6371;
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
             const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
                 Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
                 Math.sin(dLon / 2) * Math.sin(dLon / 2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            const distance = R * c * 1000; // Distance in meters
+            const distance = R * c * 1000;
             return distance;
         }
 
-        // Show error messages if geolocation fails
         function showError(error) {
             switch (error.code) {
                 case error.PERMISSION_DENIED:
-                    document.getElementById("result").innerText = "User denied the request for Geolocation.";
+                    document.getElementById("result").innerText = "អ្នកបានបដិសេធសំណើសុំចូលប្រើ Geolocation។";
                     break;
                 case error.POSITION_UNAVAILABLE:
-                    document.getElementById("result").innerText = "Location information is unavailable.";
+                    document.getElementById("result").innerText = "ព័ត៌មានទីតាំងមិនមាន availability។";
                     break;
                 case error.TIMEOUT:
-                    document.getElementById("result").innerText = "The request to get user location timed out.";
+                    document.getElementById("result").innerText = "សំណើសុំទីតាំងពេលវេលាបង្ហាញហើយ។";
                     break;
                 case error.UNKNOWN_ERROR:
-                    document.getElementById("result").innerText = "An unknown error occurred.";
+                    document.getElementById("result").innerText = "កើតមានកំហុសមិនស្គាល់។";
                     break;
             }
         }
