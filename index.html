@@ -96,24 +96,40 @@
     <p id="result" class="result"></p>
 
     <script>
-        const allowedLocation = {
-            latitude: 13.3595514,
-            longitude: 103.8584329,
-            radius: 5
+        // Define the allowed locations for each branch
+        const branchLocations = {
+            "PP-01": { latitude: 11.5752218, longitude: 104.9230773, radius: 500 },
+            "SR-001": { latitude: 13.3599128, longitude: 103.8585311, radius: 20 },
+            "KPC-001": { latitude: 12.3000, longitude: 105.0000, radius: 5 },
+            "PP-02": { latitude: 11.5752218, longitude: 104.9230773, radius: 500 },
+            "SR-002": { latitude: 13.3599128, longitude: 103.8585311, radius: 20 },
+            "KPC-002": { latitude: 12.3100, longitude: 105.0100, radius: 5 },
+            "PP-03": { latitude: 11.5752218, longitude: 104.9230773, radius: 500 },
+            "SR-003": { latitude: 13.3599128, longitude: 103.8585311, radius: 20 },
+            "KPC-003": { latitude: 12.3200, longitude: 105.0200, radius: 5 },
+            "PP-04": { latitude: 11.5752218, longitude: 104.9230773, radius: 500 }
         };
 
         function submitAttendance(action) {
             var empID = document.getElementById("empID").value;
             var branch = document.getElementById("branch").value;
 
+            // Get the branch location
+            const branchLocation = branchLocations[branch];
+
+            if (!branchLocation) {
+                document.getElementById("result").innerText = "ការជ្រើសរើសសាខាមិនត្រឹមត្រូវ។";
+                return;
+            }
+
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(position => {
                     const userLat = position.coords.latitude;
                     const userLon = position.coords.longitude;
 
-                    const distance = calculateDistance(userLat, userLon, allowedLocation.latitude, allowedLocation.longitude);
+                    const distance = calculateDistance(userLat, userLon, branchLocation.latitude, branchLocation.longitude);
 
-                    if (distance <= allowedLocation.radius) {
+                    if (distance <= branchLocation.radius) {
                         var url = "https://script.google.com/macros/s/AKfycbwsFqbfK-tm5Cyk8DForGaCqWWpnc1H62SrSTmw6E2BvQoLOl09Q-yKS2BLqnVJugLnow/exec" +
                             "?action=" + encodeURIComponent(action) +
                             "&empID=" + encodeURIComponent(empID) +
@@ -136,6 +152,7 @@
             }
         }
 
+        // Distance calculation remains the same
         function calculateDistance(lat1, lon1, lat2, lon2) {
             const R = 6371;
             const dLat = (lat2 - lat1) * Math.PI / 180;
