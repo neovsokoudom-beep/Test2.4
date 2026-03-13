@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Attendance Check-In/Out</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 40px; }
+      label { display: block; margin-top: 10px; }
+      button { margin: 10px 5px; padding: 10px 20px; }
+    </style>
+  </head>
+  <body>
+    <h2>Attendance System</h2>
+    
+    <!-- Employee ID Dropdown -->
+    <label for="empID">Employee ID:</label>
+    <select id="empID">
+      <option value="EMP-001">EMP-001</option>
+      <option value="EMP-002">EMP-002</option>
+      <option value="EMP-003">EMP-003</option>
+      <option value="EMP-004">EMP-004</option>
+      <option value="EMP-005">EMP-005</option>
+      <option value="EMP-006">EMP-006</option>
+      <option value="EMP-007">EMP-007</option>
+      <option value="EMP-008">EMP-008</option>
+      <option value="EMP-009">EMP-009</option>
+      <option value="EMP-010">EMP-010</option>
+    </select>
+
+    <!-- Branch ID Dropdown -->
+    <label for="branch">Branch ID:</label>
+    <select id="branch">
+      <option value="PP-01">PP-01 (Phnom Penh)</option>
+      <option value="SR-001">SR-001 (Siem Reap)</option>
+      <option value="KPC-001">KPC-001 (Kampong Cham)</option>
+      <option value="PP-02">PP-02 (Phnom Penh)</option>
+      <option value="SR-002">SR-002 (Siem Reap)</option>
+      <option value="KPC-002">KPC-002 (Kampong Cham)</option>
+      <option value="PP-03">PP-03 (Phnom Penh)</option>
+      <option value="SR-003">SR-003 (Siem Reap)</option>
+      <option value="KPC-003">KPC-003 (Kampong Cham)</option>
+      <option value="PP-04">PP-04 (Phnom Penh)</option>
+    </select>
+
+    <!-- Buttons -->
+    <div>
+      <button onclick="submitAttendance('Check-In')">Check-In</button>
+      <button onclick="submitAttendance('Check-Out')">Check-Out</button>
+    </div>
+
+    <p id="result"></p>
+
+    <script>
+      function submitAttendance(action) {
+        var empID = document.getElementById("empID").value;
+        var branch = document.getElementById("branch").value;
+        
+        var url = "https://script.google.com/macros/s/AKfycbwsFqbfK-tm5Cyk8DForGaCqWWpnc1H62SrSTmw6E2BvQoLOl09Q-yKS2BLqnVJugLnow/exec"
+                  + "?action=" + encodeURIComponent(action)
+                  + "&empID=" + encodeURIComponent(empID)
+                  + "&branch=" + encodeURIComponent(branch);
+
+        fetch(url)
+          .then(response => response.text())
+          .then(text => document.getElementById("result").innerText = text)
+          .catch(err => document.getElementById("result").innerText = "Error: " + err);
+      }
+    </script>
+  </body>
+</html>
