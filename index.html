@@ -4,218 +4,139 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Attendance Portal</title>
+  <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f0f2f5;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 12px;
-    }
-    .container {
-      background: #fff;
-      border-radius: 20px;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 700px;
-      padding: 32px 24px;
-    }
-    .header { text-align: center; margin-bottom: 28px; }
-    .header h1 { font-size: 32px; color: #1a1a2e; margin-bottom: 6px; }
-    .header p { font-size: 18px; color: #888; }
-    .form-group { margin-bottom: 24px; }
-    label { display: block; font-size: 20px; font-weight: 600; color: #444; margin-bottom: 10px; }
-    select, input[type="text"], input[type="password"] {
-      width: 100%; padding: 16px 20px; font-size: 22px;
-      border: 2.5px solid #ddd; border-radius: 12px;
-      background: #fafafa; transition: border-color 0.2s; color: #333;
-      -webkit-appearance: none;
-    }
-    select:focus, input:focus { outline: none; border-color: #4361ee; background: #fff; }
-    .info-card {
-      background: #f7f8fc; border: 1px solid #e8eaf0;
-      border-radius: 14px; padding: 20px; margin-bottom: 24px; display: none;
-    }
-    .info-card.visible { display: block; }
-    .info-row { display: flex; justify-content: space-between; padding: 10px 0; font-size: 19px; }
-    .info-row .label { color: #888; font-weight: 500; }
-    .info-row .value { color: #333; font-weight: 600; text-align: right; max-width: 60%; }
-    .status-badge {
-      display: inline-block; padding: 6px 16px; border-radius: 24px;
-      font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
-    }
-    .status-in { background: #e6f9ee; color: #1b9e4b; }
-    .status-out { background: #fef3e6; color: #d4830a; }
-    .status-none { background: #f0f0f0; color: #888; }
-    .action-buttons { display: flex; gap: 14px; margin-bottom: 24px; }
-    .action-btn {
-      flex: 1; padding: 22px; font-size: 24px; font-weight: 700;
-      border: 3px solid transparent; border-radius: 16px;
-      cursor: pointer; transition: all 0.2s; text-align: center;
-    }
-    .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .btn-checkin { background: #e8f5e9; color: #2e7d32; border-color: #c8e6c9; }
-    .btn-checkin:hover:not(:disabled) { background: #c8e6c9; }
-    .btn-checkin.selected { background: #2e7d32; color: #fff; border-color: #2e7d32; }
-    .btn-checkout { background: #fff3e0; color: #e65100; border-color: #ffe0b2; }
-    .btn-checkout:hover:not(:disabled) { background: #ffe0b2; }
-    .btn-checkout.selected { background: #e65100; color: #fff; border-color: #e65100; }
-    .primary-btn {
-      width: 100%; padding: 22px; font-size: 24px; font-weight: 700;
-      color: #fff; background: #4361ee; border: none; border-radius: 16px;
-      cursor: pointer; transition: all 0.2s;
-    }
-    .primary-btn:hover { background: #3a56d4; }
-    .primary-btn:disabled { background: #bbb; cursor: not-allowed; }
-    .toast {
-      position: fixed; top: 20px; left: 50%;
-      transform: translateX(-50%) translateY(-100px);
-      padding: 18px 30px; border-radius: 14px; font-size: 18px;
-      font-weight: 600; color: #fff; z-index: 1000;
-      transition: transform 0.4s ease; max-width: 92%; text-align: center;
-    }
-    .toast.show { transform: translateX(-50%) translateY(0); }
-    .toast.success { background: #2e7d32; }
-    .toast.error { background: #c62828; }
-    .loading-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(255,255,255,0.7); display: none;
-      justify-content: center; align-items: center; z-index: 999;
-    }
-    .loading-overlay.visible { display: flex; }
-    .spinner {
-      width: 60px; height: 60px; border: 6px solid #e0e0e0;
-      border-top: 6px solid #4361ee; border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .panel { display: none; }
-    .panel.active { display: block; }
-    .pin-container { display: flex; gap: 10px; justify-content: center; margin: 24px 0; }
-    .pin-input {
-      width: 50px; height: 68px; text-align: center; font-size: 30px; font-weight: 700;
-      border: 3px solid #ddd; border-radius: 14px; background: #fafafa; color: #333;
-      -webkit-appearance: none;
-    }
-    .pin-input:focus { outline: none; border-color: #4361ee; background: #fff; }
-    .lock-icon { font-size: 72px; text-align: center; margin-bottom: 12px; }
-    .success-icon { font-size: 96px; text-align: center; margin-bottom: 16px; }
-    .success-details {
-      background: #f7f8fc; border: 1px solid #e8eaf0;
-      border-radius: 14px; padding: 24px; margin: 28px 0;
-    }
-    .success-details .detail-row {
-      display: flex; justify-content: space-between; padding: 10px 0; font-size: 19px;
-    }
-    .success-details .detail-label { color: #888; }
-    .success-details .detail-value { color: #333; font-weight: 600; }
-    .success-action {
-      text-align: center; padding: 12px 24px; border-radius: 28px;
-      font-size: 22px; font-weight: 700; display: inline-block;
-    }
-    .success-action.checkin { background: #e6f9ee; color: #1b9e4b; }
-    .success-action.checkout { background: #fef3e6; color: #d4830a; }
-    .success-timestamp { text-align: center; font-size: 18px; color: #999; margin-top: 24px; }
-    .error-msg { color: #c62828; font-size: 18px; text-align: center; margin-top: 12px; min-height: 24px; }
-    .device-lock-banner {
-      background: #fff3e0; border: 1px solid #ffe0b2; border-radius: 12px;
-      padding: 14px 18px; margin-bottom: 20px; text-align: center;
-      font-size: 17px; color: #e65100; font-weight: 600;
-    }
-    .closed-icon { font-size: 96px; text-align: center; margin-bottom: 16px; }
-    .closed-hours {
-      background: #f7f8fc; border: 1px solid #e8eaf0; border-radius: 14px;
-      padding: 22px; text-align: center; margin-top: 28px; font-size: 22px; color: #555;
-    }
-    .closed-hours strong { color: #1a1a2e; }
-    .closed-time {
-      font-size: 44px; font-weight: 700; color: #c62828; text-align: center;
-      margin: 24px 0; font-variant-numeric: tabular-nums;
-    }
-    .geo-status {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 12px 18px; border-radius: 12px; font-size: 17px; font-weight: 600;
-      margin-bottom: 20px; text-align: center; line-height: 1.4;
-    }
-    .geo-ok { background: #e6f9ee; color: #1b9e4b; border: 1px solid #c8e6c9; }
-    .geo-fail { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
-    .geo-loading { background: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb; }
-    .geo-denied { background: #fff3e0; color: #e65100; border: 1px solid #ffe0b2; }
-    .completed-banner {
-      background: #e8f5e9; border: 2px solid #c8e6c9; border-radius: 14px;
-      padding: 24px; text-align: center; margin-bottom: 24px;
-      font-size: 20px; color: #2e7d32; font-weight: 700;
-    }
-    .completed-banner .big-icon { font-size: 48px; display: block; margin-bottom: 10px; }
-    .date-banner {
-      text-align: center; font-size: 16px; color: #888;
-      margin-bottom: 12px; padding: 8px; background: #f7f8fc; border-radius: 8px;
-    }
-    .no-employees-msg {
-      background: #fff3e0; border: 1px solid #ffe0b2; border-radius: 12px;
-      padding: 18px; text-align: center; font-size: 17px; color: #e65100; font-weight: 600;
-      margin-bottom: 20px;
-    }
-    @media (max-width: 480px) {
-      .container { padding: 28px 18px; border-radius: 16px; }
-      .header h1 { font-size: 28px; }
-      .header p { font-size: 16px; }
-      label { font-size: 18px; }
-      select, input[type="text"], input[type="password"] { font-size: 20px; padding: 14px 16px; }
-      .pin-container { gap: 6px; }
-      .pin-input { width: 46px; height: 62px; font-size: 28px; border-radius: 12px; }
-      .action-btn { padding: 20px 10px; font-size: 22px; }
-      .primary-btn { padding: 20px; font-size: 22px; }
-      .info-row { font-size: 17px; padding: 8px 0; }
-      .success-details .detail-row { font-size: 17px; }
-      .geo-status { font-size: 15px; padding: 10px 14px; }
-      .device-lock-banner { font-size: 15px; }
-    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#f0f2f5;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:12px}
+    .container{background:#fff;border-radius:20px;box-shadow:0 4px 24px rgba(0,0,0,0.1);width:100%;max-width:700px;padding:32px 24px}
+    .header{text-align:center;margin-bottom:28px}
+    .header h1{font-size:32px;color:#1a1a2e;margin-bottom:6px}
+    .header p{font-size:18px;color:#888}
+    .form-group{margin-bottom:24px}
+    label{display:block;font-size:20px;font-weight:600;color:#444;margin-bottom:10px}
+    select,input[type="text"],input[type="password"]{width:100%;padding:16px 20px;font-size:22px;border:2.5px solid #ddd;border-radius:12px;background:#fafafa;transition:border-color 0.2s;color:#333;-webkit-appearance:none}
+    select:focus,input:focus{outline:none;border-color:#4361ee;background:#fff}
+    .info-card{background:#f7f8fc;border:1px solid #e8eaf0;border-radius:14px;padding:20px;margin-bottom:24px;display:none}
+    .info-card.visible{display:block}
+    .info-row{display:flex;justify-content:space-between;padding:10px 0;font-size:19px}
+    .info-row .label{color:#888;font-weight:500}
+    .info-row .value{color:#333;font-weight:600;text-align:right;max-width:60%}
+    .status-badge{display:inline-block;padding:6px 16px;border-radius:24px;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+    .status-in{background:#e6f9ee;color:#1b9e4b}.status-out{background:#fef3e6;color:#d4830a}.status-none{background:#f0f0f0;color:#888}
+    .action-buttons{display:flex;gap:14px;margin-bottom:24px}
+    .action-btn{flex:1;padding:22px;font-size:24px;font-weight:700;border:3px solid transparent;border-radius:16px;cursor:pointer;transition:all 0.2s;text-align:center}
+    .action-btn:disabled{opacity:0.4;cursor:not-allowed}
+    .btn-checkin{background:#e8f5e9;color:#2e7d32;border-color:#c8e6c9}.btn-checkin:hover:not(:disabled){background:#c8e6c9}.btn-checkin.selected{background:#2e7d32;color:#fff;border-color:#2e7d32}
+    .btn-checkout{background:#fff3e0;color:#e65100;border-color:#ffe0b2}.btn-checkout:hover:not(:disabled){background:#ffe0b2}.btn-checkout.selected{background:#e65100;color:#fff;border-color:#e65100}
+    .primary-btn{width:100%;padding:22px;font-size:24px;font-weight:700;color:#fff;background:#4361ee;border:none;border-radius:16px;cursor:pointer;transition:all 0.2s}
+    .primary-btn:hover{background:#3a56d4}.primary-btn:disabled{background:#bbb;cursor:not-allowed}
+    .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);padding:18px 30px;border-radius:14px;font-size:18px;font-weight:600;color:#fff;z-index:1000;transition:transform 0.4s ease;max-width:92%;text-align:center}
+    .toast.show{transform:translateX(-50%) translateY(0)}.toast.success{background:#2e7d32}.toast.error{background:#c62828}
+    .loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.7);display:none;justify-content:center;align-items:center;z-index:999}
+    .loading-overlay.visible{display:flex}
+    .spinner{width:60px;height:60px;border:6px solid #e0e0e0;border-top:6px solid #4361ee;border-radius:50%;animation:spin 0.8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .panel{display:none}.panel.active{display:block}
+    .pin-container{display:flex;gap:10px;justify-content:center;margin:24px 0}
+    .pin-input{width:50px;height:68px;text-align:center;font-size:30px;font-weight:700;border:3px solid #ddd;border-radius:14px;background:#fafafa;color:#333;-webkit-appearance:none}
+    .pin-input:focus{outline:none;border-color:#4361ee;background:#fff}
+    .lock-icon{font-size:72px;text-align:center;margin-bottom:12px;cursor:default;-webkit-user-select:none;user-select:none}
+    .success-icon{font-size:96px;text-align:center;margin-bottom:16px}
+    .success-details{background:#f7f8fc;border:1px solid #e8eaf0;border-radius:14px;padding:24px;margin:28px 0}
+    .success-details .detail-row{display:flex;justify-content:space-between;padding:10px 0;font-size:19px}
+    .success-details .detail-label{color:#888}.success-details .detail-value{color:#333;font-weight:600}
+    .success-action{text-align:center;padding:12px 24px;border-radius:28px;font-size:22px;font-weight:700;display:inline-block}
+    .success-action.checkin{background:#e6f9ee;color:#1b9e4b}.success-action.checkout{background:#fef3e6;color:#d4830a}
+    .success-timestamp{text-align:center;font-size:18px;color:#999;margin-top:24px}
+    .error-msg{color:#c62828;font-size:18px;text-align:center;margin-top:12px;min-height:24px}
+    .device-lock-banner{background:#fff3e0;border:1px solid #ffe0b2;border-radius:12px;padding:14px 18px;margin-bottom:20px;text-align:center;font-size:17px;color:#e65100;font-weight:600}
+    .closed-icon{font-size:96px;text-align:center;margin-bottom:16px}
+    .closed-hours{background:#f7f8fc;border:1px solid #e8eaf0;border-radius:14px;padding:22px;text-align:center;margin-top:28px;font-size:22px;color:#555}
+    .closed-hours strong{color:#1a1a2e}
+    .closed-time{font-size:44px;font-weight:700;color:#c62828;text-align:center;margin:24px 0;font-variant-numeric:tabular-nums}
+    .geo-status{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:12px;font-size:17px;font-weight:600;margin-bottom:20px;text-align:center;line-height:1.4}
+    .geo-ok{background:#e6f9ee;color:#1b9e4b;border:1px solid #c8e6c9}.geo-fail{background:#ffebee;color:#c62828;border:1px solid #ffcdd2}
+    .geo-loading{background:#e3f2fd;color:#1565c0;border:1px solid #bbdefb}.geo-denied{background:#fff3e0;color:#e65100;border:1px solid #ffe0b2}
+    .completed-banner{background:#e8f5e9;border:2px solid #c8e6c9;border-radius:14px;padding:24px;text-align:center;margin-bottom:24px;font-size:20px;color:#2e7d32;font-weight:700}
+    .completed-banner .big-icon{font-size:48px;display:block;margin-bottom:10px}
+    .date-banner{text-align:center;font-size:16px;color:#888;margin-bottom:12px;padding:8px;background:#f7f8fc;border-radius:8px}
+    .no-employees-msg{background:#fff3e0;border:1px solid #ffe0b2;border-radius:12px;padding:18px;text-align:center;font-size:17px;color:#e65100;font-weight:600;margin-bottom:20px}
+    .face-scan-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);display:none;justify-content:center;align-items:center;z-index:1001;flex-direction:column;padding:20px}
+    .face-scan-modal.visible{display:flex}
+    .face-scan-container{background:#fff;border-radius:20px;padding:28px;max-width:500px;width:100%;text-align:center}
+    .face-scan-title{font-size:24px;font-weight:700;color:#1a1a2e;margin-bottom:8px}
+    .face-scan-subtitle{font-size:16px;color:#888;margin-bottom:20px}
+    .camera-wrapper{position:relative;width:100%;max-width:320px;margin:0 auto 20px;border-radius:16px;overflow:hidden;background:#000;aspect-ratio:1}
+    .camera-wrapper video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+    .camera-wrapper canvas{position:absolute;top:0;left:0;width:100%;height:100%}
+    .face-scan-status{font-size:18px;font-weight:600;padding:12px;border-radius:10px;margin-bottom:16px}
+    .face-scan-status.scanning{background:#e3f2fd;color:#1565c0}
+    .face-scan-status.success{background:#e6f9ee;color:#1b9e4b}
+    .face-scan-status.fail{background:#ffebee;color:#c62828}
+    .face-scan-status.loading{background:#f5f5f5;color:#888}
+    .face-btn-row{display:flex;justify-content:center;gap:12px}
+    .face-cancel-btn{padding:14px 28px;font-size:18px;font-weight:600;background:#f0f0f0;color:#555;border:none;border-radius:12px;cursor:pointer}
+    .face-cancel-btn:hover{background:#e0e0e0}
+    .face-retry-btn{padding:14px 28px;font-size:18px;font-weight:600;background:#4361ee;color:#fff;border:none;border-radius:12px;cursor:pointer}
+    .face-retry-btn:hover{background:#3a56d4}
+    .models-loading{font-size:14px;color:#888;margin-bottom:16px}
+    .dev-panel{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);display:none;justify-content:center;align-items:center;z-index:2000;padding:20px}
+    .dev-panel.visible{display:flex}
+    .dev-container{background:#fff;border-radius:16px;padding:28px;max-width:400px;width:100%}
+    .dev-btn{width:100%;padding:14px;font-size:16px;font-weight:600;border:none;border-radius:10px;cursor:pointer;margin-bottom:10px}
+    .dev-btn-red{background:#ffebee;color:#c62828}.dev-btn-red:hover{background:#ffcdd2}
+    .dev-btn-blue{background:#e3f2fd;color:#1565c0}.dev-btn-blue:hover{background:#bbdefb}
+    .dev-btn-gray{background:#f0f0f0;color:#555}.dev-btn-gray:hover{background:#e0e0e0}
+    @media(max-width:480px){.container{padding:28px 18px;border-radius:16px}.header h1{font-size:28px}.header p{font-size:16px}label{font-size:18px}select,input[type="text"],input[type="password"]{font-size:20px;padding:14px 16px}.pin-container{gap:6px}.pin-input{width:46px;height:62px;font-size:28px;border-radius:12px}.action-btn{padding:20px 10px;font-size:22px}.primary-btn{padding:20px;font-size:22px}.info-row{font-size:17px;padding:8px 0}.success-details .detail-row{font-size:17px}.geo-status{font-size:15px;padding:10px 14px}.device-lock-banner{font-size:15px}.face-scan-container{padding:20px}.face-scan-title{font-size:20px}.camera-wrapper{max-width:260px}}
   </style>
 </head>
 <body>
-
   <div id="loadingOverlay" class="loading-overlay"><div class="spinner"></div></div>
   <div id="toast" class="toast"></div>
 
+  <!-- FACE SCAN MODAL -->
+  <div id="faceScanModal" class="face-scan-modal">
+    <div class="face-scan-container">
+      <div class="face-scan-title">🔍 Face Verification</div>
+      <div class="face-scan-subtitle" id="faceScanName">Verifying identity...</div>
+      <div class="camera-wrapper"><video id="faceVideo" autoplay muted playsinline></video><canvas id="faceCanvas"></canvas></div>
+      <div class="face-scan-status loading" id="faceScanStatus">⏳ Loading...</div>
+      <div id="modelsLoading" class="models-loading" style="display:none;">Loading face recognition models...</div>
+      <div class="face-btn-row">
+        <button class="face-retry-btn" id="faceRetryBtn" onclick="retryFaceScan()" style="display:none;">🔄 Retry</button>
+        <button class="face-cancel-btn" onclick="cancelFaceScan()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HIDDEN DEVELOPER PANEL -->
+  <div id="devPanel" class="dev-panel">
+    <div class="dev-container">
+      <div style="font-size:36px;text-align:center;margin-bottom:12px;">🛠️</div>
+      <h2 style="text-align:center;font-size:20px;margin-bottom:20px;color:#1a1a2e;">Developer Tools</h2>
+      <button class="dev-btn dev-btn-red" onclick="devClearDeviceLock()">🔓 Clear Device Lock</button>
+      <button class="dev-btn dev-btn-blue" onclick="devClearAllStorage()">🗑️ Clear All Storage</button>
+      <button class="dev-btn dev-btn-gray" onclick="devShowInfo()">📋 Show Debug Info</button>
+      <div id="devInfo" style="display:none;margin-top:16px;padding:14px;background:#f5f5f5;border-radius:10px;font-size:13px;color:#555;word-break:break-all;white-space:pre-wrap;"></div>
+      <button class="dev-btn dev-btn-gray" onclick="closeDevPanel()" style="margin-top:12px;">✖ Close</button>
+    </div>
+  </div>
+
   <!-- PANEL 0: CLOSED -->
   <div class="container panel" id="panelClosed">
-    <div class="header">
-      <div class="closed-icon">🚫</div>
-      <h1>Portal Closed</h1>
-      <p id="closedDate"></p>
-    </div>
+    <div class="header"><div class="closed-icon">🚫</div><h1>Portal Closed</h1><p id="closedDate"></p></div>
     <div class="closed-time" id="closedCurrentTime"></div>
-    <div class="closed-hours">
-      Operating hours:<br>
-      <strong>7:00 AM — 10:00 PM</strong><br>
-      <strong>Monday — Saturday</strong><br><br>
-      Please come back during operating hours.
-    </div>
+    <div class="closed-hours">Operating hours:<br><strong>7:00 AM — 10:00 PM</strong><br><strong>Monday — Saturday</strong><br><br>Please come back during operating hours.</div>
   </div>
 
   <!-- PANEL 1: LOGIN -->
   <div class="container panel active" id="panelLogin">
-    <div class="header">
-      <div class="lock-icon">🔐</div>
-      <h1>Employee Login</h1>
-      <p id="loginDate"></p>
-    </div>
+    <div class="header"><div class="lock-icon" id="lockIcon">🔐</div><h1>Employee Login</h1><p id="loginDate"></p></div>
     <div id="geoStatus" class="geo-status geo-loading">📍 Checking your location...</div>
     <div class="device-lock-banner" id="deviceLockBanner" style="display:none;"></div>
-    <div id="noEmployeesMsg" class="no-employees-msg" style="display:none;">
-      ⚠️ No employees are assigned to this location. Contact admin.
-    </div>
+    <div id="noEmployeesMsg" class="no-employees-msg" style="display:none;"></div>
     <div id="loginFormSection">
-      <div class="form-group">
-        <label for="loginEmployeeSelect">Employee ID</label>
-        <select id="loginEmployeeSelect">
-          <option value="">-- Select Employee ID --</option>
-        </select>
-      </div>
+      <div class="form-group"><label for="loginEmployeeSelect">Employee ID</label><select id="loginEmployeeSelect"><option value="">-- Select Employee ID --</option></select></div>
       <div class="form-group">
         <label>Enter 6-Digit PIN</label>
         <div class="pin-container">
@@ -234,10 +155,7 @@
 
   <!-- PANEL 2: ATTENDANCE -->
   <div class="container panel" id="panelAttendance">
-    <div class="header">
-      <h1>📋 Attendance Portal</h1>
-      <p id="attendanceDate"></p>
-    </div>
+    <div class="header"><h1>📋 Attendance Portal</h1><p id="attendanceDate"></p></div>
     <div id="geoStatusAttendance" class="geo-status geo-ok" style="display:none;"></div>
     <div id="infoCard" class="info-card visible">
       <div class="info-row"><span class="label">Name</span><span class="value" id="infoName">-</span></div>
@@ -247,33 +165,18 @@
       <div class="info-row"><span class="label">District</span><span class="value" id="infoDistrict">-</span></div>
       <div class="info-row"><span class="label">Last Status</span><span class="value" id="infoStatus"><span class="status-badge status-none">No Record</span></span></div>
     </div>
-    <div id="completedBanner" class="completed-banner" style="display:none;">
-      <span class="big-icon">🎉</span>
-      Attendance completed for today!<br>You have already checked in and out.
-    </div>
+    <div id="completedBanner" class="completed-banner" style="display:none;"><span class="big-icon">🎉</span>Attendance completed for today!</div>
     <div id="actionSection">
-      <div class="form-group">
-        <label>Action</label>
-        <div class="action-buttons">
-          <button class="action-btn btn-checkin" id="btnCheckIn" onclick="selectAction('Check In')">✅ Check In</button>
-          <button class="action-btn btn-checkout" id="btnCheckOut" onclick="selectAction('Check Out')">🚪 Check Out</button>
-        </div>
-      </div>
+      <div class="form-group"><label>Action</label><div class="action-buttons"><button class="action-btn btn-checkin" id="btnCheckIn" onclick="selectAction('Check In')">✅ Check In</button><button class="action-btn btn-checkout" id="btnCheckOut" onclick="selectAction('Check Out')">🚪 Check Out</button></div></div>
       <button class="primary-btn" id="submitBtn" onclick="submitAttendance()" disabled>Submit Attendance</button>
     </div>
   </div>
 
   <!-- PANEL 3: SUCCESS -->
   <div class="container panel" id="panelSuccess">
-    <div class="header">
-      <div class="success-icon">✅</div>
-      <h1 id="successTitle">Check In Successful!</h1>
-      <p>Your attendance has been recorded</p>
-    </div>
+    <div class="header"><div class="success-icon">✅</div><h1 id="successTitle">Check In Successful!</h1><p>Your attendance has been recorded</p></div>
     <div class="date-banner" id="successDate"></div>
-    <div style="text-align:center; margin: 24px 0;">
-      <span class="success-action" id="successActionBadge">Check In</span>
-    </div>
+    <div style="text-align:center;margin:24px 0;"><span class="success-action" id="successActionBadge">Check In</span></div>
     <div class="success-details">
       <div class="detail-row"><span class="detail-label">Name</span><span class="detail-value" id="successName">-</span></div>
       <div class="detail-row"><span class="detail-label">Employee ID</span><span class="detail-value" id="successId">-</span></div>
@@ -285,388 +188,296 @@
   </div>
 
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbwPOoq46rC2nZmuwcLrS00o4BFar6u-hKeM2tf7Tm9T28Mx9QWtWmQ4sOrq6YDIPVIpXw/exec';
+    const API_URL='https://script.google.com/macros/s/AKfycbwPOoq46rC2nZmuwcLrS00o4BFar6u-hKeM2tf7Tm9T28Mx9QWtWmQ4sOrq6YDIPVIpXw/exec';
+    const FACE_MODELS_URL='https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/model/';
+    const FACE_PHOTOS_PATH='./faces/';
+    const FACE_MATCH_THRESHOLD=0.45;
 
-    const OPEN_HOUR = 7;
-    const CLOSE_HOUR = 22;
-    const BLOCKED_DAYS = [0];
-    const HOLIDAYS = [
-      '2026-01-01','2026-01-07','2026-03-08',
-      '2026-04-14','2026-04-15','2026-04-16',
-      '2026-05-01','2026-05-14','2026-05-15','2026-05-16',
-      '2026-06-18','2026-09-24','2026-10-15','2026-10-29',
-      '2026-11-09','2026-11-18','2026-11-19','2026-11-20',
+    const OPEN_HOUR=7,CLOSE_HOUR=22,BLOCKED_DAYS=[0];
+    const HOLIDAYS=['2026-01-01','2026-01-07','2026-03-08','2026-04-14','2026-04-15','2026-04-16','2026-05-01','2026-05-14','2026-05-15','2026-05-16','2026-06-18','2026-09-24','2026-10-15','2026-10-29','2026-11-09','2026-11-18','2026-11-19','2026-11-20'];
+
+    const ALLOWED_LOCATIONS=[
+      {name:'ស្នាក់ការកណ្ដាល (HQ)',lat:11.574984,lng:104.925366,radius:200},
+      {name:'ទឹកល្អក់',lat:11.567364,lng:104.900508,radius:50},
+      {name:'ដង្កោ (Dangkor)',lat:11.562540,lng:104.856171,radius:50},
+      {name:'បឹងសាឡាង',lat:11.549739,lng:104.899910,radius:50},
+      {name:'អូឡាំពិក (Olympic)',lat:11.558100,lng:104.919700,radius:50},
+      {name:'ច្បារអំពៅ (Chbar Ampov)',lat:11.530928,lng:104.944263,radius:50},
+      {name:'បឹងប្រលិត (Boeung Prolit)',lat:11.555993,lng:104.918761,radius:50},
+      {name:'រោងចក្រកែវ',lat:11.498345,lng:104.892716,radius:50},
+      {name:'អ៊ីអនម៉លទន្លេបាសាក់ (AEON Tonle Bassac)',lat:11.547982,lng:104.932870,radius:50},
+      {name:'អ៊ីអនម៉លសែនសុខ (AEON Sen Sok)',lat:11.599664,lng:104.885370,radius:50},
+      {name:'អ៊ីអនម៉លមានជ័យ (AEON Mean Chey)',lat:11.484916,lng:104.918083,radius:50},
+      {name:'ពោធិ៍ចិនតុង (Pochentong)',lat:11.552512,lng:104.844986,radius:50}
     ];
 
-    const ALLOWED_LOCATIONS = [
-      { name: 'ស្នាក់ការកណ្ដាល (HQ)',                          lat: 11.574984,  lng: 104.925366,  radius: 200 },  // 0
-      { name: 'ទឹកល្អក់',                                       lat: 11.567364,  lng: 104.900508,  radius: 50 },  // 1
-      { name: 'ដង្កោ (Dangkor)',                                 lat: 11.562540,  lng: 104.856171,  radius: 50 },  // 2
-      { name: 'បឹងសាឡាង',                                      lat: 11.549739,  lng: 104.899910,  radius: 50 },  // 3
-      { name: 'អូឡាំពិក (Olympic)',                              lat: 11.558100,  lng: 104.919700,  radius: 50 },  // 4
-      { name: 'ច្បារអំពៅ (Chbar Ampov)',                         lat: 11.530928,  lng: 104.944263,  radius: 50 },  // 5
-      { name: 'បឹងប្រលិត (Boeung Prolit)',                       lat: 11.555993,  lng: 104.918761,  radius: 50 },  // 6
-      { name: 'រោងចក្រកែវ',                                      lat: 11.498345,  lng: 104.892716,  radius: 50 },  // 7
-      { name: 'អ៊ីអនម៉លទន្លេបាសាក់ (AEON Tonle Bassac)',       lat: 11.547982,  lng: 104.932870,  radius: 50 },  // 8
-      { name: 'អ៊ីអនម៉លសែនសុខ (AEON Sen Sok)',                   lat: 11.599664,  lng: 104.885370,  radius: 50 },  // 9
-      { name: 'អ៊ីអនម៉លមានជ័យ (AEON Mean Chey)',                 lat: 11.484916,  lng: 104.918083,  radius: 50 },  // 10
-      { name: 'ពោធិ៍ចិនតុង (Pochentong)',                         lat: 11.552512,  lng: 104.844986,  radius: 50 },  // 11
-    ];
+    const PIN_MAP={'001':'000001','002':'000002','003':'000003','004':'000004','005':'000005','006':'000006','007':'000007','008':'000008','009':'000009','010':'000010','011':'000011','012':'000012'};
+    const EMPLOYEE_LOCATION_MAP={'001':[0],'002':[1],'003':[2],'004':[3],'005':[4],'006':[5],'007':[6],'008':[7],'009':[8],'010':[9],'011':[10],'012':[11]};
 
-    const PIN_MAP = {
-      '001': '000001', '002': '000002', '003': '000003', '004': '000004',
-      '005': '000005', '006': '000006', '007': '000007', '008': '000008',
-      '009': '000009', '010': '000010', '011': '000011', '012': '000012'
-    };
+    let employees=[],loggedInEmployee=null,selectedAction='',closedTimeInterval=null;
+    let userLocation=null,geoReady=false,geoError=false;
+    let detectedLocationName=null,detectedLocationIndex=-1;
+    let faceModelsLoaded=false,faceStream=null,faceScanInterval=null,pendingEmployee=null;
 
-    const EMPLOYEE_LOCATION_MAP = {
-      '001': [0],   // A → ស្នាក់ការកណ្ដាល (HQ)
-      '002': [1],   // B → ទឹកល្អក់
-      '003': [2],   // C → ដង្កោ (Dangkor)
-      '004': [3],   // D → បឹងសាឡាង
-      '005': [4],   // E → អូឡាំពិក (Olympic)
-      '006': [5],   // F → ច្បារអំពៅ (Chbar Ampov)
-      '007': [6],   // G → បឹងប្រលិត (Boeung Prolit)
-      '008': [7],   // H → រោងចក្រកែវ
-      '009': [8],   // I → អ៊ីអនម៉លទន្លេបាសាក់ (AEON Tonle Bassac)
-      '010': [9],   // J → អ៊ីអនម៉លសែនសុខ (AEON Sen Sok)
-      '011': [10],  // K → អ៊ីអនម៉លមានជ័យ (AEON Mean Chey)
-      '012': [11],  // L → ពោធិ៍ចិនតុង (Pochentong)
-    };
+    function getDateStr(){return new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}
+    function getTodayISO(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+    function isHoliday(){return HOLIDAYS.indexOf(getTodayISO())!==-1}
+    function isBlockedDay(){return BLOCKED_DAYS.indexOf(new Date().getDay())!==-1}
+    function isPortalOpen(){if(isBlockedDay()||isHoliday())return false;var h=new Date().getHours();return h>=OPEN_HOUR&&h<CLOSE_HOUR}
 
-    let employees = [];
-    let loggedInEmployee = null;
-    let selectedAction = '';
-    let closedTimeInterval = null;
-    let userLocation = null;
-    let geoReady = false;
-    let geoError = false;
-    let detectedLocationName = null;
-    let detectedLocationIndex = -1;
+    // ============ GEO ============
+    function getDistanceMeters(a,b,c,d){var R=6371000,dLat=(c-a)*Math.PI/180,dLng=(d-b)*Math.PI/180;var x=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
 
-    function getDateStr() { return new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); }
-    function getTodayISO() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
-    function isHoliday() { return HOLIDAYS.indexOf(getTodayISO()) !== -1; }
-    function isBlockedDay() { return BLOCKED_DAYS.indexOf(new Date().getDay()) !== -1; }
-
-    function getDistanceMeters(lat1, lng1, lat2, lng2) {
-      var R = 6371000, dLat = (lat2 - lat1) * Math.PI / 180, dLng = (lng2 - lng1) * Math.PI / 180;
-      var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
-      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    function checkGeofence(lat,lng,idx){
+      var locs=idx?idx.map(function(i){return ALLOWED_LOCATIONS[i]}):ALLOWED_LOCATIONS;
+      for(var i=0;i<locs.length;i++){var l=locs[i],dist=getDistanceMeters(lat,lng,l.lat,l.lng);if(dist<=l.radius)return{inside:true,location:l.name,distance:Math.round(dist)}}
+      var cl=null,cd=Infinity;for(var j=0;j<locs.length;j++){var dd=getDistanceMeters(lat,lng,locs[j].lat,locs[j].lng);if(dd<cd){cd=dd;cl=locs[j].name}}
+      return{inside:false,closest:cl,distance:Math.round(cd)}
     }
 
-    function checkGeofence(lat, lng, allowedIndexes) {
-      var locations = allowedIndexes
-        ? allowedIndexes.map(function(i) { return ALLOWED_LOCATIONS[i]; })
-        : ALLOWED_LOCATIONS;
-      for (var i = 0; i < locations.length; i++) {
-        var loc = locations[i], dist = getDistanceMeters(lat, lng, loc.lat, loc.lng);
-        if (dist <= loc.radius) return { inside: true, location: loc.name, distance: Math.round(dist) };
-      }
-      var closest = null, closestDist = Infinity;
-      for (var j = 0; j < locations.length; j++) {
-        var d = getDistanceMeters(lat, lng, locations[j].lat, locations[j].lng);
-        if (d < closestDist) { closestDist = d; closest = locations[j].name; }
-      }
-      return { inside: false, closest: closest, distance: Math.round(closestDist) };
+    function filterEmployeesByLocation(){
+      if(detectedLocationIndex===-1)return;var ids=[];
+      for(var e in EMPLOYEE_LOCATION_MAP){if(EMPLOYEE_LOCATION_MAP[e].indexOf(detectedLocationIndex)!==-1)ids.push(e)}
+      var sel=document.getElementById('loginEmployeeSelect'),opts=sel.querySelectorAll('option'),vc=0;
+      for(var j=1;j<opts.length;j++){if(ids.indexOf(opts[j].value)===-1){opts[j].style.display='none';opts[j].disabled=true}else{opts[j].style.display='';opts[j].disabled=false;vc++}}
+      if(vc===1)sel.value=ids[0];
+      if(vc===0){document.getElementById('noEmployeesMsg').style.display='block';document.getElementById('noEmployeesMsg').textContent='⚠️ No employees assigned here.';document.getElementById('loginFormSection').style.display='none'}
+      else{document.getElementById('noEmployeesMsg').style.display='none';document.getElementById('loginFormSection').style.display='block'}
+      var lk=getDeviceLock();if(lk&&ids.indexOf(lk.empId)!==-1){sel.value=lk.empId;sel.disabled=true}
     }
 
-    // ============ FILTER DROPDOWN BY LOCATION ============
-    function filterEmployeesByLocation() {
-      if (detectedLocationIndex === -1) return;
-
-      // Find employees assigned to this location
-      var allowedEmpIds = [];
-      for (var empId in EMPLOYEE_LOCATION_MAP) {
-        if (EMPLOYEE_LOCATION_MAP[empId].indexOf(detectedLocationIndex) !== -1) {
-          allowedEmpIds.push(empId);
-        }
-      }
-
-      // Filter dropdown options
-      var select = document.getElementById('loginEmployeeSelect');
-      var options = select.querySelectorAll('option');
-      var visibleCount = 0;
-
-      for (var j = 1; j < options.length; j++) {
-        if (allowedEmpIds.indexOf(options[j].value) === -1) {
-          options[j].style.display = 'none';
-          options[j].disabled = true;
-        } else {
-          options[j].style.display = '';
-          options[j].disabled = false;
-          visibleCount++;
-        }
-      }
-
-      // If only 1 employee at this location, auto-select them
-      if (visibleCount === 1) {
-        select.value = allowedEmpIds[0];
-      }
-
-      // Show message if no employees assigned
-      if (visibleCount === 0) {
-        document.getElementById('noEmployeesMsg').style.display = 'block';
-        document.getElementById('loginFormSection').style.display = 'none';
-      } else {
-        document.getElementById('noEmployeesMsg').style.display = 'none';
-        document.getElementById('loginFormSection').style.display = 'block';
-      }
-
-      // If device locked, keep that selection
-      var lock = getDeviceLock();
-      if (lock && allowedEmpIds.indexOf(lock.empId) !== -1) {
-        select.value = lock.empId;
-        select.disabled = true;
-      }
+    function requestLocation(){
+      var el=document.getElementById('geoStatus');el.className='geo-status geo-loading';el.textContent='📍 Checking your location...';
+      if(!navigator.geolocation){el.className='geo-status geo-denied';el.textContent='⚠️ Geolocation not supported.';geoReady=true;geoError=true;return}
+      navigator.geolocation.getCurrentPosition(function(pos){
+        userLocation={lat:pos.coords.latitude,lng:pos.coords.longitude};geoReady=true;geoError=false;
+        var r=checkGeofence(userLocation.lat,userLocation.lng,null);
+        if(r.inside){el.className='geo-status geo-ok';el.textContent='📍 '+r.location;detectedLocationName=r.location;
+          for(var i=0;i<ALLOWED_LOCATIONS.length;i++){if(ALLOWED_LOCATIONS[i].name===detectedLocationName){detectedLocationIndex=i;break}}
+          filterEmployeesByLocation()}
+        else{el.className='geo-status geo-fail';el.textContent='❌ You are '+r.distance+'m from '+r.closest+'. Move closer.';
+          document.getElementById('noEmployeesMsg').style.display='block';document.getElementById('noEmployeesMsg').textContent='⚠️ Move within 50m of your branch to log in.';document.getElementById('loginFormSection').style.display='none'}
+      },function(err){geoReady=true;geoError=true;el.className='geo-status geo-denied';
+        if(err.code===1)el.textContent='⚠️ Location denied. Enable GPS and refresh.';
+        else if(err.code===2)el.textContent='⚠️ Location unavailable.';
+        else el.textContent='⚠️ Location timed out. Refresh.';
+      },{enableHighAccuracy:true,timeout:15000,maximumAge:0})
     }
 
-    // ============ GEOLOCATION ============
-    function requestLocation() {
-      var el = document.getElementById('geoStatus');
-      el.className = 'geo-status geo-loading'; el.textContent = '📍 Checking your location...';
-      if (!navigator.geolocation) {
-        el.className = 'geo-status geo-denied'; el.textContent = '⚠️ Geolocation not supported.';
-        geoReady = true; geoError = true; return;
-      }
-      navigator.geolocation.getCurrentPosition(
-        function(pos) {
-          userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-          geoReady = true; geoError = false;
-
-          // Check which branch the user is at
-          var result = checkGeofence(userLocation.lat, userLocation.lng, null);
-          if (result.inside) {
-            el.className = 'geo-status geo-ok';
-            el.textContent = '📍 ' + result.location;
-            detectedLocationName = result.location;
-
-            // Find the index of this location
-            for (var i = 0; i < ALLOWED_LOCATIONS.length; i++) {
-              if (ALLOWED_LOCATIONS[i].name === detectedLocationName) {
-                detectedLocationIndex = i;
-                break;
-              }
-            }
-
-            // Filter employees to only this branch
-            filterEmployeesByLocation();
-          } else {
-            el.className = 'geo-status geo-fail';
-            el.textContent = '❌ You are ' + result.distance + 'm from ' + result.closest + '. Move closer to a branch.';
-            detectedLocationName = null;
-            detectedLocationIndex = -1;
-
-            // Hide login form — must be at a branch
-            document.getElementById('noEmployeesMsg').style.display = 'block';
-            document.getElementById('noEmployeesMsg').textContent = '⚠️ You are not at any branch. Move within 50m of your assigned branch to log in.';
-            document.getElementById('loginFormSection').style.display = 'none';
-          }
-        },
-        function(err) {
-          geoReady = true; geoError = true; el.className = 'geo-status geo-denied';
-          if (err.code === 1) el.textContent = '⚠️ Location denied. Enable GPS and refresh.';
-          else if (err.code === 2) el.textContent = '⚠️ Location unavailable.';
-          else el.textContent = '⚠️ Location timed out. Refresh.';
-        }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+    // ============ FACE RECOGNITION ============
+    async function loadFaceModels(){
+      if(faceModelsLoaded)return true;
+      try{document.getElementById('modelsLoading').style.display='block';
+        await faceapi.nets.tinyFaceDetector.loadFromUri(FACE_MODELS_URL);
+        await faceapi.nets.faceLandmark68Net.loadFromUri(FACE_MODELS_URL);
+        await faceapi.nets.faceRecognitionNet.loadFromUri(FACE_MODELS_URL);
+        faceModelsLoaded=true;document.getElementById('modelsLoading').style.display='none';return true}
+      catch(err){document.getElementById('modelsLoading').textContent='❌ Failed to load models.';return false}
     }
 
-    // ============ OPERATING HOURS ============
-    function isPortalOpen() { if (isBlockedDay() || isHoliday()) return false; var h = new Date().getHours(); return h >= OPEN_HOUR && h < CLOSE_HOUR; }
-
-    function getClosedReason() {
-      if (isHoliday()) return '🎌 Today is a public holiday.';
-      if (isBlockedDay()) { var d = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']; return '📅 Closed on ' + d[new Date().getDay()] + '.'; }
-      return '';
+    async function getReferenceDescriptor(empId){
+      var img=await new Promise(function(res,rej){var i=new Image();i.crossOrigin='anonymous';i.onload=function(){res(i)};i.onerror=function(){rej(new Error('Photo not found: faces/'+empId+'.jpg'))};i.src=FACE_PHOTOS_PATH+empId+'.jpg'});
+      var det=await faceapi.detectSingleFace(img,new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+      if(!det)throw new Error('No face in reference photo for '+empId);
+      return det.descriptor
     }
 
-    function showClosedPanel() {
-      document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
-      document.getElementById('panelClosed').classList.add('active');
-      document.getElementById('closedDate').textContent = getDateStr();
-      var reason = getClosedReason();
-      if (reason) document.querySelector('.closed-hours').innerHTML = '<strong>' + reason + '</strong><br><br>Operating hours:<br><strong>7:00 AM — 10:00 PM</strong><br><strong>Monday — Saturday</strong>';
-      updateClosedTime();
-      if (closedTimeInterval) clearInterval(closedTimeInterval);
-      closedTimeInterval = setInterval(function() { updateClosedTime(); if (isPortalOpen()) { clearInterval(closedTimeInterval); location.reload(); } }, 1000);
+    function stopCamera(){if(faceStream){faceStream.getTracks().forEach(function(t){t.stop()});faceStream=null}if(faceScanInterval){clearInterval(faceScanInterval);faceScanInterval=null}document.getElementById('faceVideo').srcObject=null}
+
+    async function openFaceScan(empId,empName){
+      var st=document.getElementById('faceScanStatus'),rb=document.getElementById('faceRetryBtn');
+      rb.style.display='none';
+      document.getElementById('faceScanName').textContent='Verifying: '+empName;
+      st.className='face-scan-status loading';st.textContent='⏳ Loading face recognition...';
+      document.getElementById('faceScanModal').classList.add('visible');
+
+      var ok=await loadFaceModels();
+      if(!ok){st.className='face-scan-status fail';st.textContent='❌ Could not load models. Check internet.';rb.style.display='inline-block';return}
+
+      var refDesc;
+      try{refDesc=await getReferenceDescriptor(empId)}
+      catch(err){st.className='face-scan-status fail';st.textContent='❌ '+err.message;rb.style.display='inline-block';return}
+
+      try{faceStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:320},height:{ideal:320}}});document.getElementById('faceVideo').srcObject=faceStream}
+      catch(err){st.className='face-scan-status fail';st.textContent='❌ Camera access denied.';rb.style.display='inline-block';return}
+
+      st.className='face-scan-status scanning';st.textContent='📸 Look at the camera...';
+
+      var attempts=0,maxAttempts=30;
+      faceScanInterval=setInterval(async function(){
+        attempts++;
+        if(attempts>maxAttempts){clearInterval(faceScanInterval);faceScanInterval=null;st.className='face-scan-status fail';st.textContent='⏰ Timed out. Try again.';rb.style.display='inline-block';stopCamera();return}
+        var video=document.getElementById('faceVideo');if(video.readyState<2)return;
+        try{
+          var det=await faceapi.detectSingleFace(video,new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+          if(!det){st.textContent='📸 No face detected... ('+attempts+'/'+maxAttempts+')';return}
+          var dist=faceapi.euclideanDistance(det.descriptor,refDesc);
+          if(dist<FACE_MATCH_THRESHOLD){
+            clearInterval(faceScanInterval);faceScanInterval=null;
+            st.className='face-scan-status success';st.textContent='✅ Face verified! Welcome, '+empName+'!';
+            setTimeout(function(){stopCamera();document.getElementById('faceScanModal').classList.remove('visible');onFaceVerified()},1500)
+          }else{st.textContent='📸 Keep looking... ('+attempts+'/'+maxAttempts+')'}
+        }catch(err){st.textContent='📸 Scanning... ('+attempts+'/'+maxAttempts+')'}
+      },1000)
     }
 
-    function updateClosedTime() { document.getElementById('closedCurrentTime').textContent = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
-    function startPortalCloseWatcher() { setInterval(function() { if (!isPortalOpen()) showClosedPanel(); }, 60000); }
+    function retryFaceScan(){stopCamera();if(pendingEmployee)openFaceScan(pendingEmployee.id,pendingEmployee.name)}
+    function cancelFaceScan(){stopCamera();document.getElementById('faceScanModal').classList.remove('visible');pendingEmployee=null}
+
+    function onFaceVerified(){
+      loggedInEmployee=pendingEmployee;pendingEmployee=null;
+      setDeviceLock(loggedInEmployee.id,loggedInEmployee.name);
+      populateAttendancePanel().then(function(){showPanel('panelAttendance')}).catch(function(err){alert('Error: '+err.message)})
+    }
+
+    // ============ HOURS ============
+    function getClosedReason(){if(isHoliday())return'🎌 Today is a public holiday.';if(isBlockedDay()){return'📅 Closed on '+['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date().getDay()]+'.'}return''}
+    function showClosedPanel(){document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});document.getElementById('panelClosed').classList.add('active');document.getElementById('closedDate').textContent=getDateStr();var r=getClosedReason();if(r)document.querySelector('.closed-hours').innerHTML='<strong>'+r+'</strong><br><br>Operating hours:<br><strong>7:00 AM — 10:00 PM</strong><br><strong>Monday — Saturday</strong>';updateClosedTime();if(closedTimeInterval)clearInterval(closedTimeInterval);closedTimeInterval=setInterval(function(){updateClosedTime();if(isPortalOpen()){clearInterval(closedTimeInterval);location.reload()}},1000)}
+    function updateClosedTime(){document.getElementById('closedCurrentTime').textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}
+    function startPortalCloseWatcher(){setInterval(function(){if(!isPortalOpen())showClosedPanel()},60000)}
 
     // ============ DEVICE LOCK ============
-    function getDeviceLock() {
-      try { var l = JSON.parse(localStorage.getItem('attendanceLock')); if (l && l.date === getTodayISO()) return l; localStorage.removeItem('attendanceLock'); return null; } catch (e) { return null; }
+    function getDeviceLock(){try{var l=JSON.parse(localStorage.getItem('attendanceLock'));if(l&&l.date===getTodayISO())return l;localStorage.removeItem('attendanceLock');return null}catch(e){return null}}
+    function setDeviceLock(id,name){localStorage.setItem('attendanceLock',JSON.stringify({date:getTodayISO(),empId:id,empName:name}))}
+    function applyDeviceLock(){var lk=getDeviceLock(),bn=document.getElementById('deviceLockBanner'),sl=document.getElementById('loginEmployeeSelect');if(lk){bn.textContent='🔒 Device locked to '+lk.empName+' ('+lk.empId+') for today';bn.style.display='block';sl.value=lk.empId;sl.disabled=true}else{bn.style.display='none';sl.disabled=false}}
+
+    // ============ HIDDEN DEVELOPER PANEL ============
+    var devTapCount=0,devTapTimer=null;
+
+    document.addEventListener('click',function(e){
+      if(e.target.closest('.lock-icon')){
+        devTapCount++;
+        if(devTapTimer)clearTimeout(devTapTimer);
+        devTapTimer=setTimeout(function(){devTapCount=0},3000);
+        if(devTapCount>=7){devTapCount=0;document.getElementById('devPanel').classList.add('visible')}
+      }
+    });
+
+    function closeDevPanel(){document.getElementById('devPanel').classList.remove('visible')}
+
+    function devClearDeviceLock(){
+      localStorage.removeItem('attendanceLock');
+      alert('✅ Device lock cleared! Page will reload.');
+      closeDevPanel();location.reload();
     }
-    function setDeviceLock(id, name) { localStorage.setItem('attendanceLock', JSON.stringify({ date: getTodayISO(), empId: id, empName: name })); }
-    function applyDeviceLock() {
-      var lock = getDeviceLock(), banner = document.getElementById('deviceLockBanner'), select = document.getElementById('loginEmployeeSelect');
-      if (lock) { banner.textContent = '🔒 Device locked to ' + lock.empName + ' (' + lock.empId + ') for today'; banner.style.display = 'block'; select.value = lock.empId; select.disabled = true; }
-      else { banner.style.display = 'none'; select.disabled = false; }
+
+    function devClearAllStorage(){
+      localStorage.clear();
+      alert('✅ All storage cleared! Page will reload.');
+      closeDevPanel();location.reload();
+    }
+
+    function devShowInfo(){
+      var info=document.getElementById('devInfo');
+      var lock=localStorage.getItem('attendanceLock');
+      var data='📅 Today: '+getTodayISO()+'\n';
+      data+='🔒 Device Lock: '+(lock||'None')+'\n';
+      data+='📍 GPS: '+(userLocation?userLocation.lat.toFixed(6)+', '+userLocation.lng.toFixed(6):'Not detected')+'\n';
+      data+='🏢 Branch: '+(detectedLocationName||'None')+' (index: '+detectedLocationIndex+')\n';
+      data+='👤 Employees loaded: '+employees.length+'\n';
+      data+='🧠 Face models: '+(faceModelsLoaded?'Loaded':'Not loaded')+'\n';
+      data+='⏰ Portal open: '+isPortalOpen()+'\n';
+      data+='🔑 PIN MAP keys: '+Object.keys(PIN_MAP).join(', ')+'\n';
+      data+='📌 Location MAP keys: '+Object.keys(EMPLOYEE_LOCATION_MAP).join(', ');
+      info.textContent=data;
+      info.style.display=info.style.display==='none'?'block':'none';
     }
 
     // ============ INIT ============
-    window.onload = async function () {
-      if (!isPortalOpen()) { showClosedPanel(); return; }
-      startPortalCloseWatcher(); requestLocation();
-      var ds = getDateStr(); document.getElementById('loginDate').textContent = ds; document.getElementById('attendanceDate').textContent = ds;
+    window.onload=async function(){
+      if(!isPortalOpen()){showClosedPanel();return}
+      startPortalCloseWatcher();requestLocation();
+      var ds=getDateStr();document.getElementById('loginDate').textContent=ds;document.getElementById('attendanceDate').textContent=ds;
       showLoading();
-      try {
-        var res = await fetch(API_URL + '?action=getEmployees'); var result = await res.json(); hideLoading();
-        if (!result.success) { showToast(result.error, 'error'); return; }
-        employees = result.data; var select = document.getElementById('loginEmployeeSelect');
-        employees.forEach(function(emp) { var o = document.createElement('option'); o.value = emp.id; o.textContent = emp.id + ' — ' + emp.name; select.appendChild(o); });
-        applyDeviceLock();
-
-        // If location already detected, filter now
-        if (detectedLocationIndex !== -1) filterEmployeesByLocation();
-      } catch (err) { hideLoading(); showToast('Failed to load: ' + err.message, 'error'); }
-      document.getElementById('loginEmployeeSelect').addEventListener('change', checkLoginReady);
+      try{var res=await fetch(API_URL+'?action=getEmployees');var result=await res.json();hideLoading();
+        if(!result.success){showToast(result.error,'error');return}
+        employees=result.data;var sel=document.getElementById('loginEmployeeSelect');
+        employees.forEach(function(e){var o=document.createElement('option');o.value=e.id;o.textContent=e.id+' — '+e.name;sel.appendChild(o)});
+        applyDeviceLock();if(detectedLocationIndex!==-1)filterEmployeesByLocation()}
+      catch(err){hideLoading();showToast('Failed: '+err.message,'error')}
+      document.getElementById('loginEmployeeSelect').addEventListener('change',checkLoginReady)
     };
 
     // ============ PIN ============
-    function pinNext(n) { if (document.getElementById('pin' + n).value && n < 6) document.getElementById('pin' + (n + 1)).focus(); checkLoginReady(); }
-    function pinBack(e, n) { if (e.key === 'Backspace' && !document.getElementById('pin' + n).value && n > 1) document.getElementById('pin' + (n - 1)).focus(); }
-    function getPin() { var p = ''; for (var i = 1; i <= 6; i++) p += document.getElementById('pin' + i).value; return p; }
-    function clearPinOnly() { for (var i = 1; i <= 6; i++) document.getElementById('pin' + i).value = ''; }
-    function checkLoginReady() { document.getElementById('loginBtn').disabled = !(document.getElementById('loginEmployeeSelect').value && getPin().length === 6); }
-    function showPanel(id) { document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); }); document.getElementById(id).classList.add('active'); }
-    function showError(msg) { document.getElementById('loginError').textContent = msg; }
-    function clearError() { document.getElementById('loginError').textContent = ''; }
+    function pinNext(n){if(document.getElementById('pin'+n).value&&n<6)document.getElementById('pin'+(n+1)).focus();checkLoginReady()}
+    function pinBack(e,n){if(e.key==='Backspace'&&!document.getElementById('pin'+n).value&&n>1)document.getElementById('pin'+(n-1)).focus()}
+    function getPin(){var p='';for(var i=1;i<=6;i++)p+=document.getElementById('pin'+i).value;return p}
+    function clearPinOnly(){for(var i=1;i<=6;i++)document.getElementById('pin'+i).value=''}
+    function checkLoginReady(){document.getElementById('loginBtn').disabled=!(document.getElementById('loginEmployeeSelect').value&&getPin().length===6)}
+    function showPanel(id){document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});document.getElementById(id).classList.add('active')}
+    function showError(msg){document.getElementById('loginError').textContent=msg}
+    function clearError(){document.getElementById('loginError').textContent=''}
 
-    // ============ PANEL 1: LOGIN ============
-    async function handleLogin() {
-      if (!isPortalOpen()) { showClosedPanel(); return; }
-      if (!geoReady) { showError('Still checking location...'); return; }
-      if (geoError) { showError('Location access required. Enable GPS and refresh.'); return; }
+    // ============ LOGIN ============
+    async function handleLogin(){
+      if(!isPortalOpen()){showClosedPanel();return}
+      if(!geoReady){showError('Still checking location...');return}
+      if(geoError){showError('Enable GPS and refresh.');return}
+      var empId=document.getElementById('loginEmployeeSelect').value,pin=getPin();
+      if(!empId||pin.length!==6)return;clearError();
 
-      var empId = document.getElementById('loginEmployeeSelect').value;
-      var pin = getPin();
-      if (!empId || pin.length !== 6) return;
-      clearError();
+      var lk=getDeviceLock();if(lk&&lk.empId!==empId){clearPinOnly();showError('Device locked to '+lk.empName+' for today.');document.getElementById('pin1').focus();return}
+      var cp=PIN_MAP[empId];if(!cp){clearPinOnly();showError('No PIN configured.');document.getElementById('pin1').focus();return}
+      if(pin!==cp){clearPinOnly();showError('Incorrect PIN.');document.getElementById('pin1').focus();return}
 
-      // Device lock check
-      var lock = getDeviceLock();
-      if (lock && lock.empId !== empId) {
-        clearPinOnly();
-        showError('Device locked to ' + lock.empName + ' for today.');
-        document.getElementById('pin1').focus(); return;
-      }
+      var ai=EMPLOYEE_LOCATION_MAP[empId];if(!ai){showError('No location assigned.');return}
+      var gr=checkGeofence(userLocation.lat,userLocation.lng,ai);
+      if(!gr.inside){clearPinOnly();showError('❌ You are '+gr.distance+'m from '+gr.closest+'. Check in at your assigned branch only.');document.getElementById('pin1').focus();return}
 
-      // PIN check
-      var correctPin = PIN_MAP[empId];
-      if (!correctPin) {
-        clearPinOnly();
-        showError('No PIN configured for this employee.');
-        document.getElementById('pin1').focus(); return;
-      }
-      if (pin !== correctPin) {
-        clearPinOnly();
-        showError('Incorrect PIN. Try again.');
-        document.getElementById('pin1').focus(); return;
-      }
-
-      // Employee-specific geofence check (double-check at login)
-      var allowedIndexes = EMPLOYEE_LOCATION_MAP[empId];
-      if (!allowedIndexes) {
-        showError('No location assigned for this employee.');
-        return;
-      }
-      var geoResult = checkGeofence(userLocation.lat, userLocation.lng, allowedIndexes);
-      if (!geoResult.inside) {
-        clearPinOnly();
-        showError('❌ You are ' + geoResult.distance + 'm from ' + geoResult.closest + '. You can only check in at your assigned branch.');
-        document.getElementById('pin1').focus(); return;
-      }
-
-      // All checks passed
-      loggedInEmployee = employees.find(function(e) { return e.id === empId; });
-      if (!loggedInEmployee) { showError('Employee not found.'); return; }
-      setDeviceLock(loggedInEmployee.id, loggedInEmployee.name);
-      try { await populateAttendancePanel(); } catch (err) { alert('Error: ' + err.message); }
-      showPanel('panelAttendance');
+      var emp=employees.find(function(e){return e.id===empId});
+      if(!emp){showError('Employee not found.');return}
+      pendingEmployee=emp;
+      openFaceScan(empId,emp.name)
     }
 
-    // ============ PANEL 2: ATTENDANCE ============
-    async function populateAttendancePanel() {
-      document.getElementById('infoName').textContent = loggedInEmployee.name;
-      document.getElementById('infoId').textContent = loggedInEmployee.id;
-      document.getElementById('infoMainBranch').textContent = loggedInEmployee.mainBranch || '-';
-      document.getElementById('infoProvince').textContent = loggedInEmployee.provinceBranch || '-';
-      document.getElementById('infoDistrict').textContent = loggedInEmployee.district || '-';
-      selectedAction = ''; document.getElementById('btnCheckIn').classList.remove('selected');
-      document.getElementById('btnCheckOut').classList.remove('selected');
-      document.getElementById('submitBtn').disabled = true;
-      document.getElementById('completedBanner').style.display = 'none';
-      document.getElementById('actionSection').style.display = 'block';
-      document.getElementById('infoStatus').innerHTML = '<span class="status-badge status-none">Loading...</span>';
-      try {
-        var res = await fetch(API_URL + '?action=getTodayActions&employeeId=' + encodeURIComponent(loggedInEmployee.id));
-        var result = await res.json(); var el = document.getElementById('infoStatus');
-        var btnIn = document.getElementById('btnCheckIn'), btnOut = document.getElementById('btnCheckOut');
-        if (!result.success) { el.innerHTML = '<span class="status-badge status-none">Error</span>'; return; }
-        var actions = result.actions || [];
-        var hasIn = actions.some(function(a) { return a.action === 'Check In'; });
-        var hasOut = actions.some(function(a) { return a.action === 'Check Out'; });
-        if (hasIn && hasOut) {
-          el.innerHTML = '<span class="status-badge status-out">Checked Out</span>';
-          document.getElementById('completedBanner').style.display = 'block';
-          document.getElementById('actionSection').style.display = 'none';
-        } else if (hasIn) { el.innerHTML = '<span class="status-badge status-in">Checked In</span>'; btnIn.disabled = true; btnOut.disabled = false; }
-        else { el.innerHTML = '<span class="status-badge status-none">No Record Today</span>'; btnIn.disabled = false; btnOut.disabled = true; }
-      } catch (err) { document.getElementById('infoStatus').innerHTML = '<span class="status-badge status-none">Error</span>'; }
+    // ============ ATTENDANCE ============
+    async function populateAttendancePanel(){
+      document.getElementById('infoName').textContent=loggedInEmployee.name;
+      document.getElementById('infoId').textContent=loggedInEmployee.id;
+      document.getElementById('infoMainBranch').textContent=loggedInEmployee.mainBranch||'-';
+      document.getElementById('infoProvince').textContent=loggedInEmployee.provinceBranch||'-';
+      document.getElementById('infoDistrict').textContent=loggedInEmployee.district||'-';
+      selectedAction='';document.getElementById('btnCheckIn').classList.remove('selected');document.getElementById('btnCheckOut').classList.remove('selected');
+      document.getElementById('submitBtn').disabled=true;document.getElementById('completedBanner').style.display='none';document.getElementById('actionSection').style.display='block';
+      document.getElementById('infoStatus').innerHTML='<span class="status-badge status-none">Loading...</span>';
+      try{var res=await fetch(API_URL+'?action=getTodayActions&employeeId='+encodeURIComponent(loggedInEmployee.id));
+        var result=await res.json();var el=document.getElementById('infoStatus');
+        var bI=document.getElementById('btnCheckIn'),bO=document.getElementById('btnCheckOut');
+        if(!result.success){el.innerHTML='<span class="status-badge status-none">Error</span>';return}
+        var ac=result.actions||[];var hI=ac.some(function(a){return a.action==='Check In'});var hO=ac.some(function(a){return a.action==='Check Out'});
+        if(hI&&hO){el.innerHTML='<span class="status-badge status-out">Checked Out</span>';document.getElementById('completedBanner').style.display='block';document.getElementById('actionSection').style.display='none'}
+        else if(hI){el.innerHTML='<span class="status-badge status-in">Checked In</span>';bI.disabled=true;bO.disabled=false}
+        else{el.innerHTML='<span class="status-badge status-none">No Record Today</span>';bI.disabled=false;bO.disabled=true}
+      }catch(err){document.getElementById('infoStatus').innerHTML='<span class="status-badge status-none">Error</span>'}
     }
 
-    function selectAction(action) {
-      selectedAction = action;
-      document.getElementById('btnCheckIn').classList.toggle('selected', action === 'Check In');
-      document.getElementById('btnCheckOut').classList.toggle('selected', action === 'Check Out');
-      document.getElementById('submitBtn').disabled = false;
+    function selectAction(a){selectedAction=a;document.getElementById('btnCheckIn').classList.toggle('selected',a==='Check In');document.getElementById('btnCheckOut').classList.toggle('selected',a==='Check Out');document.getElementById('submitBtn').disabled=false}
+
+    async function submitAttendance(){
+      if(!isPortalOpen()){showClosedPanel();return}
+      if(userLocation){var ai=EMPLOYEE_LOCATION_MAP[loggedInEmployee.id];var gc=checkGeofence(userLocation.lat,userLocation.lng,ai);
+        if(!gc.inside){var g=document.getElementById('geoStatusAttendance');g.style.display='block';g.className='geo-status geo-fail';g.textContent='❌ You moved out of your branch zone.';return}}
+      if(!loggedInEmployee||!selectedAction)return;showLoading();document.getElementById('submitBtn').disabled=true;
+      try{var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'logAttendance',data:{employeeAction:selectedAction,employeeName:loggedInEmployee.name,employeeId:loggedInEmployee.id,mainBranch:loggedInEmployee.mainBranch,provinceBranch:loggedInEmployee.provinceBranch,district:loggedInEmployee.district}})});
+        var result=await res.json();hideLoading();if(result.success)showSuccessPanel();else{showToast(result.error,'error');document.getElementById('submitBtn').disabled=false}
+      }catch(err){hideLoading();showToast('Failed: '+err.message,'error');document.getElementById('submitBtn').disabled=false}
     }
 
-    async function submitAttendance() {
-      if (!isPortalOpen()) { showClosedPanel(); return; }
-
-      // Re-check employee-specific geofence at submit
-      if (userLocation) {
-        var allowedIndexes = EMPLOYEE_LOCATION_MAP[loggedInEmployee.id];
-        var geoCheck = checkGeofence(userLocation.lat, userLocation.lng, allowedIndexes);
-        if (!geoCheck.inside) {
-          var geoEl = document.getElementById('geoStatusAttendance');
-          geoEl.style.display = 'block'; geoEl.className = 'geo-status geo-fail';
-          geoEl.textContent = '❌ You moved out of your assigned branch zone.'; return;
-        }
-      }
-
-      if (!loggedInEmployee || !selectedAction) return;
-      showLoading(); document.getElementById('submitBtn').disabled = true;
-      try {
-        var res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({ action: 'logAttendance', data: { employeeAction: selectedAction, employeeName: loggedInEmployee.name, employeeId: loggedInEmployee.id, mainBranch: loggedInEmployee.mainBranch, provinceBranch: loggedInEmployee.provinceBranch, district: loggedInEmployee.district } }) });
-        var result = await res.json(); hideLoading();
-        if (result.success) showSuccessPanel();
-        else { showToast(result.error, 'error'); document.getElementById('submitBtn').disabled = false; }
-      } catch (err) { hideLoading(); showToast('Failed: ' + err.message, 'error'); document.getElementById('submitBtn').disabled = false; }
+    // ============ SUCCESS ============
+    function showSuccessPanel(){
+      var c=selectedAction==='Check In';document.getElementById('successTitle').textContent=selectedAction+' Successful!';
+      var b=document.getElementById('successActionBadge');b.textContent=selectedAction;b.className='success-action '+(c?'checkin':'checkout');
+      document.getElementById('successDate').textContent='📅 '+getDateStr();
+      document.getElementById('successName').textContent=loggedInEmployee.name;document.getElementById('successId').textContent=loggedInEmployee.id;
+      document.getElementById('successBranch').textContent=loggedInEmployee.mainBranch||'-';document.getElementById('successProvince').textContent=loggedInEmployee.provinceBranch||'-';
+      document.getElementById('successDistrict').textContent=loggedInEmployee.district||'-';
+      document.getElementById('successTimestamp').textContent='⏰ '+new Date().toLocaleString('en-US',{weekday:'short',year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+      showPanel('panelSuccess')
     }
 
-    // ============ PANEL 3: SUCCESS ============
-    function showSuccessPanel() {
-      var isCI = selectedAction === 'Check In';
-      document.getElementById('successTitle').textContent = selectedAction + ' Successful!';
-      var b = document.getElementById('successActionBadge'); b.textContent = selectedAction; b.className = 'success-action ' + (isCI ? 'checkin' : 'checkout');
-      document.getElementById('successDate').textContent = '📅 ' + getDateStr();
-      document.getElementById('successName').textContent = loggedInEmployee.name;
-      document.getElementById('successId').textContent = loggedInEmployee.id;
-      document.getElementById('successBranch').textContent = loggedInEmployee.mainBranch || '-';
-      document.getElementById('successProvince').textContent = loggedInEmployee.provinceBranch || '-';
-      document.getElementById('successDistrict').textContent = loggedInEmployee.district || '-';
-      document.getElementById('successTimestamp').textContent = '⏰ ' + new Date().toLocaleString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      showPanel('panelSuccess');
-    }
-
-    function showLoading() { document.getElementById('loadingOverlay').classList.add('visible'); }
-    function hideLoading() { document.getElementById('loadingOverlay').classList.remove('visible'); }
-    function showToast(msg, type) { var t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast ' + type + ' show'; setTimeout(function() { t.classList.remove('show'); }, 4000); }
+    function showLoading(){document.getElementById('loadingOverlay').classList.add('visible')}
+    function hideLoading(){document.getElementById('loadingOverlay').classList.remove('visible')}
+    function showToast(m,t){var e=document.getElementById('toast');e.textContent=m;e.className='toast '+t+' show';setTimeout(function(){e.classList.remove('show')},4000)}
   </script>
 </body>
 </html>
