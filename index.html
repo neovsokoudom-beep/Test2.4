@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Attendance Portal</title>
-  <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#f0f2f5;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:12px}
@@ -61,25 +60,6 @@
     .completed-banner .big-icon{font-size:48px;display:block;margin-bottom:10px}
     .date-banner{text-align:center;font-size:16px;color:#888;margin-bottom:12px;padding:8px;background:#f7f8fc;border-radius:8px}
     .no-employees-msg{background:#fff3e0;border:1px solid #ffe0b2;border-radius:12px;padding:18px;text-align:center;font-size:17px;color:#e65100;font-weight:600;margin-bottom:20px}
-    .face-scan-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);display:none;justify-content:center;align-items:center;z-index:1001;flex-direction:column;padding:20px}
-    .face-scan-modal.visible{display:flex}
-    .face-scan-container{background:#fff;border-radius:20px;padding:28px;max-width:500px;width:100%;text-align:center}
-    .face-scan-title{font-size:24px;font-weight:700;color:#1a1a2e;margin-bottom:8px}
-    .face-scan-subtitle{font-size:16px;color:#888;margin-bottom:20px}
-    .camera-wrapper{position:relative;width:100%;max-width:320px;margin:0 auto 20px;border-radius:16px;overflow:hidden;background:#000;aspect-ratio:1}
-    .camera-wrapper video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
-    .camera-wrapper canvas{position:absolute;top:0;left:0;width:100%;height:100%}
-    .face-scan-status{font-size:18px;font-weight:600;padding:12px;border-radius:10px;margin-bottom:16px}
-    .face-scan-status.scanning{background:#e3f2fd;color:#1565c0}
-    .face-scan-status.success{background:#e6f9ee;color:#1b9e4b}
-    .face-scan-status.fail{background:#ffebee;color:#c62828}
-    .face-scan-status.loading{background:#f5f5f5;color:#888}
-    .face-btn-row{display:flex;justify-content:center;gap:12px}
-    .face-cancel-btn{padding:14px 28px;font-size:18px;font-weight:600;background:#f0f0f0;color:#555;border:none;border-radius:12px;cursor:pointer}
-    .face-cancel-btn:hover{background:#e0e0e0}
-    .face-retry-btn{padding:14px 28px;font-size:18px;font-weight:600;background:#4361ee;color:#fff;border:none;border-radius:12px;cursor:pointer}
-    .face-retry-btn:hover{background:#3a56d4}
-    .models-loading{font-size:14px;color:#888;margin-bottom:16px}
     .dev-panel{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);display:none;justify-content:center;align-items:center;z-index:2000;padding:20px}
     .dev-panel.visible{display:flex}
     .dev-container{background:#fff;border-radius:16px;padding:28px;max-width:400px;width:100%}
@@ -87,27 +67,12 @@
     .dev-btn-red{background:#ffebee;color:#c62828}.dev-btn-red:hover{background:#ffcdd2}
     .dev-btn-blue{background:#e3f2fd;color:#1565c0}.dev-btn-blue:hover{background:#bbdefb}
     .dev-btn-gray{background:#f0f0f0;color:#555}.dev-btn-gray:hover{background:#e0e0e0}
-    @media(max-width:480px){.container{padding:28px 18px;border-radius:16px}.header h1{font-size:28px}.header p{font-size:16px}label{font-size:18px}select,input[type="text"],input[type="password"]{font-size:20px;padding:14px 16px}.pin-container{gap:6px}.pin-input{width:46px;height:62px;font-size:28px;border-radius:12px}.action-btn{padding:20px 10px;font-size:22px}.primary-btn{padding:20px;font-size:22px}.info-row{font-size:17px;padding:8px 0}.success-details .detail-row{font-size:17px}.geo-status{font-size:15px;padding:10px 14px}.device-lock-banner{font-size:15px}.face-scan-container{padding:20px}.face-scan-title{font-size:20px}.camera-wrapper{max-width:260px}}
+    @media(max-width:480px){.container{padding:28px 18px;border-radius:16px}.header h1{font-size:28px}.header p{font-size:16px}label{font-size:18px}select,input[type="text"],input[type="password"]{font-size:20px;padding:14px 16px}.pin-container{gap:6px}.pin-input{width:46px;height:62px;font-size:28px;border-radius:12px}.action-btn{padding:20px 10px;font-size:22px}.primary-btn{padding:20px;font-size:22px}.info-row{font-size:17px;padding:8px 0}.success-details .detail-row{font-size:17px}.geo-status{font-size:15px;padding:10px 14px}.device-lock-banner{font-size:15px}}
   </style>
 </head>
 <body>
   <div id="loadingOverlay" class="loading-overlay"><div class="spinner"></div></div>
   <div id="toast" class="toast"></div>
-
-  <!-- FACE SCAN MODAL -->
-  <div id="faceScanModal" class="face-scan-modal">
-    <div class="face-scan-container">
-      <div class="face-scan-title">🔍 Face Verification</div>
-      <div class="face-scan-subtitle" id="faceScanName">Verifying identity...</div>
-      <div class="camera-wrapper"><video id="faceVideo" autoplay muted playsinline></video><canvas id="faceCanvas"></canvas></div>
-      <div class="face-scan-status loading" id="faceScanStatus">⏳ Loading...</div>
-      <div id="modelsLoading" class="models-loading" style="display:none;">Loading face recognition models...</div>
-      <div class="face-btn-row">
-        <button class="face-retry-btn" id="faceRetryBtn" onclick="retryFaceScan()" style="display:none;">🔄 Retry</button>
-        <button class="face-cancel-btn" onclick="cancelFaceScan()">Cancel</button>
-      </div>
-    </div>
-  </div>
 
   <!-- HIDDEN DEVELOPER PANEL -->
   <div id="devPanel" class="dev-panel">
@@ -189,9 +154,6 @@
 
   <script>
     const API_URL='https://script.google.com/macros/s/AKfycbwPOoq46rC2nZmuwcLrS00o4BFar6u-hKeM2tf7Tm9T28Mx9QWtWmQ4sOrq6YDIPVIpXw/exec';
-    const FACE_MODELS_URL='https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/model/';
-    const FACE_PHOTOS_PATH='./faces/';
-    const FACE_MATCH_THRESHOLD=0.45;
 
     const OPEN_HOUR=7,CLOSE_HOUR=22,BLOCKED_DAYS=[0];
     const HOLIDAYS=['2026-01-01','2026-01-07','2026-03-08','2026-04-14','2026-04-15','2026-04-16','2026-05-01','2026-05-14','2026-05-15','2026-05-16','2026-06-18','2026-09-24','2026-10-15','2026-10-29','2026-11-09','2026-11-18','2026-11-19','2026-11-20'];
@@ -217,7 +179,6 @@
     let employees=[],loggedInEmployee=null,selectedAction='',closedTimeInterval=null;
     let userLocation=null,geoReady=false,geoError=false;
     let detectedLocationName=null,detectedLocationIndex=-1;
-    let faceModelsLoaded=false,faceStream=null,faceScanInterval=null,pendingEmployee=null;
 
     function getDateStr(){return new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}
     function getTodayISO(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
@@ -225,7 +186,6 @@
     function isBlockedDay(){return BLOCKED_DAYS.indexOf(new Date().getDay())!==-1}
     function isPortalOpen(){if(isBlockedDay()||isHoliday())return false;var h=new Date().getHours();return h>=OPEN_HOUR&&h<CLOSE_HOUR}
 
-    // ============ GEO ============
     function getDistanceMeters(a,b,c,d){var R=6371000,dLat=(c-a)*Math.PI/180,dLng=(d-b)*Math.PI/180;var x=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
 
     function checkGeofence(lat,lng,idx){
@@ -264,86 +224,17 @@
       },{enableHighAccuracy:true,timeout:15000,maximumAge:0})
     }
 
-    // ============ FACE RECOGNITION ============
-    async function loadFaceModels(){
-      if(faceModelsLoaded)return true;
-      try{document.getElementById('modelsLoading').style.display='block';
-        await faceapi.nets.tinyFaceDetector.loadFromUri(FACE_MODELS_URL);
-        await faceapi.nets.faceLandmark68Net.loadFromUri(FACE_MODELS_URL);
-        await faceapi.nets.faceRecognitionNet.loadFromUri(FACE_MODELS_URL);
-        faceModelsLoaded=true;document.getElementById('modelsLoading').style.display='none';return true}
-      catch(err){document.getElementById('modelsLoading').textContent='❌ Failed to load models.';return false}
-    }
-
-    async function getReferenceDescriptor(empId){
-      var img=await new Promise(function(res,rej){var i=new Image();i.crossOrigin='anonymous';i.onload=function(){res(i)};i.onerror=function(){rej(new Error('Photo not found: faces/'+empId+'.jpg'))};i.src=FACE_PHOTOS_PATH+empId+'.jpg'});
-      var det=await faceapi.detectSingleFace(img,new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
-      if(!det)throw new Error('No face in reference photo for '+empId);
-      return det.descriptor
-    }
-
-    function stopCamera(){if(faceStream){faceStream.getTracks().forEach(function(t){t.stop()});faceStream=null}if(faceScanInterval){clearInterval(faceScanInterval);faceScanInterval=null}document.getElementById('faceVideo').srcObject=null}
-
-    async function openFaceScan(empId,empName){
-      var st=document.getElementById('faceScanStatus'),rb=document.getElementById('faceRetryBtn');
-      rb.style.display='none';
-      document.getElementById('faceScanName').textContent='Verifying: '+empName;
-      st.className='face-scan-status loading';st.textContent='⏳ Loading face recognition...';
-      document.getElementById('faceScanModal').classList.add('visible');
-
-      var ok=await loadFaceModels();
-      if(!ok){st.className='face-scan-status fail';st.textContent='❌ Could not load models. Check internet.';rb.style.display='inline-block';return}
-
-      var refDesc;
-      try{refDesc=await getReferenceDescriptor(empId)}
-      catch(err){st.className='face-scan-status fail';st.textContent='❌ '+err.message;rb.style.display='inline-block';return}
-
-      try{faceStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:320},height:{ideal:320}}});document.getElementById('faceVideo').srcObject=faceStream}
-      catch(err){st.className='face-scan-status fail';st.textContent='❌ Camera access denied.';rb.style.display='inline-block';return}
-
-      st.className='face-scan-status scanning';st.textContent='📸 Look at the camera...';
-
-      var attempts=0,maxAttempts=30;
-      faceScanInterval=setInterval(async function(){
-        attempts++;
-        if(attempts>maxAttempts){clearInterval(faceScanInterval);faceScanInterval=null;st.className='face-scan-status fail';st.textContent='⏰ Timed out. Try again.';rb.style.display='inline-block';stopCamera();return}
-        var video=document.getElementById('faceVideo');if(video.readyState<2)return;
-        try{
-          var det=await faceapi.detectSingleFace(video,new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
-          if(!det){st.textContent='📸 No face detected... ('+attempts+'/'+maxAttempts+')';return}
-          var dist=faceapi.euclideanDistance(det.descriptor,refDesc);
-          if(dist<FACE_MATCH_THRESHOLD){
-            clearInterval(faceScanInterval);faceScanInterval=null;
-            st.className='face-scan-status success';st.textContent='✅ Face verified! Welcome, '+empName+'!';
-            setTimeout(function(){stopCamera();document.getElementById('faceScanModal').classList.remove('visible');onFaceVerified()},1500)
-          }else{st.textContent='📸 Keep looking... ('+attempts+'/'+maxAttempts+')'}
-        }catch(err){st.textContent='📸 Scanning... ('+attempts+'/'+maxAttempts+')'}
-      },1000)
-    }
-
-    function retryFaceScan(){stopCamera();if(pendingEmployee)openFaceScan(pendingEmployee.id,pendingEmployee.name)}
-    function cancelFaceScan(){stopCamera();document.getElementById('faceScanModal').classList.remove('visible');pendingEmployee=null}
-
-    function onFaceVerified(){
-      loggedInEmployee=pendingEmployee;pendingEmployee=null;
-      setDeviceLock(loggedInEmployee.id,loggedInEmployee.name);
-      populateAttendancePanel().then(function(){showPanel('panelAttendance')}).catch(function(err){alert('Error: '+err.message)})
-    }
-
-    // ============ HOURS ============
     function getClosedReason(){if(isHoliday())return'🎌 Today is a public holiday.';if(isBlockedDay()){return'📅 Closed on '+['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date().getDay()]+'.'}return''}
     function showClosedPanel(){document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});document.getElementById('panelClosed').classList.add('active');document.getElementById('closedDate').textContent=getDateStr();var r=getClosedReason();if(r)document.querySelector('.closed-hours').innerHTML='<strong>'+r+'</strong><br><br>Operating hours:<br><strong>7:00 AM — 10:00 PM</strong><br><strong>Monday — Saturday</strong>';updateClosedTime();if(closedTimeInterval)clearInterval(closedTimeInterval);closedTimeInterval=setInterval(function(){updateClosedTime();if(isPortalOpen()){clearInterval(closedTimeInterval);location.reload()}},1000)}
     function updateClosedTime(){document.getElementById('closedCurrentTime').textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}
     function startPortalCloseWatcher(){setInterval(function(){if(!isPortalOpen())showClosedPanel()},60000)}
 
-    // ============ DEVICE LOCK ============
     function getDeviceLock(){try{var l=JSON.parse(localStorage.getItem('attendanceLock'));if(l&&l.date===getTodayISO())return l;localStorage.removeItem('attendanceLock');return null}catch(e){return null}}
     function setDeviceLock(id,name){localStorage.setItem('attendanceLock',JSON.stringify({date:getTodayISO(),empId:id,empName:name}))}
     function applyDeviceLock(){var lk=getDeviceLock(),bn=document.getElementById('deviceLockBanner'),sl=document.getElementById('loginEmployeeSelect');if(lk){bn.textContent='🔒 Device locked to '+lk.empName+' ('+lk.empId+') for today';bn.style.display='block';sl.value=lk.empId;sl.disabled=true}else{bn.style.display='none';sl.disabled=false}}
 
-    // ============ HIDDEN DEVELOPER PANEL ============
+    // ============ HIDDEN DEVELOPER PANEL (tap 🔐 7 times) ============
     var devTapCount=0,devTapTimer=null;
-
     document.addEventListener('click',function(e){
       if(e.target.closest('.lock-icon')){
         devTapCount++;
@@ -352,36 +243,18 @@
         if(devTapCount>=7){devTapCount=0;document.getElementById('devPanel').classList.add('visible')}
       }
     });
-
     function closeDevPanel(){document.getElementById('devPanel').classList.remove('visible')}
-
-    function devClearDeviceLock(){
-      localStorage.removeItem('attendanceLock');
-      alert('✅ Device lock cleared! Page will reload.');
-      closeDevPanel();location.reload();
-    }
-
-    function devClearAllStorage(){
-      localStorage.clear();
-      alert('✅ All storage cleared! Page will reload.');
-      closeDevPanel();location.reload();
-    }
-
+    function devClearDeviceLock(){localStorage.removeItem('attendanceLock');alert('✅ Device lock cleared!');closeDevPanel();location.reload()}
+    function devClearAllStorage(){localStorage.clear();alert('✅ All storage cleared!');closeDevPanel();location.reload()}
     function devShowInfo(){
-      var info=document.getElementById('devInfo');
-      var lock=localStorage.getItem('attendanceLock');
+      var info=document.getElementById('devInfo');var lock=localStorage.getItem('attendanceLock');
       var data='📅 Today: '+getTodayISO()+'\n';
-      data+='🔒 Device Lock: '+(lock||'None')+'\n';
+      data+='🔒 Lock: '+(lock||'None')+'\n';
       data+='📍 GPS: '+(userLocation?userLocation.lat.toFixed(6)+', '+userLocation.lng.toFixed(6):'Not detected')+'\n';
       data+='🏢 Branch: '+(detectedLocationName||'None')+' (index: '+detectedLocationIndex+')\n';
-      data+='👤 Employees loaded: '+employees.length+'\n';
-      data+='🧠 Face models: '+(faceModelsLoaded?'Loaded':'Not loaded')+'\n';
-      data+='⏰ Portal open: '+isPortalOpen()+'\n';
-      data+='🔑 PIN MAP keys: '+Object.keys(PIN_MAP).join(', ')+'\n';
-      data+='📌 Location MAP keys: '+Object.keys(EMPLOYEE_LOCATION_MAP).join(', ');
-      info.textContent=data;
-      info.style.display=info.style.display==='none'?'block':'none';
-    }
+      data+='👤 Employees: '+employees.length+'\n';
+      data+='⏰ Open: '+isPortalOpen();
+      info.textContent=data;info.style.display=info.style.display==='none'?'block':'none'}
 
     // ============ INIT ============
     window.onload=async function(){
@@ -398,7 +271,6 @@
       document.getElementById('loginEmployeeSelect').addEventListener('change',checkLoginReady)
     };
 
-    // ============ PIN ============
     function pinNext(n){if(document.getElementById('pin'+n).value&&n<6)document.getElementById('pin'+(n+1)).focus();checkLoginReady()}
     function pinBack(e,n){if(e.key==='Backspace'&&!document.getElementById('pin'+n).value&&n>1)document.getElementById('pin'+(n-1)).focus()}
     function getPin(){var p='';for(var i=1;i<=6;i++)p+=document.getElementById('pin'+i).value;return p}
@@ -408,7 +280,7 @@
     function showError(msg){document.getElementById('loginError').textContent=msg}
     function clearError(){document.getElementById('loginError').textContent=''}
 
-    // ============ LOGIN ============
+    // ============ LOGIN (PIN + GPS, no face) ============
     async function handleLogin(){
       if(!isPortalOpen()){showClosedPanel();return}
       if(!geoReady){showError('Still checking location...');return}
@@ -424,10 +296,12 @@
       var gr=checkGeofence(userLocation.lat,userLocation.lng,ai);
       if(!gr.inside){clearPinOnly();showError('❌ You are '+gr.distance+'m from '+gr.closest+'. Check in at your assigned branch only.');document.getElementById('pin1').focus();return}
 
-      var emp=employees.find(function(e){return e.id===empId});
-      if(!emp){showError('Employee not found.');return}
-      pendingEmployee=emp;
-      openFaceScan(empId,emp.name)
+      // All checks passed — direct login
+      loggedInEmployee=employees.find(function(e){return e.id===empId});
+      if(!loggedInEmployee){showError('Employee not found.');return}
+      setDeviceLock(loggedInEmployee.id,loggedInEmployee.name);
+      try{await populateAttendancePanel()}catch(err){alert('Error: '+err.message)}
+      showPanel('panelAttendance');
     }
 
     // ============ ATTENDANCE ============
