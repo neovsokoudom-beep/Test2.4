@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Attendance Portal</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -55,11 +56,12 @@
       border: 3px solid transparent; border-radius: 16px;
       cursor: pointer; transition: all 0.2s; text-align: center;
     }
+    .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
     .btn-checkin { background: #e8f5e9; color: #2e7d32; border-color: #c8e6c9; }
-    .btn-checkin:hover { background: #c8e6c9; }
+    .btn-checkin:hover:not(:disabled) { background: #c8e6c9; }
     .btn-checkin.selected { background: #2e7d32; color: #fff; border-color: #2e7d32; }
     .btn-checkout { background: #fff3e0; color: #e65100; border-color: #ffe0b2; }
-    .btn-checkout:hover { background: #ffe0b2; }
+    .btn-checkout:hover:not(:disabled) { background: #ffe0b2; }
     .btn-checkout.selected { background: #e65100; color: #fff; border-color: #e65100; }
     .primary-btn {
       width: 100%; padding: 22px; font-size: 24px; font-weight: 700;
@@ -142,8 +144,21 @@
     .geo-fail { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
     .geo-loading { background: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb; }
     .geo-denied { background: #fff3e0; color: #e65100; border: 1px solid #ffe0b2; }
-
-    /* ============ EXTRA LARGE FOR SMALL PHONES ============ */
+    .completed-banner {
+      background: #e8f5e9; border: 2px solid #c8e6c9; border-radius: 14px;
+      padding: 24px; text-align: center; margin-bottom: 24px;
+      font-size: 20px; color: #2e7d32; font-weight: 700;
+    }
+    .completed-banner .big-icon { font-size: 48px; display: block; margin-bottom: 10px; }
+    .date-banner {
+      text-align: center; font-size: 16px; color: #888;
+      margin-bottom: 12px; padding: 8px; background: #f7f8fc; border-radius: 8px;
+    }
+    .no-employees-msg {
+      background: #fff3e0; border: 1px solid #ffe0b2; border-radius: 12px;
+      padding: 18px; text-align: center; font-size: 17px; color: #e65100; font-weight: 600;
+      margin-bottom: 20px;
+    }
     @media (max-width: 480px) {
       .container { padding: 28px 18px; border-radius: 16px; }
       .header h1 { font-size: 28px; }
@@ -176,7 +191,8 @@
     <div class="closed-time" id="closedCurrentTime"></div>
     <div class="closed-hours">
       Operating hours:<br>
-      <strong>7:00 AM — 10:00 PM</strong><br><br>
+      <strong>7:00 AM — 10:00 PM</strong><br>
+      <strong>Monday — Saturday</strong><br><br>
       Please come back during operating hours.
     </div>
   </div>
@@ -190,25 +206,30 @@
     </div>
     <div id="geoStatus" class="geo-status geo-loading">📍 Checking your location...</div>
     <div class="device-lock-banner" id="deviceLockBanner" style="display:none;"></div>
-    <div class="form-group">
-      <label for="loginEmployeeSelect">Employee ID</label>
-      <select id="loginEmployeeSelect">
-        <option value="">-- Select Employee ID --</option>
-      </select>
+    <div id="noEmployeesMsg" class="no-employees-msg" style="display:none;">
+      ⚠️ No employees are assigned to this location. Contact admin.
     </div>
-    <div class="form-group">
-      <label>Enter 6-Digit PIN</label>
-      <div class="pin-container">
-        <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin1" oninput="pinNext(1)" onkeydown="pinBack(event,1)">
-        <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin2" oninput="pinNext(2)" onkeydown="pinBack(event,2)">
-        <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin3" oninput="pinNext(3)" onkeydown="pinBack(event,3)">
-        <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin4" oninput="pinNext(4)" onkeydown="pinBack(event,4)">
-        <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin5" oninput="pinNext(5)" onkeydown="pinBack(event,5)">
-        <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin6" oninput="pinNext(6)" onkeydown="pinBack(event,6)">
+    <div id="loginFormSection">
+      <div class="form-group">
+        <label for="loginEmployeeSelect">Employee ID</label>
+        <select id="loginEmployeeSelect">
+          <option value="">-- Select Employee ID --</option>
+        </select>
       </div>
-      <div class="error-msg" id="loginError"></div>
+      <div class="form-group">
+        <label>Enter 6-Digit PIN</label>
+        <div class="pin-container">
+          <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin1" oninput="pinNext(1)" onkeydown="pinBack(event,1)">
+          <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin2" oninput="pinNext(2)" onkeydown="pinBack(event,2)">
+          <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin3" oninput="pinNext(3)" onkeydown="pinBack(event,3)">
+          <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin4" oninput="pinNext(4)" onkeydown="pinBack(event,4)">
+          <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin5" oninput="pinNext(5)" onkeydown="pinBack(event,5)">
+          <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin6" oninput="pinNext(6)" onkeydown="pinBack(event,6)">
+        </div>
+        <div class="error-msg" id="loginError"></div>
+      </div>
+      <button class="primary-btn" id="loginBtn" onclick="handleLogin()" disabled>Login</button>
     </div>
-    <button class="primary-btn" id="loginBtn" onclick="handleLogin()" disabled>Login</button>
   </div>
 
   <!-- PANEL 2: ATTENDANCE -->
@@ -226,14 +247,20 @@
       <div class="info-row"><span class="label">District</span><span class="value" id="infoDistrict">-</span></div>
       <div class="info-row"><span class="label">Last Status</span><span class="value" id="infoStatus"><span class="status-badge status-none">No Record</span></span></div>
     </div>
-    <div class="form-group">
-      <label>Action</label>
-      <div class="action-buttons">
-        <button class="action-btn btn-checkin" id="btnCheckIn" onclick="selectAction('Check In')">✅ Check In</button>
-        <button class="action-btn btn-checkout" id="btnCheckOut" onclick="selectAction('Check Out')">🚪 Check Out</button>
-      </div>
+    <div id="completedBanner" class="completed-banner" style="display:none;">
+      <span class="big-icon">🎉</span>
+      Attendance completed for today!<br>You have already checked in and out.
     </div>
-    <button class="primary-btn" id="submitBtn" onclick="submitAttendance()" disabled>Submit Attendance</button>
+    <div id="actionSection">
+      <div class="form-group">
+        <label>Action</label>
+        <div class="action-buttons">
+          <button class="action-btn btn-checkin" id="btnCheckIn" onclick="selectAction('Check In')">✅ Check In</button>
+          <button class="action-btn btn-checkout" id="btnCheckOut" onclick="selectAction('Check Out')">🚪 Check Out</button>
+        </div>
+      </div>
+      <button class="primary-btn" id="submitBtn" onclick="submitAttendance()" disabled>Submit Attendance</button>
+    </div>
   </div>
 
   <!-- PANEL 3: SUCCESS -->
@@ -243,6 +270,7 @@
       <h1 id="successTitle">Check In Successful!</h1>
       <p>Your attendance has been recorded</p>
     </div>
+    <div class="date-banner" id="successDate"></div>
     <div style="text-align:center; margin: 24px 0;">
       <span class="success-action" id="successActionBadge">Check In</span>
     </div>
@@ -261,35 +289,49 @@
 
     const OPEN_HOUR = 7;
     const CLOSE_HOUR = 22;
+    const BLOCKED_DAYS = [0];
+    const HOLIDAYS = [
+      '2026-01-01','2026-01-07','2026-03-08',
+      '2026-04-14','2026-04-15','2026-04-16',
+      '2026-05-01','2026-05-14','2026-05-15','2026-05-16',
+      '2026-06-18','2026-09-24','2026-10-15','2026-10-29',
+      '2026-11-09','2026-11-18','2026-11-19','2026-11-20',
+    ];
 
     const ALLOWED_LOCATIONS = [
-      { name: 'ស្នាក់ការកណ្ដាល (HQ)',                          lat: 11.574984,  lng: 104.925366,  radius: 200 },
-      { name: 'ទឹកល្អក់',                                       lat: 11.567364,  lng: 104.900508,  radius: 50 },
-      { name: 'ដង្កោ (Dangkor)',                                 lat: 11.562540,  lng: 104.856171,  radius: 50 },
-      { name: 'បឹងសាឡាង',                                      lat: 11.549739,  lng: 104.899910,  radius: 50 },
-      { name: 'អូឡាំពិក (Olympic)',                              lat: 11.558100,  lng: 104.919700,  radius: 50 },
-      { name: 'ច្បារអំពៅ (Chbar Ampov)',                         lat: 11.530928,  lng: 104.944263,  radius: 50 },
-      { name: 'បឹងប្រលិត (Boeung Prolit)',                       lat: 11.555993,  lng: 104.918761,  radius: 50 },
-      { name: 'រោងចក្រកែវ',                                      lat: 11.498345,  lng: 104.892716,  radius: 50 },
-      { name: 'អ៊ីអនម៉លទន្លេបាសាក់ (AEON Tonle Bassac)',       lat: 11.547982,  lng: 104.932870,  radius: 50 },
-      { name: 'អ៊ីអនម៉លសែនសុខ (AEON Sen Sok)',                   lat: 11.599664,  lng: 104.885370,  radius: 50 },
-      { name: 'អ៊ីអនម៉លមានជ័យ (AEON Mean Chey)',                 lat: 11.484916,  lng: 104.918083,  radius: 50 },
-      { name: 'ពោធិ៍ចិនតុង (Pochentong)',                         lat: 11.552512,  lng: 104.844986,  radius: 50 },
+      { name: 'ស្នាក់ការកណ្ដាល (HQ)',                          lat: 11.574984,  lng: 104.925366,  radius: 200 },  // 0
+      { name: 'ទឹកល្អក់',                                       lat: 11.567364,  lng: 104.900508,  radius: 50 },  // 1
+      { name: 'ដង្កោ (Dangkor)',                                 lat: 11.562540,  lng: 104.856171,  radius: 50 },  // 2
+      { name: 'បឹងសាឡាង',                                      lat: 11.549739,  lng: 104.899910,  radius: 50 },  // 3
+      { name: 'អូឡាំពិក (Olympic)',                              lat: 11.558100,  lng: 104.919700,  radius: 50 },  // 4
+      { name: 'ច្បារអំពៅ (Chbar Ampov)',                         lat: 11.530928,  lng: 104.944263,  radius: 50 },  // 5
+      { name: 'បឹងប្រលិត (Boeung Prolit)',                       lat: 11.555993,  lng: 104.918761,  radius: 50 },  // 6
+      { name: 'រោងចក្រកែវ',                                      lat: 11.498345,  lng: 104.892716,  radius: 50 },  // 7
+      { name: 'អ៊ីអនម៉លទន្លេបាសាក់ (AEON Tonle Bassac)',       lat: 11.547982,  lng: 104.932870,  radius: 50 },  // 8
+      { name: 'អ៊ីអនម៉លសែនសុខ (AEON Sen Sok)',                   lat: 11.599664,  lng: 104.885370,  radius: 50 },  // 9
+      { name: 'អ៊ីអនម៉លមានជ័យ (AEON Mean Chey)',                 lat: 11.484916,  lng: 104.918083,  radius: 50 },  // 10
+      { name: 'ពោធិ៍ចិនតុង (Pochentong)',                         lat: 11.552512,  lng: 104.844986,  radius: 50 },  // 11
     ];
 
     const PIN_MAP = {
-      '001': '000001',
-      '002': '000002',
-      '003': '000003',
-      '004': '000004',
-      '005': '000005',
-      '006': '000006',
-      '007': '000007',
-      '008': '000008',
-      '009': '000009',
-      '010': '000010',
-      '011': '000011',
-      '012': '000012'
+      '001': '000001', '002': '000002', '003': '000003', '004': '000004',
+      '005': '000005', '006': '000006', '007': '000007', '008': '000008',
+      '009': '000009', '010': '000010', '011': '000011', '012': '000012'
+    };
+
+    const EMPLOYEE_LOCATION_MAP = {
+      '001': [0],   // A → ស្នាក់ការកណ្ដាល (HQ)
+      '002': [1],   // B → ទឹកល្អក់
+      '003': [2],   // C → ដង្កោ (Dangkor)
+      '004': [3],   // D → បឹងសាឡាង
+      '005': [4],   // E → អូឡាំពិក (Olympic)
+      '006': [5],   // F → ច្បារអំពៅ (Chbar Ampov)
+      '007': [6],   // G → បឹងប្រលិត (Boeung Prolit)
+      '008': [7],   // H → រោងចក្រកែវ
+      '009': [8],   // I → អ៊ីអនម៉លទន្លេបាសាក់ (AEON Tonle Bassac)
+      '010': [9],   // J → អ៊ីអនម៉លសែនសុខ (AEON Sen Sok)
+      '011': [10],  // K → អ៊ីអនម៉លមានជ័យ (AEON Mean Chey)
+      '012': [11],  // L → ពោធិ៍ចិនតុង (Pochentong)
     };
 
     let employees = [];
@@ -297,206 +339,281 @@
     let selectedAction = '';
     let closedTimeInterval = null;
     let userLocation = null;
-    let geoAllowed = false;
-    let geoChecked = false;
+    let geoReady = false;
+    let geoError = false;
+    let detectedLocationName = null;
+    let detectedLocationIndex = -1;
+
+    function getDateStr() { return new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); }
+    function getTodayISO() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+    function isHoliday() { return HOLIDAYS.indexOf(getTodayISO()) !== -1; }
+    function isBlockedDay() { return BLOCKED_DAYS.indexOf(new Date().getDay()) !== -1; }
 
     function getDistanceMeters(lat1, lng1, lat2, lng2) {
-      var R = 6371000;
-      var dLat = (lat2 - lat1) * Math.PI / 180;
-      var dLng = (lng2 - lng1) * Math.PI / 180;
-      var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-              Math.sin(dLng / 2) * Math.sin(dLng / 2);
-      var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      return R * c;
+      var R = 6371000, dLat = (lat2 - lat1) * Math.PI / 180, dLng = (lng2 - lng1) * Math.PI / 180;
+      var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 
-    function checkGeofence(lat, lng) {
-      for (var i = 0; i < ALLOWED_LOCATIONS.length; i++) {
-        var loc = ALLOWED_LOCATIONS[i];
-        var dist = getDistanceMeters(lat, lng, loc.lat, loc.lng);
+    function checkGeofence(lat, lng, allowedIndexes) {
+      var locations = allowedIndexes
+        ? allowedIndexes.map(function(i) { return ALLOWED_LOCATIONS[i]; })
+        : ALLOWED_LOCATIONS;
+      for (var i = 0; i < locations.length; i++) {
+        var loc = locations[i], dist = getDistanceMeters(lat, lng, loc.lat, loc.lng);
         if (dist <= loc.radius) return { inside: true, location: loc.name, distance: Math.round(dist) };
       }
       var closest = null, closestDist = Infinity;
-      for (var j = 0; j < ALLOWED_LOCATIONS.length; j++) {
-        var d = getDistanceMeters(lat, lng, ALLOWED_LOCATIONS[j].lat, ALLOWED_LOCATIONS[j].lng);
-        if (d < closestDist) { closestDist = d; closest = ALLOWED_LOCATIONS[j].name; }
+      for (var j = 0; j < locations.length; j++) {
+        var d = getDistanceMeters(lat, lng, locations[j].lat, locations[j].lng);
+        if (d < closestDist) { closestDist = d; closest = locations[j].name; }
       }
       return { inside: false, closest: closest, distance: Math.round(closestDist) };
     }
 
+    // ============ FILTER DROPDOWN BY LOCATION ============
+    function filterEmployeesByLocation() {
+      if (detectedLocationIndex === -1) return;
+
+      // Find employees assigned to this location
+      var allowedEmpIds = [];
+      for (var empId in EMPLOYEE_LOCATION_MAP) {
+        if (EMPLOYEE_LOCATION_MAP[empId].indexOf(detectedLocationIndex) !== -1) {
+          allowedEmpIds.push(empId);
+        }
+      }
+
+      // Filter dropdown options
+      var select = document.getElementById('loginEmployeeSelect');
+      var options = select.querySelectorAll('option');
+      var visibleCount = 0;
+
+      for (var j = 1; j < options.length; j++) {
+        if (allowedEmpIds.indexOf(options[j].value) === -1) {
+          options[j].style.display = 'none';
+          options[j].disabled = true;
+        } else {
+          options[j].style.display = '';
+          options[j].disabled = false;
+          visibleCount++;
+        }
+      }
+
+      // If only 1 employee at this location, auto-select them
+      if (visibleCount === 1) {
+        select.value = allowedEmpIds[0];
+      }
+
+      // Show message if no employees assigned
+      if (visibleCount === 0) {
+        document.getElementById('noEmployeesMsg').style.display = 'block';
+        document.getElementById('loginFormSection').style.display = 'none';
+      } else {
+        document.getElementById('noEmployeesMsg').style.display = 'none';
+        document.getElementById('loginFormSection').style.display = 'block';
+      }
+
+      // If device locked, keep that selection
+      var lock = getDeviceLock();
+      if (lock && allowedEmpIds.indexOf(lock.empId) !== -1) {
+        select.value = lock.empId;
+        select.disabled = true;
+      }
+    }
+
+    // ============ GEOLOCATION ============
     function requestLocation() {
-      var geoEl = document.getElementById('geoStatus');
-      geoEl.className = 'geo-status geo-loading';
-      geoEl.textContent = '📍 Checking your location...';
+      var el = document.getElementById('geoStatus');
+      el.className = 'geo-status geo-loading'; el.textContent = '📍 Checking your location...';
       if (!navigator.geolocation) {
-        geoEl.className = 'geo-status geo-denied';
-        geoEl.textContent = '⚠️ Geolocation not supported by your browser.';
-        geoChecked = true; geoAllowed = false; return;
+        el.className = 'geo-status geo-denied'; el.textContent = '⚠️ Geolocation not supported.';
+        geoReady = true; geoError = true; return;
       }
       navigator.geolocation.getCurrentPosition(
         function(pos) {
           userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-          var result = checkGeofence(userLocation.lat, userLocation.lng);
-          geoChecked = true;
+          geoReady = true; geoError = false;
+
+          // Check which branch the user is at
+          var result = checkGeofence(userLocation.lat, userLocation.lng, null);
           if (result.inside) {
-            geoAllowed = true;
-            geoEl.className = 'geo-status geo-ok';
-            geoEl.textContent = '✅ Location verified: ' + result.location;
+            el.className = 'geo-status geo-ok';
+            el.textContent = '📍 ' + result.location;
+            detectedLocationName = result.location;
+
+            // Find the index of this location
+            for (var i = 0; i < ALLOWED_LOCATIONS.length; i++) {
+              if (ALLOWED_LOCATIONS[i].name === detectedLocationName) {
+                detectedLocationIndex = i;
+                break;
+              }
+            }
+
+            // Filter employees to only this branch
+            filterEmployeesByLocation();
           } else {
-            geoAllowed = false;
-            geoEl.className = 'geo-status geo-fail';
-            geoEl.textContent = '❌ You are ' + result.distance + 'm from ' + result.closest + '. Move closer to check in.';
+            el.className = 'geo-status geo-fail';
+            el.textContent = '❌ You are ' + result.distance + 'm from ' + result.closest + '. Move closer to a branch.';
+            detectedLocationName = null;
+            detectedLocationIndex = -1;
+
+            // Hide login form — must be at a branch
+            document.getElementById('noEmployeesMsg').style.display = 'block';
+            document.getElementById('noEmployeesMsg').textContent = '⚠️ You are not at any branch. Move within 50m of your assigned branch to log in.';
+            document.getElementById('loginFormSection').style.display = 'none';
           }
         },
         function(err) {
-          geoChecked = true; geoAllowed = false;
-          geoEl.className = 'geo-status geo-denied';
-          if (err.code === 1) geoEl.textContent = '⚠️ Location access denied. Please enable GPS and refresh.';
-          else if (err.code === 2) geoEl.textContent = '⚠️ Location unavailable. Please check your GPS.';
-          else geoEl.textContent = '⚠️ Location request timed out. Please refresh.';
-        },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-      );
+          geoReady = true; geoError = true; el.className = 'geo-status geo-denied';
+          if (err.code === 1) el.textContent = '⚠️ Location denied. Enable GPS and refresh.';
+          else if (err.code === 2) el.textContent = '⚠️ Location unavailable.';
+          else el.textContent = '⚠️ Location timed out. Refresh.';
+        }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
     }
 
-    function isPortalOpen() { var h = new Date().getHours(); return h >= OPEN_HOUR && h < CLOSE_HOUR; }
+    // ============ OPERATING HOURS ============
+    function isPortalOpen() { if (isBlockedDay() || isHoliday()) return false; var h = new Date().getHours(); return h >= OPEN_HOUR && h < CLOSE_HOUR; }
+
+    function getClosedReason() {
+      if (isHoliday()) return '🎌 Today is a public holiday.';
+      if (isBlockedDay()) { var d = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']; return '📅 Closed on ' + d[new Date().getDay()] + '.'; }
+      return '';
+    }
 
     function showClosedPanel() {
       document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
       document.getElementById('panelClosed').classList.add('active');
-      document.getElementById('closedDate').textContent =
-        new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      document.getElementById('closedDate').textContent = getDateStr();
+      var reason = getClosedReason();
+      if (reason) document.querySelector('.closed-hours').innerHTML = '<strong>' + reason + '</strong><br><br>Operating hours:<br><strong>7:00 AM — 10:00 PM</strong><br><strong>Monday — Saturday</strong>';
       updateClosedTime();
       if (closedTimeInterval) clearInterval(closedTimeInterval);
-      closedTimeInterval = setInterval(function() {
-        updateClosedTime();
-        if (isPortalOpen()) { clearInterval(closedTimeInterval); location.reload(); }
-      }, 1000);
+      closedTimeInterval = setInterval(function() { updateClosedTime(); if (isPortalOpen()) { clearInterval(closedTimeInterval); location.reload(); } }, 1000);
     }
 
-    function updateClosedTime() {
-      document.getElementById('closedCurrentTime').textContent =
-        new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    }
-
+    function updateClosedTime() { document.getElementById('closedCurrentTime').textContent = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
     function startPortalCloseWatcher() { setInterval(function() { if (!isPortalOpen()) showClosedPanel(); }, 60000); }
 
-    function getTodayStr() {
-      var d = new Date();
-      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-    }
-
+    // ============ DEVICE LOCK ============
     function getDeviceLock() {
-      try {
-        var lock = JSON.parse(localStorage.getItem('attendanceLock'));
-        if (lock && lock.date === getTodayStr()) return lock;
-        localStorage.removeItem('attendanceLock');
-        return null;
-      } catch (e) { return null; }
+      try { var l = JSON.parse(localStorage.getItem('attendanceLock')); if (l && l.date === getTodayISO()) return l; localStorage.removeItem('attendanceLock'); return null; } catch (e) { return null; }
     }
-
-    function setDeviceLock(empId, empName) {
-      localStorage.setItem('attendanceLock', JSON.stringify({ date: getTodayStr(), empId: empId, empName: empName }));
-    }
-
+    function setDeviceLock(id, name) { localStorage.setItem('attendanceLock', JSON.stringify({ date: getTodayISO(), empId: id, empName: name })); }
     function applyDeviceLock() {
-      var lock = getDeviceLock();
-      var banner = document.getElementById('deviceLockBanner');
-      var select = document.getElementById('loginEmployeeSelect');
-      if (lock) {
-        banner.textContent = '🔒 This device is locked to ' + lock.empName + ' (' + lock.empId + ') for today';
-        banner.style.display = 'block';
-        select.value = lock.empId;
-        select.disabled = true;
-      } else { banner.style.display = 'none'; select.disabled = false; }
+      var lock = getDeviceLock(), banner = document.getElementById('deviceLockBanner'), select = document.getElementById('loginEmployeeSelect');
+      if (lock) { banner.textContent = '🔒 Device locked to ' + lock.empName + ' (' + lock.empId + ') for today'; banner.style.display = 'block'; select.value = lock.empId; select.disabled = true; }
+      else { banner.style.display = 'none'; select.disabled = false; }
     }
 
+    // ============ INIT ============
     window.onload = async function () {
       if (!isPortalOpen()) { showClosedPanel(); return; }
-      startPortalCloseWatcher();
-      requestLocation();
-      var dateStr = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-      document.getElementById('loginDate').textContent = dateStr;
-      document.getElementById('attendanceDate').textContent = dateStr;
+      startPortalCloseWatcher(); requestLocation();
+      var ds = getDateStr(); document.getElementById('loginDate').textContent = ds; document.getElementById('attendanceDate').textContent = ds;
       showLoading();
       try {
-        var res = await fetch(API_URL + '?action=getEmployees');
-        var result = await res.json();
-        hideLoading();
+        var res = await fetch(API_URL + '?action=getEmployees'); var result = await res.json(); hideLoading();
         if (!result.success) { showToast(result.error, 'error'); return; }
-        employees = result.data;
-        var select = document.getElementById('loginEmployeeSelect');
-        employees.forEach(function(emp) {
-          var option = document.createElement('option');
-          option.value = emp.id;
-          option.textContent = emp.id + ' — ' + emp.name;
-          select.appendChild(option);
-        });
+        employees = result.data; var select = document.getElementById('loginEmployeeSelect');
+        employees.forEach(function(emp) { var o = document.createElement('option'); o.value = emp.id; o.textContent = emp.id + ' — ' + emp.name; select.appendChild(o); });
         applyDeviceLock();
-      } catch (err) { hideLoading(); showToast('Failed to load employees: ' + err.message, 'error'); }
+
+        // If location already detected, filter now
+        if (detectedLocationIndex !== -1) filterEmployeesByLocation();
+      } catch (err) { hideLoading(); showToast('Failed to load: ' + err.message, 'error'); }
       document.getElementById('loginEmployeeSelect').addEventListener('change', checkLoginReady);
     };
 
-    function pinNext(num) {
-      if (document.getElementById('pin' + num).value && num < 6) document.getElementById('pin' + (num + 1)).focus();
-      checkLoginReady();
-    }
-    function pinBack(e, num) {
-      if (e.key === 'Backspace' && !document.getElementById('pin' + num).value && num > 1)
-        document.getElementById('pin' + (num - 1)).focus();
-    }
+    // ============ PIN ============
+    function pinNext(n) { if (document.getElementById('pin' + n).value && n < 6) document.getElementById('pin' + (n + 1)).focus(); checkLoginReady(); }
+    function pinBack(e, n) { if (e.key === 'Backspace' && !document.getElementById('pin' + n).value && n > 1) document.getElementById('pin' + (n - 1)).focus(); }
     function getPin() { var p = ''; for (var i = 1; i <= 6; i++) p += document.getElementById('pin' + i).value; return p; }
-    function clearPin() { for (var i = 1; i <= 6; i++) document.getElementById('pin' + i).value = ''; document.getElementById('loginError').textContent = ''; }
-    function checkLoginReady() {
-      document.getElementById('loginBtn').disabled = !(document.getElementById('loginEmployeeSelect').value && getPin().length === 6);
-    }
-    function showPanel(id) {
-      document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
-      document.getElementById(id).classList.add('active');
-    }
+    function clearPinOnly() { for (var i = 1; i <= 6; i++) document.getElementById('pin' + i).value = ''; }
+    function checkLoginReady() { document.getElementById('loginBtn').disabled = !(document.getElementById('loginEmployeeSelect').value && getPin().length === 6); }
+    function showPanel(id) { document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); }); document.getElementById(id).classList.add('active'); }
+    function showError(msg) { document.getElementById('loginError').textContent = msg; }
+    function clearError() { document.getElementById('loginError').textContent = ''; }
 
+    // ============ PANEL 1: LOGIN ============
     async function handleLogin() {
       if (!isPortalOpen()) { showClosedPanel(); return; }
-      if (!geoChecked) { document.getElementById('loginError').textContent = 'Still checking your location. Please wait...'; return; }
-      if (!geoAllowed) { document.getElementById('loginError').textContent = 'You are not within an allowed location. Cannot log in.'; return; }
+      if (!geoReady) { showError('Still checking location...'); return; }
+      if (geoError) { showError('Location access required. Enable GPS and refresh.'); return; }
+
       var empId = document.getElementById('loginEmployeeSelect').value;
       var pin = getPin();
       if (!empId || pin.length !== 6) return;
-      document.getElementById('loginError').textContent = '';
+      clearError();
+
+      // Device lock check
       var lock = getDeviceLock();
       if (lock && lock.empId !== empId) {
-        document.getElementById('loginError').textContent = 'This device is locked to ' + lock.empName + ' for today.';
-        clearPin(); document.getElementById('pin1').focus(); return;
+        clearPinOnly();
+        showError('Device locked to ' + lock.empName + ' for today.');
+        document.getElementById('pin1').focus(); return;
       }
+
+      // PIN check
       var correctPin = PIN_MAP[empId];
-      if (!correctPin) { document.getElementById('loginError').textContent = 'No PIN configured. ID: "' + empId + '"'; clearPin(); document.getElementById('pin1').focus(); return; }
-      if (pin !== correctPin) { document.getElementById('loginError').textContent = 'Incorrect PIN. Try again.'; clearPin(); document.getElementById('pin1').focus(); return; }
+      if (!correctPin) {
+        clearPinOnly();
+        showError('No PIN configured for this employee.');
+        document.getElementById('pin1').focus(); return;
+      }
+      if (pin !== correctPin) {
+        clearPinOnly();
+        showError('Incorrect PIN. Try again.');
+        document.getElementById('pin1').focus(); return;
+      }
+
+      // Employee-specific geofence check (double-check at login)
+      var allowedIndexes = EMPLOYEE_LOCATION_MAP[empId];
+      if (!allowedIndexes) {
+        showError('No location assigned for this employee.');
+        return;
+      }
+      var geoResult = checkGeofence(userLocation.lat, userLocation.lng, allowedIndexes);
+      if (!geoResult.inside) {
+        clearPinOnly();
+        showError('❌ You are ' + geoResult.distance + 'm from ' + geoResult.closest + '. You can only check in at your assigned branch.');
+        document.getElementById('pin1').focus(); return;
+      }
+
+      // All checks passed
       loggedInEmployee = employees.find(function(e) { return e.id === empId; });
-      if (!loggedInEmployee) { document.getElementById('loginError').textContent = 'Employee not found.'; return; }
+      if (!loggedInEmployee) { showError('Employee not found.'); return; }
       setDeviceLock(loggedInEmployee.id, loggedInEmployee.name);
       try { await populateAttendancePanel(); } catch (err) { alert('Error: ' + err.message); }
       showPanel('panelAttendance');
     }
 
+    // ============ PANEL 2: ATTENDANCE ============
     async function populateAttendancePanel() {
       document.getElementById('infoName').textContent = loggedInEmployee.name;
       document.getElementById('infoId').textContent = loggedInEmployee.id;
       document.getElementById('infoMainBranch').textContent = loggedInEmployee.mainBranch || '-';
       document.getElementById('infoProvince').textContent = loggedInEmployee.provinceBranch || '-';
       document.getElementById('infoDistrict').textContent = loggedInEmployee.district || '-';
-      selectedAction = '';
-      document.getElementById('btnCheckIn').classList.remove('selected');
+      selectedAction = ''; document.getElementById('btnCheckIn').classList.remove('selected');
       document.getElementById('btnCheckOut').classList.remove('selected');
       document.getElementById('submitBtn').disabled = true;
+      document.getElementById('completedBanner').style.display = 'none';
+      document.getElementById('actionSection').style.display = 'block';
       document.getElementById('infoStatus').innerHTML = '<span class="status-badge status-none">Loading...</span>';
       try {
-        var res = await fetch(API_URL + '?action=getLastAction&employeeId=' + encodeURIComponent(loggedInEmployee.id));
-        var result = await res.json();
-        var el = document.getElementById('infoStatus');
-        if (!result.success || !result.lastAction) el.innerHTML = '<span class="status-badge status-none">No Record</span>';
-        else if (result.lastAction.action === 'Check In') el.innerHTML = '<span class="status-badge status-in">Checked In</span>';
-        else el.innerHTML = '<span class="status-badge status-out">Checked Out</span>';
+        var res = await fetch(API_URL + '?action=getTodayActions&employeeId=' + encodeURIComponent(loggedInEmployee.id));
+        var result = await res.json(); var el = document.getElementById('infoStatus');
+        var btnIn = document.getElementById('btnCheckIn'), btnOut = document.getElementById('btnCheckOut');
+        if (!result.success) { el.innerHTML = '<span class="status-badge status-none">Error</span>'; return; }
+        var actions = result.actions || [];
+        var hasIn = actions.some(function(a) { return a.action === 'Check In'; });
+        var hasOut = actions.some(function(a) { return a.action === 'Check Out'; });
+        if (hasIn && hasOut) {
+          el.innerHTML = '<span class="status-badge status-out">Checked Out</span>';
+          document.getElementById('completedBanner').style.display = 'block';
+          document.getElementById('actionSection').style.display = 'none';
+        } else if (hasIn) { el.innerHTML = '<span class="status-badge status-in">Checked In</span>'; btnIn.disabled = true; btnOut.disabled = false; }
+        else { el.innerHTML = '<span class="status-badge status-none">No Record Today</span>'; btnIn.disabled = false; btnOut.disabled = true; }
       } catch (err) { document.getElementById('infoStatus').innerHTML = '<span class="status-badge status-none">Error</span>'; }
     }
 
@@ -509,54 +626,47 @@
 
     async function submitAttendance() {
       if (!isPortalOpen()) { showClosedPanel(); return; }
+
+      // Re-check employee-specific geofence at submit
       if (userLocation) {
-        var geoCheck = checkGeofence(userLocation.lat, userLocation.lng);
+        var allowedIndexes = EMPLOYEE_LOCATION_MAP[loggedInEmployee.id];
+        var geoCheck = checkGeofence(userLocation.lat, userLocation.lng, allowedIndexes);
         if (!geoCheck.inside) {
           var geoEl = document.getElementById('geoStatusAttendance');
           geoEl.style.display = 'block'; geoEl.className = 'geo-status geo-fail';
-          geoEl.textContent = '❌ You moved out of the allowed zone. Cannot submit.'; return;
+          geoEl.textContent = '❌ You moved out of your assigned branch zone.'; return;
         }
       }
+
       if (!loggedInEmployee || !selectedAction) return;
       showLoading(); document.getElementById('submitBtn').disabled = true;
       try {
-        var res = await fetch(API_URL, {
-          method: 'POST', headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({ action: 'logAttendance', data: {
-            employeeAction: selectedAction, employeeName: loggedInEmployee.name,
-            employeeId: loggedInEmployee.id, mainBranch: loggedInEmployee.mainBranch,
-            provinceBranch: loggedInEmployee.provinceBranch, district: loggedInEmployee.district
-          }})
-        });
+        var res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: 'logAttendance', data: { employeeAction: selectedAction, employeeName: loggedInEmployee.name, employeeId: loggedInEmployee.id, mainBranch: loggedInEmployee.mainBranch, provinceBranch: loggedInEmployee.provinceBranch, district: loggedInEmployee.district } }) });
         var result = await res.json(); hideLoading();
         if (result.success) showSuccessPanel();
         else { showToast(result.error, 'error'); document.getElementById('submitBtn').disabled = false; }
-      } catch (err) { hideLoading(); showToast('Submit failed: ' + err.message, 'error'); document.getElementById('submitBtn').disabled = false; }
+      } catch (err) { hideLoading(); showToast('Failed: ' + err.message, 'error'); document.getElementById('submitBtn').disabled = false; }
     }
 
+    // ============ PANEL 3: SUCCESS ============
     function showSuccessPanel() {
-      var isCheckIn = selectedAction === 'Check In';
+      var isCI = selectedAction === 'Check In';
       document.getElementById('successTitle').textContent = selectedAction + ' Successful!';
-      var badge = document.getElementById('successActionBadge');
-      badge.textContent = selectedAction;
-      badge.className = 'success-action ' + (isCheckIn ? 'checkin' : 'checkout');
+      var b = document.getElementById('successActionBadge'); b.textContent = selectedAction; b.className = 'success-action ' + (isCI ? 'checkin' : 'checkout');
+      document.getElementById('successDate').textContent = '📅 ' + getDateStr();
       document.getElementById('successName').textContent = loggedInEmployee.name;
       document.getElementById('successId').textContent = loggedInEmployee.id;
       document.getElementById('successBranch').textContent = loggedInEmployee.mainBranch || '-';
       document.getElementById('successProvince').textContent = loggedInEmployee.provinceBranch || '-';
       document.getElementById('successDistrict').textContent = loggedInEmployee.district || '-';
-      document.getElementById('successTimestamp').textContent =
-        new Date().toLocaleString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      document.getElementById('successTimestamp').textContent = '⏰ ' + new Date().toLocaleString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
       showPanel('panelSuccess');
     }
 
     function showLoading() { document.getElementById('loadingOverlay').classList.add('visible'); }
     function hideLoading() { document.getElementById('loadingOverlay').classList.remove('visible'); }
-    function showToast(msg, type) {
-      var toast = document.getElementById('toast');
-      toast.textContent = msg; toast.className = 'toast ' + type + ' show';
-      setTimeout(function() { toast.classList.remove('show'); }, 4000);
-    }
+    function showToast(msg, type) { var t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast ' + type + ' show'; setTimeout(function() { t.classList.remove('show'); }, 4000); }
   </script>
 </body>
 </html>
