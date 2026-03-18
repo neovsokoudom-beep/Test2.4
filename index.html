@@ -1,211 +1,562 @@
 <!DOCTYPE html>
-<html lang="km">
-
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Attendance Check-In/Out</title>
-    <style>
-        /* Define the custom font */
-        @font-face {
-            font-family: 'KhmerMPTC';
-            src: url('fonts/KhmerMPTC (2).otf') format('opentype');
-            font-weight: normal;
-            font-style: normal;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 12px;
+    }
+    .container {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 700px;
+      padding: 32px 24px;
+    }
+    .header { text-align: center; margin-bottom: 28px; }
+    .header h1 { font-size: 32px; color: #1a1a2e; margin-bottom: 6px; }
+    .header p { font-size: 18px; color: #888; }
+    .form-group { margin-bottom: 24px; }
+    label { display: block; font-size: 20px; font-weight: 600; color: #444; margin-bottom: 10px; }
+    select, input[type="text"], input[type="password"] {
+      width: 100%; padding: 16px 20px; font-size: 22px;
+      border: 2.5px solid #ddd; border-radius: 12px;
+      background: #fafafa; transition: border-color 0.2s; color: #333;
+      -webkit-appearance: none;
+    }
+    select:focus, input:focus { outline: none; border-color: #4361ee; background: #fff; }
+    .info-card {
+      background: #f7f8fc; border: 1px solid #e8eaf0;
+      border-radius: 14px; padding: 20px; margin-bottom: 24px; display: none;
+    }
+    .info-card.visible { display: block; }
+    .info-row { display: flex; justify-content: space-between; padding: 10px 0; font-size: 19px; }
+    .info-row .label { color: #888; font-weight: 500; }
+    .info-row .value { color: #333; font-weight: 600; text-align: right; max-width: 60%; }
+    .status-badge {
+      display: inline-block; padding: 6px 16px; border-radius: 24px;
+      font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .status-in { background: #e6f9ee; color: #1b9e4b; }
+    .status-out { background: #fef3e6; color: #d4830a; }
+    .status-none { background: #f0f0f0; color: #888; }
+    .action-buttons { display: flex; gap: 14px; margin-bottom: 24px; }
+    .action-btn {
+      flex: 1; padding: 22px; font-size: 24px; font-weight: 700;
+      border: 3px solid transparent; border-radius: 16px;
+      cursor: pointer; transition: all 0.2s; text-align: center;
+    }
+    .btn-checkin { background: #e8f5e9; color: #2e7d32; border-color: #c8e6c9; }
+    .btn-checkin:hover { background: #c8e6c9; }
+    .btn-checkin.selected { background: #2e7d32; color: #fff; border-color: #2e7d32; }
+    .btn-checkout { background: #fff3e0; color: #e65100; border-color: #ffe0b2; }
+    .btn-checkout:hover { background: #ffe0b2; }
+    .btn-checkout.selected { background: #e65100; color: #fff; border-color: #e65100; }
+    .primary-btn {
+      width: 100%; padding: 22px; font-size: 24px; font-weight: 700;
+      color: #fff; background: #4361ee; border: none; border-radius: 16px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .primary-btn:hover { background: #3a56d4; }
+    .primary-btn:disabled { background: #bbb; cursor: not-allowed; }
+    .toast {
+      position: fixed; top: 20px; left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      padding: 18px 30px; border-radius: 14px; font-size: 18px;
+      font-weight: 600; color: #fff; z-index: 1000;
+      transition: transform 0.4s ease; max-width: 92%; text-align: center;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { background: #2e7d32; }
+    .toast.error { background: #c62828; }
+    .loading-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255,255,255,0.7); display: none;
+      justify-content: center; align-items: center; z-index: 999;
+    }
+    .loading-overlay.visible { display: flex; }
+    .spinner {
+      width: 60px; height: 60px; border: 6px solid #e0e0e0;
+      border-top: 6px solid #4361ee; border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .pin-container { display: flex; gap: 10px; justify-content: center; margin: 24px 0; }
+    .pin-input {
+      width: 50px; height: 68px; text-align: center; font-size: 30px; font-weight: 700;
+      border: 3px solid #ddd; border-radius: 14px; background: #fafafa; color: #333;
+      -webkit-appearance: none;
+    }
+    .pin-input:focus { outline: none; border-color: #4361ee; background: #fff; }
+    .lock-icon { font-size: 72px; text-align: center; margin-bottom: 12px; }
+    .success-icon { font-size: 96px; text-align: center; margin-bottom: 16px; }
+    .success-details {
+      background: #f7f8fc; border: 1px solid #e8eaf0;
+      border-radius: 14px; padding: 24px; margin: 28px 0;
+    }
+    .success-details .detail-row {
+      display: flex; justify-content: space-between; padding: 10px 0; font-size: 19px;
+    }
+    .success-details .detail-label { color: #888; }
+    .success-details .detail-value { color: #333; font-weight: 600; }
+    .success-action {
+      text-align: center; padding: 12px 24px; border-radius: 28px;
+      font-size: 22px; font-weight: 700; display: inline-block;
+    }
+    .success-action.checkin { background: #e6f9ee; color: #1b9e4b; }
+    .success-action.checkout { background: #fef3e6; color: #d4830a; }
+    .success-timestamp { text-align: center; font-size: 18px; color: #999; margin-top: 24px; }
+    .error-msg { color: #c62828; font-size: 18px; text-align: center; margin-top: 12px; min-height: 24px; }
+    .device-lock-banner {
+      background: #fff3e0; border: 1px solid #ffe0b2; border-radius: 12px;
+      padding: 14px 18px; margin-bottom: 20px; text-align: center;
+      font-size: 17px; color: #e65100; font-weight: 600;
+    }
+    .closed-icon { font-size: 96px; text-align: center; margin-bottom: 16px; }
+    .closed-hours {
+      background: #f7f8fc; border: 1px solid #e8eaf0; border-radius: 14px;
+      padding: 22px; text-align: center; margin-top: 28px; font-size: 22px; color: #555;
+    }
+    .closed-hours strong { color: #1a1a2e; }
+    .closed-time {
+      font-size: 44px; font-weight: 700; color: #c62828; text-align: center;
+      margin: 24px 0; font-variant-numeric: tabular-nums;
+    }
+    .geo-status {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 12px 18px; border-radius: 12px; font-size: 17px; font-weight: 600;
+      margin-bottom: 20px; text-align: center; line-height: 1.4;
+    }
+    .geo-ok { background: #e6f9ee; color: #1b9e4b; border: 1px solid #c8e6c9; }
+    .geo-fail { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+    .geo-loading { background: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb; }
+    .geo-denied { background: #fff3e0; color: #e65100; border: 1px solid #ffe0b2; }
 
-        body {
-            font-family: 'KhmerMPTC', Arial, sans-serif; /* Apply the custom font */
-            margin: 40px;
-            font-size: 22px;
-        }
-
-        label {
-            display: block;
-            margin-top: 30px;
-            font-size: 26px;
-        }
-
-        button {
-            margin: 30px 15px;
-            padding: 20px 40px;
-            font-size: 24px;
-        }
-
-        .container {
-            width: 100%;
-        }
-
-        .form-group {
-            margin-bottom: 40px;
-        }
-
-        .result {
-            margin-top: 40px;
-            font-weight: bold;
-            font-size: 30px;
-        }
-
-        /* Style the login form */
-        .login-form {
-            display: none;
-            margin-top: 20px;
-        }
-
-        .logged-in {
-            display: none;
-        }
-
-        .logged-in.active {
-            display: block;
-        }
-    </style>
+    /* ============ EXTRA LARGE FOR SMALL PHONES ============ */
+    @media (max-width: 480px) {
+      .container { padding: 28px 18px; border-radius: 16px; }
+      .header h1 { font-size: 28px; }
+      .header p { font-size: 16px; }
+      label { font-size: 18px; }
+      select, input[type="text"], input[type="password"] { font-size: 20px; padding: 14px 16px; }
+      .pin-container { gap: 6px; }
+      .pin-input { width: 46px; height: 62px; font-size: 28px; border-radius: 12px; }
+      .action-btn { padding: 20px 10px; font-size: 22px; }
+      .primary-btn { padding: 20px; font-size: 22px; }
+      .info-row { font-size: 17px; padding: 8px 0; }
+      .success-details .detail-row { font-size: 17px; }
+      .geo-status { font-size: 15px; padding: 10px 14px; }
+      .device-lock-banner { font-size: 15px; }
+    }
+  </style>
 </head>
-
 <body>
 
-    <h2>ប្រព័ន្ធចុះវត្តមាន</h2> <!-- Attendance System in Khmer -->
+  <div id="loadingOverlay" class="loading-overlay"><div class="spinner"></div></div>
+  <div id="toast" class="toast"></div>
 
-    <!-- Login Form -->
-    <div id="loginForm" class="login-form">
-        <h3>សូមចូលប្រើប្រាស់គណនីរបស់អ្នក</h3>
-        <div class="form-group">
-            <label for="username">អត្តសញ្ញាណអ្នកប្រើ:</label>
-            <input type="text" id="username" style="font-size: 24px; padding: 10px;" placeholder="Username">
-        </div>
-        <div class="form-group">
-            <label for="password">លេខសម្ងាត់:</label>
-            <input type="password" id="password" style="font-size: 24px; padding: 10px;" placeholder="Password">
-        </div>
-        <button onclick="login()">ចូល</button>
+  <!-- PANEL 0: CLOSED -->
+  <div class="container panel" id="panelClosed">
+    <div class="header">
+      <div class="closed-icon">🚫</div>
+      <h1>Portal Closed</h1>
+      <p id="closedDate"></p>
     </div>
-
-    <!-- Display the login or attendance system based on login -->
-    <div id="loggedInSection" class="logged-in">
-        <!-- Employee ID Dropdown -->
-        <div class="form-group">
-            <label for="empID">លេខសម្គាល់បុគ្គលិក:</label>
-            <select id="empID" style="font-size: 24px; padding: 10px;">
-                <option value="EMP-001">EMP-001</option>
-                <option value="EMP-002">EMP-002</option>
-                <option value="EMP-003">EMP-003</option>
-                <option value="EMP-004">EMP-004</option>
-                <option value="EMP-005">EMP-005</option>
-                <option value="EMP-006">EMP-006</option>
-                <option value="EMP-007">EMP-007</option>
-                <option value="EMP-008">EMP-008</option>
-                <option value="EMP-009">EMP-009</option>
-                <option value="EMP-010">EMP-010</option>
-            </select>
-        </div>
-
-        <!-- Branch ID Dropdown -->
-        <div class="form-group">
-            <label for="branch">លេខសាខា:</label>
-            <select id="branch" style="font-size: 24px; padding: 10px;">
-                <option value="PP-01">PP-01 (ភ្នំពេញ)</option>
-                <option value="SR-001">SR-001 (សៀមរាប)</option>
-                <option value="KPC-001">KPC-001 (កំពង់ចាម)</option>
-                <option value="PP-02">PP-02 (ភ្នំពេញ)</option>
-                <option value="SR-002">SR-002 (សៀមរាប)</option>
-                <option value="KPC-002">KPC-002 (កំពង់ចាម)</option>
-                <option value="PP-03">PP-03 (ភ្នំពេញ)</option>
-                <option value="SR-003">SR-003 (សៀមរាប)</option>
-                <option value="KPC-003">KPC-003 (កំពង់ចាម)</option>
-                <option value="PP-04">PP-04 (ភ្នំពេញ)</option>
-            </select>
-        </div>
-
-        <!-- Check-In/Check-Out Buttons -->
-        <div class="form-group">
-            <button onclick="submitAttendance('Check-In')">វត្តមានចូល</button>
-            <button onclick="submitAttendance('Check-Out')">វត្តមានចេញ</button>
-        </div>
-
-        <!-- Display Result -->
-        <p id="result" class="result"></p>
+    <div class="closed-time" id="closedCurrentTime"></div>
+    <div class="closed-hours">
+      Operating hours:<br>
+      <strong>7:00 AM — 10:00 PM</strong><br><br>
+      Please come back during operating hours.
     </div>
+  </div>
 
-    <script>
-        // Set up a sample of valid usernames and passwords
-        const validUsers = {
-            "EMP-001": "password1",
-            "EMP-002": "password2",
-            "EMP-003": "password3",
-            "EMP-004": "password4",
-            "EMP-005": "password5"
-        };
+  <!-- PANEL 1: LOGIN -->
+  <div class="container panel active" id="panelLogin">
+    <div class="header">
+      <div class="lock-icon">🔐</div>
+      <h1>Employee Login</h1>
+      <p id="loginDate"></p>
+    </div>
+    <div id="geoStatus" class="geo-status geo-loading">📍 Checking your location...</div>
+    <div class="device-lock-banner" id="deviceLockBanner" style="display:none;"></div>
+    <div class="form-group">
+      <label for="loginEmployeeSelect">Employee ID</label>
+      <select id="loginEmployeeSelect">
+        <option value="">-- Select Employee ID --</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Enter 6-Digit PIN</label>
+      <div class="pin-container">
+        <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin1" oninput="pinNext(1)" onkeydown="pinBack(event,1)">
+        <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin2" oninput="pinNext(2)" onkeydown="pinBack(event,2)">
+        <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin3" oninput="pinNext(3)" onkeydown="pinBack(event,3)">
+        <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin4" oninput="pinNext(4)" onkeydown="pinBack(event,4)">
+        <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin5" oninput="pinNext(5)" onkeydown="pinBack(event,5)">
+        <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin6" oninput="pinNext(6)" onkeydown="pinBack(event,6)">
+      </div>
+      <div class="error-msg" id="loginError"></div>
+    </div>
+    <button class="primary-btn" id="loginBtn" onclick="handleLogin()" disabled>Login</button>
+  </div>
 
-        // Check if the user is logged in
-        if (localStorage.getItem("loggedIn")) {
-            document.getElementById("loginForm").style.display = "none";
-            document.getElementById("loggedInSection").classList.add("active");
-        } else {
-            document.getElementById("loginForm").style.display = "block";
+  <!-- PANEL 2: ATTENDANCE -->
+  <div class="container panel" id="panelAttendance">
+    <div class="header">
+      <h1>📋 Attendance Portal</h1>
+      <p id="attendanceDate"></p>
+    </div>
+    <div id="geoStatusAttendance" class="geo-status geo-ok" style="display:none;"></div>
+    <div id="infoCard" class="info-card visible">
+      <div class="info-row"><span class="label">Name</span><span class="value" id="infoName">-</span></div>
+      <div class="info-row"><span class="label">Employee ID</span><span class="value" id="infoId">-</span></div>
+      <div class="info-row"><span class="label">Main Branch</span><span class="value" id="infoMainBranch">-</span></div>
+      <div class="info-row"><span class="label">Province Branch</span><span class="value" id="infoProvince">-</span></div>
+      <div class="info-row"><span class="label">District</span><span class="value" id="infoDistrict">-</span></div>
+      <div class="info-row"><span class="label">Last Status</span><span class="value" id="infoStatus"><span class="status-badge status-none">No Record</span></span></div>
+    </div>
+    <div class="form-group">
+      <label>Action</label>
+      <div class="action-buttons">
+        <button class="action-btn btn-checkin" id="btnCheckIn" onclick="selectAction('Check In')">✅ Check In</button>
+        <button class="action-btn btn-checkout" id="btnCheckOut" onclick="selectAction('Check Out')">🚪 Check Out</button>
+      </div>
+    </div>
+    <button class="primary-btn" id="submitBtn" onclick="submitAttendance()" disabled>Submit Attendance</button>
+  </div>
+
+  <!-- PANEL 3: SUCCESS -->
+  <div class="container panel" id="panelSuccess">
+    <div class="header">
+      <div class="success-icon">✅</div>
+      <h1 id="successTitle">Check In Successful!</h1>
+      <p>Your attendance has been recorded</p>
+    </div>
+    <div style="text-align:center; margin: 24px 0;">
+      <span class="success-action" id="successActionBadge">Check In</span>
+    </div>
+    <div class="success-details">
+      <div class="detail-row"><span class="detail-label">Name</span><span class="detail-value" id="successName">-</span></div>
+      <div class="detail-row"><span class="detail-label">Employee ID</span><span class="detail-value" id="successId">-</span></div>
+      <div class="detail-row"><span class="detail-label">Branch</span><span class="detail-value" id="successBranch">-</span></div>
+      <div class="detail-row"><span class="detail-label">Province</span><span class="detail-value" id="successProvince">-</span></div>
+      <div class="detail-row"><span class="detail-label">District</span><span class="detail-value" id="successDistrict">-</span></div>
+    </div>
+    <div class="success-timestamp" id="successTimestamp"></div>
+  </div>
+
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwPOoq46rC2nZmuwcLrS00o4BFar6u-hKeM2tf7Tm9T28Mx9QWtWmQ4sOrq6YDIPVIpXw/exec';
+
+    const OPEN_HOUR = 7;
+    const CLOSE_HOUR = 22;
+
+    const ALLOWED_LOCATIONS = [
+      { name: 'ស្នាក់ការកណ្ដាល (HQ)',                          lat: 11.574984,  lng: 104.925366,  radius: 200 },
+      { name: 'ទឹកល្អក់',                                       lat: 11.567364,  lng: 104.900508,  radius: 50 },
+      { name: 'ដង្កោ (Dangkor)',                                 lat: 11.562540,  lng: 104.856171,  radius: 50 },
+      { name: 'បឹងសាឡាង',                                      lat: 11.549739,  lng: 104.899910,  radius: 50 },
+      { name: 'អូឡាំពិក (Olympic)',                              lat: 11.558100,  lng: 104.919700,  radius: 50 },
+      { name: 'ច្បារអំពៅ (Chbar Ampov)',                         lat: 11.530928,  lng: 104.944263,  radius: 50 },
+      { name: 'បឹងប្រលិត (Boeung Prolit)',                       lat: 11.555993,  lng: 104.918761,  radius: 50 },
+      { name: 'រោងចក្រកែវ',                                      lat: 11.498345,  lng: 104.892716,  radius: 50 },
+      { name: 'អ៊ីអនម៉លទន្លេបាសាក់ (AEON Tonle Bassac)',       lat: 11.547982,  lng: 104.932870,  radius: 50 },
+      { name: 'អ៊ីអនម៉លសែនសុខ (AEON Sen Sok)',                   lat: 11.599664,  lng: 104.885370,  radius: 50 },
+      { name: 'អ៊ីអនម៉លមានជ័យ (AEON Mean Chey)',                 lat: 11.484916,  lng: 104.918083,  radius: 50 },
+      { name: 'ពោធិ៍ចិនតុង (Pochentong)',                         lat: 11.552512,  lng: 104.844986,  radius: 50 },
+    ];
+
+    const PIN_MAP = {
+      '001': '000001',
+      '002': '000002',
+      '003': '000003',
+      '004': '000004',
+      '005': '000005',
+      '006': '000006',
+      '007': '000007',
+      '008': '000008',
+      '009': '000009',
+      '010': '000010',
+      '011': '000011',
+      '012': '000012'
+    };
+
+    let employees = [];
+    let loggedInEmployee = null;
+    let selectedAction = '';
+    let closedTimeInterval = null;
+    let userLocation = null;
+    let geoAllowed = false;
+    let geoChecked = false;
+
+    function getDistanceMeters(lat1, lng1, lat2, lng2) {
+      var R = 6371000;
+      var dLat = (lat2 - lat1) * Math.PI / 180;
+      var dLng = (lng2 - lng1) * Math.PI / 180;
+      var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLng / 2) * Math.sin(dLng / 2);
+      var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    function checkGeofence(lat, lng) {
+      for (var i = 0; i < ALLOWED_LOCATIONS.length; i++) {
+        var loc = ALLOWED_LOCATIONS[i];
+        var dist = getDistanceMeters(lat, lng, loc.lat, loc.lng);
+        if (dist <= loc.radius) return { inside: true, location: loc.name, distance: Math.round(dist) };
+      }
+      var closest = null, closestDist = Infinity;
+      for (var j = 0; j < ALLOWED_LOCATIONS.length; j++) {
+        var d = getDistanceMeters(lat, lng, ALLOWED_LOCATIONS[j].lat, ALLOWED_LOCATIONS[j].lng);
+        if (d < closestDist) { closestDist = d; closest = ALLOWED_LOCATIONS[j].name; }
+      }
+      return { inside: false, closest: closest, distance: Math.round(closestDist) };
+    }
+
+    function requestLocation() {
+      var geoEl = document.getElementById('geoStatus');
+      geoEl.className = 'geo-status geo-loading';
+      geoEl.textContent = '📍 Checking your location...';
+      if (!navigator.geolocation) {
+        geoEl.className = 'geo-status geo-denied';
+        geoEl.textContent = '⚠️ Geolocation not supported by your browser.';
+        geoChecked = true; geoAllowed = false; return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        function(pos) {
+          userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          var result = checkGeofence(userLocation.lat, userLocation.lng);
+          geoChecked = true;
+          if (result.inside) {
+            geoAllowed = true;
+            geoEl.className = 'geo-status geo-ok';
+            geoEl.textContent = '✅ Location verified: ' + result.location;
+          } else {
+            geoAllowed = false;
+            geoEl.className = 'geo-status geo-fail';
+            geoEl.textContent = '❌ You are ' + result.distance + 'm from ' + result.closest + '. Move closer to check in.';
+          }
+        },
+        function(err) {
+          geoChecked = true; geoAllowed = false;
+          geoEl.className = 'geo-status geo-denied';
+          if (err.code === 1) geoEl.textContent = '⚠️ Location access denied. Please enable GPS and refresh.';
+          else if (err.code === 2) geoEl.textContent = '⚠️ Location unavailable. Please check your GPS.';
+          else geoEl.textContent = '⚠️ Location request timed out. Please refresh.';
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+      );
+    }
+
+    function isPortalOpen() { var h = new Date().getHours(); return h >= OPEN_HOUR && h < CLOSE_HOUR; }
+
+    function showClosedPanel() {
+      document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+      document.getElementById('panelClosed').classList.add('active');
+      document.getElementById('closedDate').textContent =
+        new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      updateClosedTime();
+      if (closedTimeInterval) clearInterval(closedTimeInterval);
+      closedTimeInterval = setInterval(function() {
+        updateClosedTime();
+        if (isPortalOpen()) { clearInterval(closedTimeInterval); location.reload(); }
+      }, 1000);
+    }
+
+    function updateClosedTime() {
+      document.getElementById('closedCurrentTime').textContent =
+        new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    function startPortalCloseWatcher() { setInterval(function() { if (!isPortalOpen()) showClosedPanel(); }, 60000); }
+
+    function getTodayStr() {
+      var d = new Date();
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+
+    function getDeviceLock() {
+      try {
+        var lock = JSON.parse(localStorage.getItem('attendanceLock'));
+        if (lock && lock.date === getTodayStr()) return lock;
+        localStorage.removeItem('attendanceLock');
+        return null;
+      } catch (e) { return null; }
+    }
+
+    function setDeviceLock(empId, empName) {
+      localStorage.setItem('attendanceLock', JSON.stringify({ date: getTodayStr(), empId: empId, empName: empName }));
+    }
+
+    function applyDeviceLock() {
+      var lock = getDeviceLock();
+      var banner = document.getElementById('deviceLockBanner');
+      var select = document.getElementById('loginEmployeeSelect');
+      if (lock) {
+        banner.textContent = '🔒 This device is locked to ' + lock.empName + ' (' + lock.empId + ') for today';
+        banner.style.display = 'block';
+        select.value = lock.empId;
+        select.disabled = true;
+      } else { banner.style.display = 'none'; select.disabled = false; }
+    }
+
+    window.onload = async function () {
+      if (!isPortalOpen()) { showClosedPanel(); return; }
+      startPortalCloseWatcher();
+      requestLocation();
+      var dateStr = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      document.getElementById('loginDate').textContent = dateStr;
+      document.getElementById('attendanceDate').textContent = dateStr;
+      showLoading();
+      try {
+        var res = await fetch(API_URL + '?action=getEmployees');
+        var result = await res.json();
+        hideLoading();
+        if (!result.success) { showToast(result.error, 'error'); return; }
+        employees = result.data;
+        var select = document.getElementById('loginEmployeeSelect');
+        employees.forEach(function(emp) {
+          var option = document.createElement('option');
+          option.value = emp.id;
+          option.textContent = emp.id + ' — ' + emp.name;
+          select.appendChild(option);
+        });
+        applyDeviceLock();
+      } catch (err) { hideLoading(); showToast('Failed to load employees: ' + err.message, 'error'); }
+      document.getElementById('loginEmployeeSelect').addEventListener('change', checkLoginReady);
+    };
+
+    function pinNext(num) {
+      if (document.getElementById('pin' + num).value && num < 6) document.getElementById('pin' + (num + 1)).focus();
+      checkLoginReady();
+    }
+    function pinBack(e, num) {
+      if (e.key === 'Backspace' && !document.getElementById('pin' + num).value && num > 1)
+        document.getElementById('pin' + (num - 1)).focus();
+    }
+    function getPin() { var p = ''; for (var i = 1; i <= 6; i++) p += document.getElementById('pin' + i).value; return p; }
+    function clearPin() { for (var i = 1; i <= 6; i++) document.getElementById('pin' + i).value = ''; document.getElementById('loginError').textContent = ''; }
+    function checkLoginReady() {
+      document.getElementById('loginBtn').disabled = !(document.getElementById('loginEmployeeSelect').value && getPin().length === 6);
+    }
+    function showPanel(id) {
+      document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+      document.getElementById(id).classList.add('active');
+    }
+
+    async function handleLogin() {
+      if (!isPortalOpen()) { showClosedPanel(); return; }
+      if (!geoChecked) { document.getElementById('loginError').textContent = 'Still checking your location. Please wait...'; return; }
+      if (!geoAllowed) { document.getElementById('loginError').textContent = 'You are not within an allowed location. Cannot log in.'; return; }
+      var empId = document.getElementById('loginEmployeeSelect').value;
+      var pin = getPin();
+      if (!empId || pin.length !== 6) return;
+      document.getElementById('loginError').textContent = '';
+      var lock = getDeviceLock();
+      if (lock && lock.empId !== empId) {
+        document.getElementById('loginError').textContent = 'This device is locked to ' + lock.empName + ' for today.';
+        clearPin(); document.getElementById('pin1').focus(); return;
+      }
+      var correctPin = PIN_MAP[empId];
+      if (!correctPin) { document.getElementById('loginError').textContent = 'No PIN configured. ID: "' + empId + '"'; clearPin(); document.getElementById('pin1').focus(); return; }
+      if (pin !== correctPin) { document.getElementById('loginError').textContent = 'Incorrect PIN. Try again.'; clearPin(); document.getElementById('pin1').focus(); return; }
+      loggedInEmployee = employees.find(function(e) { return e.id === empId; });
+      if (!loggedInEmployee) { document.getElementById('loginError').textContent = 'Employee not found.'; return; }
+      setDeviceLock(loggedInEmployee.id, loggedInEmployee.name);
+      try { await populateAttendancePanel(); } catch (err) { alert('Error: ' + err.message); }
+      showPanel('panelAttendance');
+    }
+
+    async function populateAttendancePanel() {
+      document.getElementById('infoName').textContent = loggedInEmployee.name;
+      document.getElementById('infoId').textContent = loggedInEmployee.id;
+      document.getElementById('infoMainBranch').textContent = loggedInEmployee.mainBranch || '-';
+      document.getElementById('infoProvince').textContent = loggedInEmployee.provinceBranch || '-';
+      document.getElementById('infoDistrict').textContent = loggedInEmployee.district || '-';
+      selectedAction = '';
+      document.getElementById('btnCheckIn').classList.remove('selected');
+      document.getElementById('btnCheckOut').classList.remove('selected');
+      document.getElementById('submitBtn').disabled = true;
+      document.getElementById('infoStatus').innerHTML = '<span class="status-badge status-none">Loading...</span>';
+      try {
+        var res = await fetch(API_URL + '?action=getLastAction&employeeId=' + encodeURIComponent(loggedInEmployee.id));
+        var result = await res.json();
+        var el = document.getElementById('infoStatus');
+        if (!result.success || !result.lastAction) el.innerHTML = '<span class="status-badge status-none">No Record</span>';
+        else if (result.lastAction.action === 'Check In') el.innerHTML = '<span class="status-badge status-in">Checked In</span>';
+        else el.innerHTML = '<span class="status-badge status-out">Checked Out</span>';
+      } catch (err) { document.getElementById('infoStatus').innerHTML = '<span class="status-badge status-none">Error</span>'; }
+    }
+
+    function selectAction(action) {
+      selectedAction = action;
+      document.getElementById('btnCheckIn').classList.toggle('selected', action === 'Check In');
+      document.getElementById('btnCheckOut').classList.toggle('selected', action === 'Check Out');
+      document.getElementById('submitBtn').disabled = false;
+    }
+
+    async function submitAttendance() {
+      if (!isPortalOpen()) { showClosedPanel(); return; }
+      if (userLocation) {
+        var geoCheck = checkGeofence(userLocation.lat, userLocation.lng);
+        if (!geoCheck.inside) {
+          var geoEl = document.getElementById('geoStatusAttendance');
+          geoEl.style.display = 'block'; geoEl.className = 'geo-status geo-fail';
+          geoEl.textContent = '❌ You moved out of the allowed zone. Cannot submit.'; return;
         }
+      }
+      if (!loggedInEmployee || !selectedAction) return;
+      showLoading(); document.getElementById('submitBtn').disabled = true;
+      try {
+        var res = await fetch(API_URL, {
+          method: 'POST', headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: 'logAttendance', data: {
+            employeeAction: selectedAction, employeeName: loggedInEmployee.name,
+            employeeId: loggedInEmployee.id, mainBranch: loggedInEmployee.mainBranch,
+            provinceBranch: loggedInEmployee.provinceBranch, district: loggedInEmployee.district
+          }})
+        });
+        var result = await res.json(); hideLoading();
+        if (result.success) showSuccessPanel();
+        else { showToast(result.error, 'error'); document.getElementById('submitBtn').disabled = false; }
+      } catch (err) { hideLoading(); showToast('Submit failed: ' + err.message, 'error'); document.getElementById('submitBtn').disabled = false; }
+    }
 
-        // User login function
-        function login() {
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
+    function showSuccessPanel() {
+      var isCheckIn = selectedAction === 'Check In';
+      document.getElementById('successTitle').textContent = selectedAction + ' Successful!';
+      var badge = document.getElementById('successActionBadge');
+      badge.textContent = selectedAction;
+      badge.className = 'success-action ' + (isCheckIn ? 'checkin' : 'checkout');
+      document.getElementById('successName').textContent = loggedInEmployee.name;
+      document.getElementById('successId').textContent = loggedInEmployee.id;
+      document.getElementById('successBranch').textContent = loggedInEmployee.mainBranch || '-';
+      document.getElementById('successProvince').textContent = loggedInEmployee.provinceBranch || '-';
+      document.getElementById('successDistrict').textContent = loggedInEmployee.district || '-';
+      document.getElementById('successTimestamp').textContent =
+        new Date().toLocaleString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      showPanel('panelSuccess');
+    }
 
-            if (validUsers[username] && validUsers[username] === password) {
-                localStorage.setItem("loggedIn", true);
-                localStorage.setItem("user", username);
-
-                document.getElementById("loginForm").style.display = "none";
-                document.getElementById("loggedInSection").classList.add("active");
-
-                // Show only the logged-in user's Employee ID in the dropdown
-                const loggedInUser = localStorage.getItem("user");
-                const empIDSelect = document.getElementById("empID");
-
-                for (let i = 0; i < empIDSelect.options.length; i++) {
-                    const option = empIDSelect.options[i];
-                    if (option.value !== loggedInUser) {
-                        option.disabled = true;  // Disable options that are not the logged-in user
-                    }
-                }
-            } else {
-                alert("ការចូលប្រើប្រាស់មិនត្រឹមត្រូវ។ សូមព្យាយាមម្តងទៀត!");
-            }
-        }
-
-        function submitAttendance(action) {
-            const loggedInUser = localStorage.getItem("user");
-
-            if (!loggedInUser) {
-                alert("សូមចូលប្រើប្រាស់មុនពេលចុះវត្តមាន។");
-                return;
-            }
-
-            var empID = document.getElementById("empID").value;
-            var branch = document.getElementById("branch").value;
-
-            // If the logged-in user tries to log in for another user, prevent it
-            if (empID !== loggedInUser) {
-                document.getElementById("result").innerText = "អ្នកមិនអាចចុះវត្តមានសម្រាប់អ្នកផ្សេងទេ។";
-                return;
-            }
-
-            // Perform the attendance action and submit it to Google Apps Script
-            var url = "https://script.google.com/macros/s/AKfycbwsFqbfK-tm5Cyk8DForGaCqWWpnc1H62SrSTmw6E2BvQoLOl09Q-yKS2BLqnVJugLnow/exec" +
-                "?action=" + encodeURIComponent(action) +
-                "&empID=" + encodeURIComponent(empID) +
-                "&branch=" + encodeURIComponent(branch);
-
-            fetch(url)
-                .then(response => response.text())
-                .then(text => {
-                    document.getElementById("result").innerText = text;
-                })
-                .catch(err => {
-                    document.getElementById("result").innerText = "Error: " + err;
-                });
-        }
-
-    </script>
-
+    function showLoading() { document.getElementById('loadingOverlay').classList.add('visible'); }
+    function hideLoading() { document.getElementById('loadingOverlay').classList.remove('visible'); }
+    function showToast(msg, type) {
+      var toast = document.getElementById('toast');
+      toast.textContent = msg; toast.className = 'toast ' + type + ' show';
+      setTimeout(function() { toast.classList.remove('show'); }, 4000);
+    }
+  </script>
 </body>
-
 </html>
