@@ -73,8 +73,8 @@
     .face-scan-container{background:#fff;border-radius:20px;padding:28px;max-width:500px;width:100%;text-align:center}
     .face-scan-title{font-size:24px;font-weight:700;color:#1a1a2e;margin-bottom:8px}
     .face-scan-subtitle{font-size:16px;color:#888;margin-bottom:20px}
-    .camera-wrapper{position:relative;width:100%;max-width:320px;margin:0 auto 20px;border-radius:16px;overflow:hidden;background:#000;aspect-ratio:1}
-    .camera-wrapper video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+    .camera-wrapper{position:relative;width:100%;max-width:320px;height:320px;margin:0 auto 20px;border-radius:16px;overflow:hidden;background:#000}
+    .camera-wrapper video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:block}
     .face-scan-status{font-size:18px;font-weight:600;padding:12px;border-radius:10px;margin-bottom:16px}
     .face-scan-status.scanning{background:#e3f2fd;color:#1565c0}
     .face-scan-status.success{background:#e6f9ee;color:#1b9e4b}
@@ -86,7 +86,7 @@
     .face-retry-btn{padding:14px 28px;font-size:18px;font-weight:600;background:#4361ee;color:#fff;border:none;border-radius:12px;cursor:pointer}
     .face-retry-btn:hover{background:#3a56d4}
     .models-loading{font-size:14px;color:#888;margin-bottom:16px}
-    @media(max-width:480px){.container{padding:28px 18px;border-radius:16px}.header h1{font-size:28px}.header p{font-size:16px}label{font-size:18px}select,input[type="text"],input[type="password"]{font-size:20px;padding:14px 16px}.pin-container{gap:6px}.pin-input{width:46px;height:62px;font-size:28px;border-radius:12px}.action-btn{padding:20px 10px;font-size:22px}.primary-btn{padding:20px;font-size:22px}.info-row{font-size:17px;padding:8px 0}.success-details .detail-row{font-size:17px}.geo-status{font-size:15px;padding:10px 14px}.device-lock-banner{font-size:15px}.face-scan-container{padding:20px}.face-scan-title{font-size:20px}.camera-wrapper{max-width:260px}}
+    @media(max-width:480px){.container{padding:28px 18px;border-radius:16px}.header h1{font-size:28px}.header p{font-size:16px}label{font-size:18px}select,input[type="text"],input[type="password"]{font-size:20px;padding:14px 16px}.pin-container{gap:6px}.pin-input{width:46px;height:62px;font-size:28px;border-radius:12px}.action-btn{padding:20px 10px;font-size:22px}.primary-btn{padding:20px;font-size:22px}.info-row{font-size:17px;padding:8px 0}.success-details .detail-row{font-size:17px}.geo-status{font-size:15px;padding:10px 14px}.device-lock-banner{font-size:15px}.face-scan-container{padding:20px}.face-scan-title{font-size:20px}.camera-wrapper{max-width:280px;height:280px}}
   </style>
 </head>
 <body>
@@ -98,7 +98,9 @@
     <div class="face-scan-container">
       <div class="face-scan-title">🔍 Face Verification</div>
       <div class="face-scan-subtitle" id="faceScanName">Verifying identity...</div>
-      <div class="camera-wrapper"><video id="faceVideo" autoplay muted playsinline></video></div>
+      <div class="camera-wrapper">
+        <video id="faceVideo" autoplay muted playsinline webkit-playsinline></video>
+      </div>
       <div class="face-scan-status loading" id="faceScanStatus">⏳ Loading...</div>
       <div id="modelsLoading" class="models-loading" style="display:none;">Loading face recognition models...</div>
       <div class="face-btn-row">
@@ -200,7 +202,7 @@
       {name:'ទឹកល្អក់',lat:11.567364,lng:104.900508,radius:50},
       {name:'ដង្កោ (Dangkor)',lat:11.562540,lng:104.856171,radius:50},
       {name:'បឹងសាឡាង',lat:11.549739,lng:104.899910,radius:50},
-      {name:'អូឡាំពិក (Olympic)',lat:11.558100,lng:104.919700,radius:50},
+      {name:'អូឡាំorg (Olympic)',lat:11.558100,lng:104.919700,radius:50},
       {name:'ច្បារអំពៅ (Chbar Ampov)',lat:11.530928,lng:104.944263,radius:50},
       {name:'បឹងប្រលិត (Boeung Prolit)',lat:11.555993,lng:104.918761,radius:50},
       {name:'រោងចក្រកែវ',lat:11.498345,lng:104.892716,radius:50},
@@ -274,13 +276,18 @@
     }
 
     async function getReferenceDescriptor(empId){
-      var img=await new Promise(function(res,rej){var i=new Image();i.crossOrigin='anonymous';i.onload=function(){res(i)};i.onerror=function(){rej(new Error('Photo not found: faces/'+empId+'.jpg'))};i.src=FACE_PHOTOS_PATH+empId+'.jpg'});
+      var img=await new Promise(function(res,rej){var i=new Image();i.crossOrigin='anonymous';i.onload=function(){res(i)};i.onerror=function(){rej(new Error('Photo not found: faces/'+empId+'.jpg — Make sure the file exists in your GitHub faces/ folder'))};i.src=FACE_PHOTOS_PATH+empId+'.jpg'});
       var det=await faceapi.detectSingleFace(img,new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
-      if(!det)throw new Error('No face detected in reference photo for '+empId);
+      if(!det)throw new Error('No face detected in reference photo. Please upload a clearer photo for '+empId);
       return det.descriptor
     }
 
-    function stopCamera(){if(faceStream){faceStream.getTracks().forEach(function(t){t.stop()});faceStream=null}if(faceScanInterval){clearInterval(faceScanInterval);faceScanInterval=null}document.getElementById('faceVideo').srcObject=null}
+    function stopCamera(){
+      if(faceScanInterval){clearInterval(faceScanInterval);faceScanInterval=null}
+      if(faceStream){faceStream.getTracks().forEach(function(t){t.stop()});faceStream=null}
+      var video=document.getElementById('faceVideo');
+      if(video)video.srcObject=null;
+    }
 
     async function openFaceScan(empId,empName){
       var st=document.getElementById('faceScanStatus'),rb=document.getElementById('faceRetryBtn');
@@ -289,34 +296,64 @@
       st.className='face-scan-status loading';st.textContent='⏳ Loading face recognition...';
       document.getElementById('faceScanModal').classList.add('visible');
 
+      // Load models
       var ok=await loadFaceModels();
       if(!ok){st.className='face-scan-status fail';st.textContent='❌ Could not load models. Check internet.';rb.style.display='inline-block';return}
 
+      // Load reference photo
       var refDesc;
       try{refDesc=await getReferenceDescriptor(empId)}
       catch(err){st.className='face-scan-status fail';st.textContent='❌ '+err.message;rb.style.display='inline-block';return}
 
-      try{faceStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:320},height:{ideal:320}}});document.getElementById('faceVideo').srcObject=faceStream}
-      catch(err){st.className='face-scan-status fail';st.textContent='❌ Camera access denied.';rb.style.display='inline-block';return}
+      // Start camera
+      try{
+        faceStream=await navigator.mediaDevices.getUserMedia({
+          video:{facingMode:'user',width:{ideal:640},height:{ideal:640}}
+        });
+        var video=document.getElementById('faceVideo');
+        video.srcObject=faceStream;
+
+        // Wait for video to actually start playing
+        await new Promise(function(resolve){
+          video.onloadedmetadata=function(){video.play().then(resolve).catch(resolve)};
+          // Fallback timeout
+          setTimeout(resolve,3000);
+        });
+      }catch(err){
+        st.className='face-scan-status fail';
+        st.textContent='❌ Camera access denied. Allow camera and try again.';
+        rb.style.display='inline-block';return;
+      }
 
       st.className='face-scan-status scanning';st.textContent='📸 Look at the camera...';
 
-      var attempts=0,maxAttempts=30;
-      faceScanInterval=setInterval(async function(){
-        attempts++;
-        if(attempts>maxAttempts){clearInterval(faceScanInterval);faceScanInterval=null;st.className='face-scan-status fail';st.textContent='⏰ Timed out. Try again.';rb.style.display='inline-block';stopCamera();return}
-        var video=document.getElementById('faceVideo');if(video.readyState<2)return;
-        try{
-          var det=await faceapi.detectSingleFace(video,new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
-          if(!det){st.textContent='📸 No face detected... ('+attempts+'/'+maxAttempts+')';return}
-          var dist=faceapi.euclideanDistance(det.descriptor,refDesc);
-          if(dist<FACE_MATCH_THRESHOLD){
+      // Start scanning after short delay for camera warmup
+      setTimeout(function(){
+        var attempts=0,maxAttempts=30;
+        faceScanInterval=setInterval(async function(){
+          attempts++;
+          if(attempts>maxAttempts){
             clearInterval(faceScanInterval);faceScanInterval=null;
-            st.className='face-scan-status success';st.textContent='✅ Face verified! Welcome, '+empName+'!';
-            setTimeout(function(){stopCamera();document.getElementById('faceScanModal').classList.remove('visible');onFaceVerified()},1500)
-          }else{st.textContent='📸 Keep looking... ('+attempts+'/'+maxAttempts+')'}
-        }catch(err){st.textContent='📸 Scanning... ('+attempts+'/'+maxAttempts+')'}
-      },1000)
+            st.className='face-scan-status fail';st.textContent='⏰ Timed out. Try again.';
+            rb.style.display='inline-block';stopCamera();return;
+          }
+          var video=document.getElementById('faceVideo');
+          if(!video||video.readyState<2||video.videoWidth===0)return;
+
+          try{
+            var det=await faceapi.detectSingleFace(video,new faceapi.TinyFaceDetectorOptions({inputSize:416,scoreThreshold:0.5})).withFaceLandmarks().withFaceDescriptor();
+            if(!det){st.textContent='📸 No face detected... ('+attempts+'/'+maxAttempts+')';return}
+            var dist=faceapi.euclideanDistance(det.descriptor,refDesc);
+            if(dist<FACE_MATCH_THRESHOLD){
+              clearInterval(faceScanInterval);faceScanInterval=null;
+              st.className='face-scan-status success';st.textContent='✅ Face verified! Welcome, '+empName+'!';
+              setTimeout(function(){stopCamera();document.getElementById('faceScanModal').classList.remove('visible');onFaceVerified()},1500)
+            }else{
+              st.textContent='📸 Keep looking... ('+attempts+'/'+maxAttempts+')';
+            }
+          }catch(err){st.textContent='📸 Scanning... ('+attempts+'/'+maxAttempts+')'}
+        },1000);
+      },1000); // 1 second warmup delay
     }
 
     function retryFaceScan(){stopCamera();if(pendingEmployee)openFaceScan(pendingEmployee.id,pendingEmployee.name)}
@@ -376,7 +413,7 @@
     function showError(msg){document.getElementById('loginError').textContent=msg}
     function clearError(){document.getElementById('loginError').textContent=''}
 
-    // ============ LOGIN (PIN + GPS + Face + Multi-device block) ============
+    // ============ LOGIN ============
     async function handleLogin(){
       if(!isPortalOpen()){showClosedPanel();return}
       if(!geoReady){showError('Still checking location...');return}
@@ -406,7 +443,7 @@
         }
       }catch(err){hideLoading()}
 
-      // PIN + GPS + multi-device passed → Face scan
+      // All pre-checks passed → Face scan
       var emp=employees.find(function(e){return e.id===empId});
       if(!emp){showError('Employee not found.');return}
       pendingEmployee=emp;
@@ -463,6 +500,3 @@
   </script>
 </body>
 </html>
-```
-
----
