@@ -98,9 +98,7 @@
     <div class="face-scan-container">
       <div class="face-scan-title">🔍 Face Verification</div>
       <div class="face-scan-subtitle" id="faceScanName">Verifying identity...</div>
-      <div class="camera-wrapper">
-        <video id="faceVideo" autoplay muted playsinline webkit-playsinline></video>
-      </div>
+      <div class="camera-wrapper"><video id="faceVideo" autoplay muted playsinline webkit-playsinline></video></div>
       <div class="face-scan-status loading" id="faceScanStatus">⏳ Loading...</div>
       <div id="modelsLoading" class="models-loading" style="display:none;">Loading face recognition models...</div>
       <div class="face-btn-row">
@@ -197,23 +195,47 @@
     const OPEN_HOUR=7,CLOSE_HOUR=22,BLOCKED_DAYS=[0];
     const HOLIDAYS=['2026-01-01','2026-01-07','2026-03-08','2026-04-14','2026-04-15','2026-04-16','2026-05-01','2026-05-14','2026-05-15','2026-05-16','2026-06-18','2026-09-24','2026-10-15','2026-10-29','2026-11-09','2026-11-18','2026-11-19','2026-11-20'];
 
+    // ============ GEOFENCE LOCATIONS (index 0-11) ============
     const ALLOWED_LOCATIONS=[
-      {name:'ស្នាក់ការកណ្ដាល (HQ)',lat:11.574984,lng:104.925366,radius:300},
-      {name:'ទឹកល្អក់',lat:11.567364,lng:104.900508,radius:50},
-      {name:'ដង្កោ (Dangkor)',lat:11.562540,lng:104.856171,radius:50},
-      {name:'បឹងសាឡាង',lat:11.549739,lng:104.899910,radius:50},
-      {name:'អូឡាំorg (Olympic)',lat:11.558100,lng:104.919700,radius:50},
-      {name:'ច្បារអំពៅ (Chbar Ampov)',lat:11.530928,lng:104.944263,radius:50},
-      {name:'បឹងប្រលិត (Boeung Prolit)',lat:11.555993,lng:104.918761,radius:50},
-      {name:'រោងចក្រកែវ',lat:11.498345,lng:104.892716,radius:50},
-      {name:'អ៊ីអនម៉លទន្លេបាសាក់ (AEON Tonle Bassac)',lat:11.547982,lng:104.932870,radius:50},
-      {name:'អ៊ីអនម៉លសែនសុខ (AEON Sen Sok)',lat:11.599664,lng:104.885370,radius:50},
-      {name:'អ៊ីអនម៉លមានជ័យ (AEON Mean Chey)',lat:11.484916,lng:104.918083,radius:50},
-      {name:'ពោធិ៍ចិនតុង (Pochentong)',lat:11.552512,lng:104.844986,radius:50}
+      {name:'ស្នាក់ការកណ្ដាល (HQ)',lat:11.574984,lng:104.925366,radius:300},            // 0
+      {name:'ទឹកល្អក់',lat:11.567364,lng:104.900508,radius:50},                          // 1
+      {name:'ដង្កោ (Dangkor)',lat:11.562540,lng:104.856171,radius:50},                    // 2
+      {name:'បឹងសាឡាង',lat:11.549739,lng:104.899910,radius:50},                         // 3
+      {name:'អូឡាំពិក (Olympic)',lat:11.558100,lng:104.919700,radius:50},                 // 4
+      {name:'ច្បារអំពៅ (Chbar Ampov)',lat:11.530928,lng:104.944263,radius:50},            // 5
+      {name:'បឹងប្រលិត (Boeung Prolit)',lat:11.555993,lng:104.918761,radius:50},          // 6
+      {name:'រោងចក្រកែវ',lat:11.498345,lng:104.892716,radius:50},                         // 7
+      {name:'អ៊ីអនម៉លទន្លេបាសាក់ (AEON Tonle Bassac)',lat:11.547982,lng:104.932870,radius:50}, // 8
+      {name:'អ៊ីអនម៉លសែនសុខ (AEON Sen Sok)',lat:11.599664,lng:104.885370,radius:50},     // 9
+      {name:'អ៊ីអនម៉លមានជ័យ (AEON Mean Chey)',lat:11.484916,lng:104.918083,radius:50},    // 10
+      {name:'ពោធិ៍ចិនតុង (Pochentong)',lat:11.552512,lng:104.844986,radius:50}             // 11
     ];
 
-    const PIN_MAP={'001':'000001','002':'000002','003':'000003','004':'000004','005':'000005','006':'000006','007':'000007','008':'000008','009':'000009','010':'000010','011':'000011','012':'000012','013':'000013','014':'000014'};
-    const EMPLOYEE_LOCATION_MAP={'001':[0],'002':[1],'003':[2],'004':[3],'005':[4],'006':[5],'007':[6],'008':[7],'009':[8],'010':[9],'011':[10],'012':[11],'013':[12],'014':[13]};
+    // ============ PIN MAP (Employee ID : 6-digit PIN) ============
+    const PIN_MAP={
+      '001':'000001','002':'000002','003':'000003','004':'000004',
+      '005':'000005','006':'000006','007':'000007','008':'000008',
+      '009':'000009','010':'000010','011':'000011','012':'000012',
+      '013':'000013','014':'000014'
+    };
+
+    // ============ EMPLOYEE → ALLOWED LOCATION INDEXES ============
+    const EMPLOYEE_LOCATION_MAP={
+      '001':[0],   // A → ស្នាក់ការកណ្ដាល (HQ)
+      '002':[0],   // B → ស្នាក់ការកណ្ដាល (HQ)
+      '003':[0],   // C → ស្នាក់ការកណ្ដាល (HQ)
+      '004':[1],   // D → ទឹកល្អក់
+      '005':[2],   // E → ដង្កោ (Dangkor)
+      '006':[3],   // F → បឹងសាឡាង
+      '007':[4],   // G → អូឡាំពិក (Olympic)
+      '008':[5],   // H → ច្បារអំពៅ (Chbar Ampov)
+      '009':[6],   // I → បឹងប្រលិត (Boeung Prolit)
+      '010':[7],   // J → រោងចក្រកែវ
+      '011':[8],   // K → អ៊ីអនម៉លទន្លេបាសាក់ (AEON Tonle Bassac)
+      '012':[9],   // L → អ៊ីអនម៉លសែនសុខ (AEON Sen Sok)
+      '013':[10],  // M → អ៊ីអនម៉លមានជ័យ (AEON Mean Chey)
+      '014':[11]   // N → ពោធិ៍ចិនតុង (Pochentong)
+    };
 
     let employees=[],loggedInEmployee=null,selectedAction='',closedTimeInterval=null;
     let userLocation=null,geoReady=false,geoError=false;
@@ -276,17 +298,16 @@
     }
 
     async function getReferenceDescriptor(empId){
-      var img=await new Promise(function(res,rej){var i=new Image();i.crossOrigin='anonymous';i.onload=function(){res(i)};i.onerror=function(){rej(new Error('Photo not found: faces/'+empId+'.jpg — Make sure the file exists in your GitHub faces/ folder'))};i.src=FACE_PHOTOS_PATH+empId+'.jpg'});
+      var img=await new Promise(function(res,rej){var i=new Image();i.crossOrigin='anonymous';i.onload=function(){res(i)};i.onerror=function(){rej(new Error('Photo not found: faces/'+empId+'.jpg'))};i.src=FACE_PHOTOS_PATH+empId+'.jpg'});
       var det=await faceapi.detectSingleFace(img,new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
-      if(!det)throw new Error('No face detected in reference photo. Please upload a clearer photo for '+empId);
+      if(!det)throw new Error('No face detected in reference photo for '+empId);
       return det.descriptor
     }
 
     function stopCamera(){
       if(faceScanInterval){clearInterval(faceScanInterval);faceScanInterval=null}
       if(faceStream){faceStream.getTracks().forEach(function(t){t.stop()});faceStream=null}
-      var video=document.getElementById('faceVideo');
-      if(video)video.srcObject=null;
+      var video=document.getElementById('faceVideo');if(video)video.srcObject=null;
     }
 
     async function openFaceScan(empId,empName){
@@ -296,50 +317,27 @@
       st.className='face-scan-status loading';st.textContent='⏳ Loading face recognition...';
       document.getElementById('faceScanModal').classList.add('visible');
 
-      // Load models
       var ok=await loadFaceModels();
       if(!ok){st.className='face-scan-status fail';st.textContent='❌ Could not load models. Check internet.';rb.style.display='inline-block';return}
 
-      // Load reference photo
       var refDesc;
       try{refDesc=await getReferenceDescriptor(empId)}
       catch(err){st.className='face-scan-status fail';st.textContent='❌ '+err.message;rb.style.display='inline-block';return}
 
-      // Start camera
       try{
-        faceStream=await navigator.mediaDevices.getUserMedia({
-          video:{facingMode:'user',width:{ideal:640},height:{ideal:640}}
-        });
-        var video=document.getElementById('faceVideo');
-        video.srcObject=faceStream;
-
-        // Wait for video to actually start playing
-        await new Promise(function(resolve){
-          video.onloadedmetadata=function(){video.play().then(resolve).catch(resolve)};
-          // Fallback timeout
-          setTimeout(resolve,3000);
-        });
-      }catch(err){
-        st.className='face-scan-status fail';
-        st.textContent='❌ Camera access denied. Allow camera and try again.';
-        rb.style.display='inline-block';return;
-      }
+        faceStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:640}}});
+        var video=document.getElementById('faceVideo');video.srcObject=faceStream;
+        await new Promise(function(resolve){video.onloadedmetadata=function(){video.play().then(resolve).catch(resolve)};setTimeout(resolve,3000)});
+      }catch(err){st.className='face-scan-status fail';st.textContent='❌ Camera access denied.';rb.style.display='inline-block';return}
 
       st.className='face-scan-status scanning';st.textContent='📸 Look at the camera...';
 
-      // Start scanning after short delay for camera warmup
       setTimeout(function(){
         var attempts=0,maxAttempts=30;
         faceScanInterval=setInterval(async function(){
           attempts++;
-          if(attempts>maxAttempts){
-            clearInterval(faceScanInterval);faceScanInterval=null;
-            st.className='face-scan-status fail';st.textContent='⏰ Timed out. Try again.';
-            rb.style.display='inline-block';stopCamera();return;
-          }
-          var video=document.getElementById('faceVideo');
-          if(!video||video.readyState<2||video.videoWidth===0)return;
-
+          if(attempts>maxAttempts){clearInterval(faceScanInterval);faceScanInterval=null;st.className='face-scan-status fail';st.textContent='⏰ Timed out. Try again.';rb.style.display='inline-block';stopCamera();return}
+          var video=document.getElementById('faceVideo');if(!video||video.readyState<2||video.videoWidth===0)return;
           try{
             var det=await faceapi.detectSingleFace(video,new faceapi.TinyFaceDetectorOptions({inputSize:416,scoreThreshold:0.5})).withFaceLandmarks().withFaceDescriptor();
             if(!det){st.textContent='📸 No face detected... ('+attempts+'/'+maxAttempts+')';return}
@@ -348,12 +346,10 @@
               clearInterval(faceScanInterval);faceScanInterval=null;
               st.className='face-scan-status success';st.textContent='✅ Face verified! Welcome, '+empName+'!';
               setTimeout(function(){stopCamera();document.getElementById('faceScanModal').classList.remove('visible');onFaceVerified()},1500)
-            }else{
-              st.textContent='📸 Keep looking... ('+attempts+'/'+maxAttempts+')';
-            }
+            }else{st.textContent='📸 Keep looking... ('+attempts+'/'+maxAttempts+')'}
           }catch(err){st.textContent='📸 Scanning... ('+attempts+'/'+maxAttempts+')'}
         },1000);
-      },1000); // 1 second warmup delay
+      },1000);
     }
 
     function retryFaceScan(){stopCamera();if(pendingEmployee)openFaceScan(pendingEmployee.id,pendingEmployee.name)}
