@@ -79,7 +79,6 @@
     .direction-overlay.visible{display:flex}
     .direction-arrow{font-size:120px;color:rgba(255,255,255,0.85);text-shadow:0 0 30px rgba(0,0,0,0.7);animation:pulse 1s ease-in-out infinite}
     .direction-label{position:absolute;bottom:20px;left:0;right:0;text-align:center;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.8);background:rgba(0,0,0,0.5);padding:8px;border-radius:8px;margin:0 20px}
-    .direction-check{font-size:80px;color:#4caf50;text-shadow:0 0 30px rgba(76,175,80,0.5)}
     @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(1.1)}}
     .face-scan-status{font-size:18px;font-weight:600;padding:12px;border-radius:10px;margin-bottom:16px}
     .face-scan-status.scanning{background:#e3f2fd;color:#1565c0}
@@ -109,10 +108,9 @@
   <div id="loadingOverlay" class="loading-overlay"><div class="spinner"></div></div>
   <div id="toast" class="toast"></div>
 
-  <!-- FACE SCAN MODAL -->
   <div id="faceScanModal" class="face-scan-modal">
     <div class="face-scan-container">
-      <div class="face-scan-title">🔍 Face Verification</div>
+      <div class="face-scan-title">Face Verification</div>
       <div class="face-scan-subtitle" id="faceScanName">Verifying identity...</div>
       <div class="step-indicators"><div class="step-dot" id="step1"></div><div class="step-dot" id="step2"></div><div class="step-dot" id="step3"></div><div class="step-dot" id="step4"></div></div>
       <div class="camera-wrapper">
@@ -131,10 +129,9 @@
     </div>
   </div>
 
-  <!-- HIDDEN DEVELOPER PANEL -->
   <div id="devPanel" class="dev-panel">
     <div class="dev-container">
-      <div style="font-size:36px;text-align:center;margin-bottom:12px;">&#x1F6E0;&#xFE0F;</div>
+      <div style="font-size:36px;text-align:center;margin-bottom:12px;">Developer</div>
       <h2 style="text-align:center;font-size:20px;margin-bottom:20px;color:#1a1a2e;">Developer Tools</h2>
       <button class="dev-btn dev-btn-red" onclick="devClearDeviceLock()">Clear Device Lock</button>
       <button class="dev-btn dev-btn-blue" onclick="devClearAllStorage()">Clear All Storage</button>
@@ -144,16 +141,14 @@
     </div>
   </div>
 
-  <!-- PANEL 0: CLOSED -->
   <div class="container panel" id="panelClosed">
-    <div class="header"><div class="closed-icon lock-icon">&#x1F6AB;</div><h1>Portal Closed</h1><p id="closedDate"></p></div>
+    <div class="header"><div class="closed-icon lock-icon">X</div><h1>Portal Closed</h1><p id="closedDate"></p></div>
     <div class="closed-time" id="closedCurrentTime"></div>
     <div class="closed-hours">Operating hours:<br><strong>7:00 AM - 10:00 PM</strong><br><strong>Monday - Saturday</strong></div>
   </div>
 
-  <!-- PANEL 1: LOGIN -->
   <div class="container panel active" id="panelLogin">
-    <div class="header"><div class="lock-icon" id="lockIcon">&#x1F510;</div><h1>Employee Login</h1><p id="loginDate"></p></div>
+    <div class="header"><div class="lock-icon" id="lockIcon">Login</div><h1>Employee Login</h1><p id="loginDate"></p></div>
     <div id="geoStatus" class="geo-status geo-loading">Checking your location...</div>
     <div class="device-lock-banner" id="deviceLockBanner" style="display:none;"></div>
     <div id="noEmployeesMsg" class="no-employees-msg" style="display:none;"></div>
@@ -186,7 +181,6 @@
     </div>
   </div>
 
-  <!-- PANEL 2: ATTENDANCE -->
   <div class="container panel" id="panelAttendance">
     <div class="header"><h1>Attendance Portal</h1><p id="attendanceDate"></p></div>
     <div id="geoStatusAttendance" class="geo-status geo-ok" style="display:none;"></div>
@@ -198,16 +192,15 @@
       <div class="info-row"><span class="label">District</span><span class="value" id="infoDistrict">-</span></div>
       <div class="info-row"><span class="label">Last Status</span><span class="value" id="infoStatus"><span class="status-badge status-none">No Record</span></span></div>
     </div>
-    <div id="completedBanner" class="completed-banner" style="display:none;"><span class="big-icon">&#x1F389;</span>Attendance completed for today!</div>
+    <div id="completedBanner" class="completed-banner" style="display:none;">Attendance completed for today!</div>
     <div id="actionSection">
       <div class="form-group"><label>Action</label><div class="action-buttons"><button class="action-btn btn-checkin" id="btnCheckIn" onclick="selectAction('Check In')">Check In</button><button class="action-btn btn-checkout" id="btnCheckOut" onclick="selectAction('Check Out')">Check Out</button></div></div>
       <button class="primary-btn" id="submitBtn" onclick="submitAttendance()" disabled>Submit Attendance</button>
     </div>
   </div>
 
-  <!-- PANEL 3: SUCCESS -->
   <div class="container panel" id="panelSuccess">
-    <div class="header"><div class="success-icon">&#x2705;</div><h1 id="successTitle">Check In Successful!</h1><p>Your attendance has been recorded</p></div>
+    <div class="header"><div class="success-icon">Done</div><h1 id="successTitle">Check In Successful!</h1><p>Your attendance has been recorded</p></div>
     <div class="date-banner" id="successDate"></div>
     <div style="text-align:center;margin:24px 0;"><span class="success-action" id="successActionBadge">Check In</span></div>
     <div class="success-details">
@@ -226,73 +219,154 @@
     var FACE_PHOTOS_PATH='./faces/';
     var FACE_MATCH_THRESHOLD=0.45;
     var HEAD_TURN_THRESHOLD=15;
-    var OPEN_HOUR=7,CLOSE_HOUR=22,BLOCKED_DAYS=[0];
+    var OPEN_HOUR=7;
+    var CLOSE_HOUR=22;
+    var BLOCKED_DAYS=[0];
     var HOLIDAYS=['2026-01-01','2026-01-07','2026-03-08','2026-04-14','2026-04-15','2026-04-16','2026-05-01','2026-05-14','2026-05-15','2026-05-16','2026-06-18','2026-09-24','2026-10-15','2026-10-29','2026-11-09','2026-11-18','2026-11-19','2026-11-20'];
-    var ALLOWED_LOCATIONS=[
-      {name:'\u179F\u17D2\u1793\u17B6\u1780\u17CB\u1780\u17B6\u179A\u1780\u178E\u17D2\u178F\u17B6\u179B (HQ)',lat:11.574984,lng:104.925366,radius:300},
-      {name:'\u1791\u17B9\u1780\u179B\u17D2\u17A2\u1780\u17CB',lat:11.567364,lng:104.900508,radius:50},
-      {name:'\u178A\u1784\u17D2\u1780\u17C4 (Dangkor)',lat:11.562540,lng:104.856171,radius:50},
-      {name:'\u1794\u17B9\u1784\u179F\u17B6\u17A1\u17B6\u1784',lat:11.549739,lng:104.899910,radius:50},
-      {name:'\u17A2\u17BC\u17A1\u17B6\u17C6\u1796\u17B7\u1780 (Olympic)',lat:11.558100,lng:104.919700,radius:50},
-      {name:'\u1785\u17D2\u1794\u17B6\u179A\u17A2\u17C6\u1796\u17C5 (Chbar Ampov)',lat:11.530928,lng:104.944263,radius:50},
-      {name:'\u1794\u17B9\u1784\u1794\u17D2\u179A\u179B\u17B7\u178F (Boeung Prolit)',lat:11.555993,lng:104.918761,radius:50},
-      {name:'\u179A\u17C4\u1784\u1785\u1780\u17D2\u179A\u1780\u17C2\u179C',lat:11.498345,lng:104.892716,radius:50},
-      {name:'AEON Tonle Bassac',lat:11.547982,lng:104.932870,radius:50},
-      {name:'AEON Sen Sok',lat:11.599664,lng:104.885370,radius:50},
-      {name:'AEON Mean Chey',lat:11.484916,lng:104.918083,radius:50},
-      {name:'\u1796\u17C4\u1792\u17B7\u17CD\u1785\u17B7\u1793\u178F\u17BB\u1784 (Pochentong)',lat:11.552512,lng:104.844986,radius:50}
-    ];
-    var PIN_MAP={'001':'000001','002':'000002','003':'000003','004':'000004','005':'000005','006':'000006','007':'000007','008':'000008','009':'000009','010':'000010','011':'000011','012':'000012','013':'000013','014':'000014'};
-    var EMPLOYEE_LOCATION_MAP={'001':[0],'002':[0],'003':[0],'004':[1],'005':[2],'006':[3],'007':[4],'008':[5],'009':[6],'010':[7],'011':[8],'012':[9],'013':[10],'014':[11]};
 
-    var employees=[],loggedInEmployee=null,selectedAction='',closedTimeInterval=null;
-    var userLocation=null,geoReady=false,geoError=false;
-    var detectedLocationName=null,detectedLocationIndex=-1;
-    var faceModelsLoaded=false,faceStream=null,faceScanInterval=null,pendingEmployee=null;
+    var ALLOWED_LOCATIONS=[];
+    ALLOWED_LOCATIONS[0]={name:'ស្នាក់ការកណ្ដាល (HQ)',lat:11.574984,lng:104.925366,radius:300};
+    ALLOWED_LOCATIONS[1]={name:'ទឹកល្អក់',lat:11.567364,lng:104.900508,radius:50};
+    ALLOWED_LOCATIONS[2]={name:'ដង្កោ (Dangkor)',lat:11.562540,lng:104.856171,radius:50};
+    ALLOWED_LOCATIONS[3]={name:'បឹងសាឡាង',lat:11.549739,lng:104.899910,radius:50};
+    ALLOWED_LOCATIONS[4]={name:'អូឡាំពិក (Olympic)',lat:11.558100,lng:104.919700,radius:50};
+    ALLOWED_LOCATIONS[5]={name:'ច្បារអំពៅ (Chbar Ampov)',lat:11.530928,lng:104.944263,radius:50};
+    ALLOWED_LOCATIONS[6]={name:'បឹងប្រលិត (Boeung Prolit)',lat:11.555993,lng:104.918761,radius:50};
+    ALLOWED_LOCATIONS[7]={name:'រោងចក្រកែវ',lat:11.498345,lng:104.892716,radius:50};
+    ALLOWED_LOCATIONS[8]={name:'អ៊ីអនម៉លទន្លេបាសាក់ (AEON Tonle Bassac)',lat:11.547982,lng:104.932870,radius:50};
+    ALLOWED_LOCATIONS[9]={name:'អ៊ីអនម៉លសែនសុខ (AEON Sen Sok)',lat:11.599664,lng:104.885370,radius:50};
+    ALLOWED_LOCATIONS[10]={name:'អ៊ីអនម៉លមានជ័យ (AEON Mean Chey)',lat:11.484916,lng:104.918083,radius:50};
+    ALLOWED_LOCATIONS[11]={name:'ពោធិ៍ចិនតុង (Pochentong)',lat:11.552512,lng:104.844986,radius:50};
+
+    var PIN_MAP={};
+    PIN_MAP['001']='000001';PIN_MAP['002']='000002';PIN_MAP['003']='000003';
+    PIN_MAP['004']='000004';PIN_MAP['005']='000005';PIN_MAP['006']='000006';
+    PIN_MAP['007']='000007';PIN_MAP['008']='000008';PIN_MAP['009']='000009';
+    PIN_MAP['010']='000010';PIN_MAP['011']='000011';PIN_MAP['012']='000012';
+    PIN_MAP['013']='000013';PIN_MAP['014']='000014';
+
+    var EMPLOYEE_LOCATION_MAP={};
+    EMPLOYEE_LOCATION_MAP['001']=[0];
+    EMPLOYEE_LOCATION_MAP['002']=[0];
+    EMPLOYEE_LOCATION_MAP['003']=[0];
+    EMPLOYEE_LOCATION_MAP['004']=[1];
+    EMPLOYEE_LOCATION_MAP['005']=[2];
+    EMPLOYEE_LOCATION_MAP['006']=[3];
+    EMPLOYEE_LOCATION_MAP['007']=[4];
+    EMPLOYEE_LOCATION_MAP['008']=[5];
+    EMPLOYEE_LOCATION_MAP['009']=[6];
+    EMPLOYEE_LOCATION_MAP['010']=[7];
+    EMPLOYEE_LOCATION_MAP['011']=[8];
+    EMPLOYEE_LOCATION_MAP['012']=[9];
+    EMPLOYEE_LOCATION_MAP['013']=[10];
+    EMPLOYEE_LOCATION_MAP['014']=[11];
+
+    var employees=[];
+    var loggedInEmployee=null;
+    var selectedAction='';
+    var closedTimeInterval=null;
+    var userLocation=null;
+    var geoReady=false;
+    var geoError=false;
+    var detectedLocationName=null;
+    var detectedLocationIndex=-1;
+    var faceModelsLoaded=false;
+    var faceStream=null;
+    var faceScanInterval=null;
+    var pendingEmployee=null;
     var loginMethod='pin';
 
-    function getDateStr(){return new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}
-    function getTodayISO(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
-    function isHoliday(){return HOLIDAYS.indexOf(getTodayISO())!==-1}
-    function isBlockedDay(){return BLOCKED_DAYS.indexOf(new Date().getDay())!==-1}
-    function isPortalOpen(){if(isBlockedDay()||isHoliday())return false;var h=new Date().getHours();return h>=OPEN_HOUR&&h<CLOSE_HOUR}
-    function getDistanceMeters(a,b,c,d){var R=6371000,dLat=(c-a)*Math.PI/180,dLng=(d-b)*Math.PI/180;var x=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
+    function getDateStr(){return new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});}
+    function getTodayISO(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+    function isHoliday(){return HOLIDAYS.indexOf(getTodayISO())!==-1;}
+    function isBlockedDay(){return BLOCKED_DAYS.indexOf(new Date().getDay())!==-1;}
+    function isPortalOpen(){if(isBlockedDay()||isHoliday())return false;var h=new Date().getHours();return h>=OPEN_HOUR&&h<CLOSE_HOUR;}
+
+    function getDistanceMeters(lat1,lng1,lat2,lng2){
+      var R=6371000;
+      var dLat=(lat2-lat1)*Math.PI/180;
+      var dLng=(lng2-lng1)*Math.PI/180;
+      var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+      return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+    }
 
     function checkGeofence(lat,lng,idx){
-      var locs=idx?idx.map(function(i){return ALLOWED_LOCATIONS[i]}):ALLOWED_LOCATIONS;
-      for(var i=0;i<locs.length;i++){var l=locs[i],dist=getDistanceMeters(lat,lng,l.lat,l.lng);if(dist<=l.radius)return{inside:true,location:l.name,distance:Math.round(dist)}}
-      var cl=null,cd=Infinity;for(var j=0;j<locs.length;j++){var dd=getDistanceMeters(lat,lng,locs[j].lat,locs[j].lng);if(dd<cd){cd=dd;cl=locs[j].name}}
-      return{inside:false,closest:cl,distance:Math.round(cd)}
+      var locs=idx?idx.map(function(i){return ALLOWED_LOCATIONS[i];}):ALLOWED_LOCATIONS;
+      for(var i=0;i<locs.length;i++){
+        var l=locs[i];
+        var dist=getDistanceMeters(lat,lng,l.lat,l.lng);
+        if(dist<=l.radius)return{inside:true,location:l.name,distance:Math.round(dist)};
+      }
+      var cl=null;var cd=Infinity;
+      for(var j=0;j<locs.length;j++){
+        var dd=getDistanceMeters(lat,lng,locs[j].lat,locs[j].lng);
+        if(dd<cd){cd=dd;cl=locs[j].name;}
+      }
+      return{inside:false,closest:cl,distance:Math.round(cd)};
     }
 
     function filterEmployeesByLocation(){
-      if(detectedLocationIndex===-1)return;var ids=[];
-      for(var e in EMPLOYEE_LOCATION_MAP){if(EMPLOYEE_LOCATION_MAP[e].indexOf(detectedLocationIndex)!==-1)ids.push(e)}
-      var sel=document.getElementById('loginEmployeeSelect'),opts=sel.querySelectorAll('option'),vc=0;
-      for(var j=1;j<opts.length;j++){if(ids.indexOf(opts[j].value)===-1){opts[j].style.display='none';opts[j].disabled=true}else{opts[j].style.display='';opts[j].disabled=false;vc++}}
+      if(detectedLocationIndex===-1)return;
+      var ids=[];
+      for(var e in EMPLOYEE_LOCATION_MAP){
+        if(EMPLOYEE_LOCATION_MAP[e].indexOf(detectedLocationIndex)!==-1)ids.push(e);
+      }
+      var sel=document.getElementById('loginEmployeeSelect');
+      var opts=sel.querySelectorAll('option');
+      var vc=0;
+      for(var j=1;j<opts.length;j++){
+        if(ids.indexOf(opts[j].value)===-1){opts[j].style.display='none';opts[j].disabled=true;}
+        else{opts[j].style.display='';opts[j].disabled=false;vc++;}
+      }
       if(vc===1)sel.value=ids[0];
-      if(vc===0){document.getElementById('noEmployeesMsg').style.display='block';document.getElementById('noEmployeesMsg').textContent='No employees assigned here.';document.getElementById('loginFormSection').style.display='none'}
-      else{document.getElementById('noEmployeesMsg').style.display='none';document.getElementById('loginFormSection').style.display='block'}
-      var lk=getDeviceLock();if(lk&&ids.indexOf(lk.empId)!==-1){sel.value=lk.empId;sel.disabled=true}
+      if(vc===0){
+        document.getElementById('noEmployeesMsg').style.display='block';
+        document.getElementById('noEmployeesMsg').textContent='No employees assigned here.';
+        document.getElementById('loginFormSection').style.display='none';
+      }else{
+        document.getElementById('noEmployeesMsg').style.display='none';
+        document.getElementById('loginFormSection').style.display='block';
+      }
+      var lk=getDeviceLock();
+      if(lk&&ids.indexOf(lk.empId)!==-1){sel.value=lk.empId;sel.disabled=true;}
       checkLoginReady();
     }
 
     function requestLocation(){
-      var el=document.getElementById('geoStatus');el.className='geo-status geo-loading';el.textContent='Checking your location...';
-      if(!navigator.geolocation){el.className='geo-status geo-denied';el.textContent='Geolocation not supported.';geoReady=true;geoError=true;return}
+      var el=document.getElementById('geoStatus');
+      el.className='geo-status geo-loading';
+      el.textContent='Checking your location...';
+      if(!navigator.geolocation){
+        el.className='geo-status geo-denied';
+        el.textContent='Geolocation not supported.';
+        geoReady=true;geoError=true;return;
+      }
       navigator.geolocation.getCurrentPosition(function(pos){
-        userLocation={lat:pos.coords.latitude,lng:pos.coords.longitude};geoReady=true;geoError=false;
+        userLocation={lat:pos.coords.latitude,lng:pos.coords.longitude};
+        geoReady=true;geoError=false;
         var r=checkGeofence(userLocation.lat,userLocation.lng,null);
-        if(r.inside){el.className='geo-status geo-ok';el.textContent=r.location;detectedLocationName=r.location;
-          for(var i=0;i<ALLOWED_LOCATIONS.length;i++){if(ALLOWED_LOCATIONS[i].name===detectedLocationName){detectedLocationIndex=i;break}}
-          filterEmployeesByLocation()}
-        else{el.className='geo-status geo-fail';el.textContent='You are '+r.distance+'m from '+r.closest+'. Move closer.';
-          document.getElementById('noEmployeesMsg').style.display='block';document.getElementById('noEmployeesMsg').textContent='Move within 50m of your branch to log in.';document.getElementById('loginFormSection').style.display='none'}
-      },function(err){geoReady=true;geoError=true;el.className='geo-status geo-denied';
+        if(r.inside){
+          el.className='geo-status geo-ok';
+          el.textContent=r.location;
+          detectedLocationName=r.location;
+          for(var i=0;i<ALLOWED_LOCATIONS.length;i++){
+            if(ALLOWED_LOCATIONS[i].name===detectedLocationName){detectedLocationIndex=i;break;}
+          }
+          filterEmployeesByLocation();
+        }else{
+          el.className='geo-status geo-fail';
+          el.textContent='You are '+r.distance+'m from '+r.closest+'. Move closer.';
+          document.getElementById('noEmployeesMsg').style.display='block';
+          document.getElementById('noEmployeesMsg').textContent='Move within 50m of your branch to log in.';
+          document.getElementById('loginFormSection').style.display='none';
+        }
+      },function(err){
+        geoReady=true;geoError=true;
+        el.className='geo-status geo-denied';
         if(err.code===1)el.textContent='Location denied. Enable GPS and refresh.';
         else if(err.code===2)el.textContent='Location unavailable.';
         else el.textContent='Location timed out. Refresh.';
-      },{enableHighAccuracy:true,timeout:15000,maximumAge:0})
+      },{enableHighAccuracy:true,timeout:15000,maximumAge:0});
     }
 
     function selectLoginMethod(method){
@@ -301,32 +375,44 @@
       document.getElementById('btnMethodFace').classList.toggle('selected',method==='face');
       document.getElementById('pinSection').classList.toggle('visible',method==='pin');
       document.getElementById('faceSection').classList.toggle('visible',method==='face');
-      clearError();checkLoginReady();
+      clearError();
+      checkLoginReady();
     }
 
-    // ============ FACE RECOGNITION WITH HEAD TURN ============
     async function loadFaceModels(){
       if(faceModelsLoaded)return true;
-      try{document.getElementById('modelsLoading').style.display='block';
+      try{
+        document.getElementById('modelsLoading').style.display='block';
         await faceapi.nets.tinyFaceDetector.loadFromUri(FACE_MODELS_URL);
         await faceapi.nets.faceLandmark68Net.loadFromUri(FACE_MODELS_URL);
         await faceapi.nets.faceRecognitionNet.loadFromUri(FACE_MODELS_URL);
-        faceModelsLoaded=true;document.getElementById('modelsLoading').style.display='none';return true}
-      catch(err){document.getElementById('modelsLoading').textContent='Failed to load models.';return false}
+        faceModelsLoaded=true;
+        document.getElementById('modelsLoading').style.display='none';
+        return true;
+      }catch(err){
+        document.getElementById('modelsLoading').textContent='Failed to load models.';
+        return false;
+      }
     }
 
     async function getReferenceDescriptor(empId){
-      var img=await new Promise(function(res,rej){var i=new Image();i.crossOrigin='anonymous';i.onload=function(){res(i)};i.onerror=function(){rej(new Error('Photo not found: faces/'+empId+'.jpg'))};i.src=FACE_PHOTOS_PATH+empId+'.jpg'});
+      var img=await new Promise(function(res,rej){
+        var i=new Image();
+        i.crossOrigin='anonymous';
+        i.onload=function(){res(i);};
+        i.onerror=function(){rej(new Error('Photo not found: faces/'+empId+'.jpg'));};
+        i.src=FACE_PHOTOS_PATH+empId+'.jpg';
+      });
       var det=await faceapi.detectSingleFace(img,new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
       if(!det)throw new Error('No face in reference photo for '+empId);
-      return det.descriptor
+      return det.descriptor;
     }
 
     function getHeadYaw(landmarks){
       var nose=landmarks.positions[30];
       var leftEye=landmarks.positions[36];
       var rightEye=landmarks.positions[45];
-      var eyeCenter={(leftEye.x+rightEye.x)/2};
+      var eyeCenter=(leftEye.x+rightEye.x)/2;
       var eyeWidth=Math.abs(rightEye.x-leftEye.x);
       if(eyeWidth===0)return 0;
       var offset=((nose.x-eyeCenter)/eyeWidth)*100;
@@ -335,11 +421,9 @@
 
     function showDirection(arrow,label){
       var overlay=document.getElementById('directionOverlay');
-      var arrowEl=document.getElementById('directionArrow');
-      var labelEl=document.getElementById('directionLabel');
+      document.getElementById('directionArrow').innerHTML=arrow;
+      document.getElementById('directionLabel').textContent=label;
       overlay.classList.add('visible');
-      arrowEl.innerHTML=arrow;
-      labelEl.textContent=label;
     }
 
     function hideDirection(){
@@ -356,198 +440,257 @@
     }
 
     function stopCamera(){
-      if(faceScanInterval){clearInterval(faceScanInterval);faceScanInterval=null}
-      if(faceStream){faceStream.getTracks().forEach(function(t){t.stop()});faceStream=null}
-      var video=document.getElementById('faceVideo');if(video)video.srcObject=null;
+      if(faceScanInterval){clearInterval(faceScanInterval);faceScanInterval=null;}
+      if(faceStream){faceStream.getTracks().forEach(function(t){t.stop();});faceStream=null;}
+      var video=document.getElementById('faceVideo');
+      if(video)video.srcObject=null;
       hideDirection();
     }
 
     async function openFaceScan(empId,empName){
-      var st=document.getElementById('faceScanStatus'),rb=document.getElementById('faceRetryBtn');
-      rb.style.display='none';hideDirection();updateSteps(1);
+      var st=document.getElementById('faceScanStatus');
+      var rb=document.getElementById('faceRetryBtn');
+      rb.style.display='none';
+      hideDirection();
+      updateSteps(1);
       document.getElementById('faceScanName').textContent='Verifying: '+empName;
-      st.className='face-scan-status loading';st.textContent='Loading face recognition...';
+      st.className='face-scan-status loading';
+      st.textContent='Loading face recognition...';
       document.getElementById('faceScanModal').classList.add('visible');
 
       var ok=await loadFaceModels();
-      if(!ok){st.className='face-scan-status fail';st.textContent='Could not load models. Check internet.';rb.style.display='inline-block';return}
+      if(!ok){st.className='face-scan-status fail';st.textContent='Could not load models. Check internet.';rb.style.display='inline-block';return;}
 
       var refDesc;
-      try{refDesc=await getReferenceDescriptor(empId)}
-      catch(err){st.className='face-scan-status fail';st.textContent=err.message;rb.style.display='inline-block';return}
+      try{refDesc=await getReferenceDescriptor(empId);}
+      catch(err){st.className='face-scan-status fail';st.textContent=err.message;rb.style.display='inline-block';return;}
 
       try{
         faceStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:640}}});
-        var video=document.getElementById('faceVideo');video.srcObject=faceStream;
-        await new Promise(function(resolve){video.onloadedmetadata=function(){video.play().then(resolve).catch(resolve)};setTimeout(resolve,3000)});
-      }catch(err){st.className='face-scan-status fail';st.textContent='Camera access denied.';rb.style.display='inline-block';return}
+        var video=document.getElementById('faceVideo');
+        video.srcObject=faceStream;
+        await new Promise(function(resolve){
+          video.onloadedmetadata=function(){video.play().then(resolve).catch(resolve);};
+          setTimeout(resolve,3000);
+        });
+      }catch(err){st.className='face-scan-status fail';st.textContent='Camera access denied.';rb.style.display='inline-block';return;}
 
-      st.className='face-scan-status scanning';st.textContent='Look at the camera...';
-
-      // Steps: 1=face match, 2=turn left, 3=turn right, 4=look center
-      var step=1,faceMatched=false,turnedLeft=false,turnedRight=false;
+      st.className='face-scan-status scanning';
+      st.textContent='Look at the camera...';
+      var step=1;
       updateSteps(1);
 
       setTimeout(function(){
-        var attempts=0,maxAttempts=45;
+        var attempts=0;
+        var maxAttempts=45;
         faceScanInterval=setInterval(async function(){
           attempts++;
-          if(attempts>maxAttempts){clearInterval(faceScanInterval);faceScanInterval=null;
-            st.className='face-scan-status fail';st.textContent='Timed out. Try again.';
-            rb.style.display='inline-block';hideDirection();stopCamera();return}
-          var video=document.getElementById('faceVideo');if(!video||video.readyState<2||video.videoWidth===0)return;
+          if(attempts>maxAttempts){
+            clearInterval(faceScanInterval);faceScanInterval=null;
+            st.className='face-scan-status fail';
+            st.textContent='Timed out. Try again.';
+            rb.style.display='inline-block';
+            hideDirection();
+            stopCamera();
+            return;
+          }
+          var video=document.getElementById('faceVideo');
+          if(!video||video.readyState<2||video.videoWidth===0)return;
           try{
             var det=await faceapi.detectSingleFace(video,new faceapi.TinyFaceDetectorOptions({inputSize:416,scoreThreshold:0.5})).withFaceLandmarks().withFaceDescriptor();
-            if(!det){st.textContent='No face detected... ('+attempts+'/'+maxAttempts+')';hideDirection();return}
+            if(!det){st.textContent='No face detected... ('+attempts+'/'+maxAttempts+')';hideDirection();return;}
 
-            // Step 1: Face match
             if(step===1){
               var dist=faceapi.euclideanDistance(det.descriptor,refDesc);
               if(dist<FACE_MATCH_THRESHOLD){
-                faceMatched=true;step=2;updateSteps(2);
+                step=2;updateSteps(2);
                 st.className='face-scan-status turn';
                 st.textContent='Face matched! Now turn your head LEFT';
-                showDirection('\u2B05\uFE0F','Turn LEFT');
+                showDirection('&#x2B05;&#xFE0F;','Turn LEFT');
               }else{
                 st.textContent='Scanning face... ('+attempts+'/'+maxAttempts+')';
                 hideDirection();
               }
-            }
-            // Step 2: Turn left
-            else if(step===2){
+            }else if(step===2){
               var yaw=getHeadYaw(det.landmarks);
               if(yaw>HEAD_TURN_THRESHOLD){
-                turnedLeft=true;step=3;updateSteps(3);
-                st.textContent='Great! Now turn your head RIGHT';
-                showDirection('\u27A1\uFE0F','Turn RIGHT');
+                step=3;updateSteps(3);
+                st.textContent='Now turn your head RIGHT';
+                showDirection('&#x27A1;&#xFE0F;','Turn RIGHT');
               }
-            }
-            // Step 3: Turn right
-            else if(step===3){
+            }else if(step===3){
               var yaw=getHeadYaw(det.landmarks);
               if(yaw<-HEAD_TURN_THRESHOLD){
-                turnedRight=true;step=4;updateSteps(4);
+                step=4;updateSteps(4);
                 st.textContent='Almost done! Look back at the camera';
-                showDirection('\u2B55','Look at CAMERA');
+                showDirection('&#x2B55;','Look at CAMERA');
               }
-            }
-            // Step 4: Look center
-            else if(step===4){
+            }else if(step===4){
               var yaw=getHeadYaw(det.landmarks);
               if(Math.abs(yaw)<8){
                 clearInterval(faceScanInterval);faceScanInterval=null;
                 updateSteps(5);hideDirection();
-                st.className='face-scan-status success';st.textContent='Face verified! Welcome, '+empName+'!';
-                setTimeout(function(){stopCamera();document.getElementById('faceScanModal').classList.remove('visible');onFaceVerified()},1500);
+                st.className='face-scan-status success';
+                st.textContent='Face verified! Welcome, '+empName+'!';
+                setTimeout(function(){stopCamera();document.getElementById('faceScanModal').classList.remove('visible');onFaceVerified();},1500);
               }
             }
-          }catch(err){st.textContent='Scanning... ('+attempts+'/'+maxAttempts+')'}
+          }catch(err){st.textContent='Scanning... ('+attempts+'/'+maxAttempts+')';}
         },800);
       },1000);
     }
 
-    function retryFaceScan(){stopCamera();if(pendingEmployee)openFaceScan(pendingEmployee.id,pendingEmployee.name)}
-    function cancelFaceScan(){stopCamera();document.getElementById('faceScanModal').classList.remove('visible');pendingEmployee=null}
+    function retryFaceScan(){stopCamera();if(pendingEmployee)openFaceScan(pendingEmployee.id,pendingEmployee.name);}
+    function cancelFaceScan(){stopCamera();document.getElementById('faceScanModal').classList.remove('visible');pendingEmployee=null;}
 
     function onFaceVerified(){
       loggedInEmployee=pendingEmployee;pendingEmployee=null;
       setDeviceLock(loggedInEmployee.id,loggedInEmployee.name);
-      populateAttendancePanel().then(function(){showPanel('panelAttendance')}).catch(function(err){alert('Error: '+err.message)})
+      populateAttendancePanel().then(function(){showPanel('panelAttendance');}).catch(function(err){alert('Error: '+err.message);});
     }
 
-    // ============ HOURS ============
-    function getClosedReason(){if(isHoliday())return'Today is a public holiday.';if(isBlockedDay()){return'Closed on '+['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date().getDay()]+'.'}return''}
-    function showClosedPanel(){document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});document.getElementById('panelClosed').classList.add('active');document.getElementById('closedDate').textContent=getDateStr();var r=getClosedReason();if(r)document.querySelector('.closed-hours').innerHTML='<strong>'+r+'</strong><br><br>Operating hours:<br><strong>7:00 AM - 10:00 PM</strong><br><strong>Monday - Saturday</strong>';updateClosedTime();if(closedTimeInterval)clearInterval(closedTimeInterval);closedTimeInterval=setInterval(function(){updateClosedTime();if(isPortalOpen()){clearInterval(closedTimeInterval);location.reload()}},1000)}
-    function updateClosedTime(){document.getElementById('closedCurrentTime').textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}
-    function startPortalCloseWatcher(){setInterval(function(){if(!isPortalOpen())showClosedPanel()},60000)}
+    function getClosedReason(){
+      if(isHoliday())return 'Today is a public holiday.';
+      if(isBlockedDay())return 'Closed on '+['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date().getDay()]+'.';
+      return '';
+    }
 
-    // ============ DEVICE LOCK ============
-    function getDeviceLock(){try{var l=JSON.parse(localStorage.getItem('attendanceLock'));if(l&&l.date===getTodayISO())return l;localStorage.removeItem('attendanceLock');return null}catch(e){return null}}
-    function setDeviceLock(id,name){localStorage.setItem('attendanceLock',JSON.stringify({date:getTodayISO(),empId:id,empName:name}))}
-    function applyDeviceLock(){var lk=getDeviceLock(),bn=document.getElementById('deviceLockBanner'),sl=document.getElementById('loginEmployeeSelect');if(lk){bn.textContent='Device locked to '+lk.empName+' ('+lk.empId+') for today';bn.style.display='block';sl.value=lk.empId;sl.disabled=true}else{bn.style.display='none';sl.disabled=false}}
+    function showClosedPanel(){
+      document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+      document.getElementById('panelClosed').classList.add('active');
+      document.getElementById('closedDate').textContent=getDateStr();
+      var r=getClosedReason();
+      if(r)document.querySelector('.closed-hours').innerHTML='<strong>'+r+'</strong><br><br>Operating hours:<br><strong>7:00 AM - 10:00 PM</strong><br><strong>Monday - Saturday</strong>';
+      updateClosedTime();
+      if(closedTimeInterval)clearInterval(closedTimeInterval);
+      closedTimeInterval=setInterval(function(){updateClosedTime();if(isPortalOpen()){clearInterval(closedTimeInterval);location.reload();}},1000);
+    }
 
-    // ============ DEVELOPER PANEL ============
-    var devTapCount=0,devTapTimer=null;
+    function updateClosedTime(){document.getElementById('closedCurrentTime').textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
+    function startPortalCloseWatcher(){setInterval(function(){if(!isPortalOpen())showClosedPanel();},60000);}
+
+    function getDeviceLock(){try{var l=JSON.parse(localStorage.getItem('attendanceLock'));if(l&&l.date===getTodayISO())return l;localStorage.removeItem('attendanceLock');return null;}catch(e){return null;}}
+    function setDeviceLock(id,name){localStorage.setItem('attendanceLock',JSON.stringify({date:getTodayISO(),empId:id,empName:name}));}
+    function applyDeviceLock(){
+      var lk=getDeviceLock();
+      var bn=document.getElementById('deviceLockBanner');
+      var sl=document.getElementById('loginEmployeeSelect');
+      if(lk){bn.textContent='Device locked to '+lk.empName+' ('+lk.empId+') for today';bn.style.display='block';sl.value=lk.empId;sl.disabled=true;}
+      else{bn.style.display='none';sl.disabled=false;}
+    }
+
+    var devTapCount=0;
+    var devTapTimer=null;
     document.addEventListener('click',function(e){
-      if(e.target.closest('.lock-icon')){devTapCount++;if(devTapTimer)clearTimeout(devTapTimer);devTapTimer=setTimeout(function(){devTapCount=0},3000);if(devTapCount>=7){devTapCount=0;document.getElementById('devPanel').classList.add('visible')}}
+      if(e.target.closest('.lock-icon')){
+        devTapCount++;
+        if(devTapTimer)clearTimeout(devTapTimer);
+        devTapTimer=setTimeout(function(){devTapCount=0;},3000);
+        if(devTapCount>=7){devTapCount=0;document.getElementById('devPanel').classList.add('visible');}
+      }
     });
-    function closeDevPanel(){document.getElementById('devPanel').classList.remove('visible')}
-    function devClearDeviceLock(){localStorage.removeItem('attendanceLock');alert('Device lock cleared!');closeDevPanel();location.reload()}
-    function devClearAllStorage(){localStorage.clear();alert('All storage cleared!');closeDevPanel();location.reload()}
+    function closeDevPanel(){document.getElementById('devPanel').classList.remove('visible');}
+    function devClearDeviceLock(){localStorage.removeItem('attendanceLock');alert('Device lock cleared!');closeDevPanel();location.reload();}
+    function devClearAllStorage(){localStorage.clear();alert('All storage cleared!');closeDevPanel();location.reload();}
     function devShowInfo(){
-      var info=document.getElementById('devInfo');var lock=localStorage.getItem('attendanceLock');
-      var data='Today: '+getTodayISO()+'\nLock: '+(lock||'None')+'\nGPS: '+(userLocation?userLocation.lat.toFixed(6)+', '+userLocation.lng.toFixed(6):'Not detected')+'\nBranch: '+(detectedLocationName||'None')+' (index: '+detectedLocationIndex+')\nEmployees: '+employees.length+'\nFace models: '+(faceModelsLoaded?'Loaded':'Not loaded')+'\nOpen: '+isPortalOpen()+'\nMethod: '+loginMethod;
-      info.textContent=data;info.style.display=info.style.display==='none'?'block':'none'}
+      var info=document.getElementById('devInfo');
+      var lock=localStorage.getItem('attendanceLock');
+      var data='Today: '+getTodayISO()+'\n';
+      data+='Lock: '+(lock||'None')+'\n';
+      data+='GPS: '+(userLocation?userLocation.lat.toFixed(6)+', '+userLocation.lng.toFixed(6):'Not detected')+'\n';
+      data+='Branch: '+(detectedLocationName||'None')+' (index: '+detectedLocationIndex+')\n';
+      data+='Employees: '+employees.length+'\n';
+      data+='Face models: '+(faceModelsLoaded?'Loaded':'Not loaded')+'\n';
+      data+='Open: '+isPortalOpen()+'\n';
+      data+='Method: '+loginMethod;
+      info.textContent=data;
+      info.style.display=info.style.display==='none'?'block':'none';
+    }
 
-    // ============ INIT ============
     window.onload=async function(){
-      if(!isPortalOpen()){showClosedPanel();return}
-      startPortalCloseWatcher();requestLocation();
-      var ds=getDateStr();document.getElementById('loginDate').textContent=ds;document.getElementById('attendanceDate').textContent=ds;
+      if(!isPortalOpen()){showClosedPanel();return;}
+      startPortalCloseWatcher();
+      requestLocation();
+      var ds=getDateStr();
+      document.getElementById('loginDate').textContent=ds;
+      document.getElementById('attendanceDate').textContent=ds;
       showLoading();
-      try{var res=await fetch(API_URL+'?action=getEmployees');var result=await res.json();hideLoading();
-        if(!result.success){showToast(result.error,'error');return}
-        employees=result.data;var sel=document.getElementById('loginEmployeeSelect');
-        employees.forEach(function(e){var o=document.createElement('option');o.value=e.id;o.textContent=e.id+' \u2014 '+e.name;sel.appendChild(o)});
-        applyDeviceLock();if(detectedLocationIndex!==-1)filterEmployeesByLocation()}
-      catch(err){hideLoading();showToast('Failed: '+err.message,'error')}
-      document.getElementById('loginEmployeeSelect').addEventListener('change',checkLoginReady)
+      try{
+        var res=await fetch(API_URL+'?action=getEmployees');
+        var result=await res.json();
+        hideLoading();
+        if(!result.success){showToast(result.error,'error');return;}
+        employees=result.data;
+        var sel=document.getElementById('loginEmployeeSelect');
+        employees.forEach(function(emp){
+          var o=document.createElement('option');
+          o.value=emp.id;
+          o.textContent=emp.id+' - '+emp.name;
+          sel.appendChild(o);
+        });
+        applyDeviceLock();
+        if(detectedLocationIndex!==-1)filterEmployeesByLocation();
+      }catch(err){hideLoading();showToast('Failed: '+err.message,'error');}
+      document.getElementById('loginEmployeeSelect').addEventListener('change',checkLoginReady);
     };
 
-    function pinNext(n){if(document.getElementById('pin'+n).value&&n<6)document.getElementById('pin'+(n+1)).focus();checkLoginReady()}
-    function pinBack(e,n){if(e.key==='Backspace'&&!document.getElementById('pin'+n).value&&n>1)document.getElementById('pin'+(n-1)).focus()}
-    function getPin(){var p='';for(var i=1;i<=6;i++)p+=document.getElementById('pin'+i).value;return p}
-    function clearPinOnly(){for(var i=1;i<=6;i++)document.getElementById('pin'+i).value=''}
+    function pinNext(n){if(document.getElementById('pin'+n).value&&n<6)document.getElementById('pin'+(n+1)).focus();checkLoginReady();}
+    function pinBack(e,n){if(e.key==='Backspace'&&!document.getElementById('pin'+n).value&&n>1)document.getElementById('pin'+(n-1)).focus();}
+    function getPin(){var p='';for(var i=1;i<=6;i++)p+=document.getElementById('pin'+i).value;return p;}
+    function clearPinOnly(){for(var i=1;i<=6;i++)document.getElementById('pin'+i).value='';}
     function checkLoginReady(){
       var empSelected=!!document.getElementById('loginEmployeeSelect').value;
-      if(loginMethod==='pin'){document.getElementById('loginBtnPin').disabled=!(empSelected&&getPin().length===6)}
-      else{document.getElementById('loginBtnFace').disabled=!empSelected}
+      if(loginMethod==='pin'){document.getElementById('loginBtnPin').disabled=!(empSelected&&getPin().length===6);}
+      else{document.getElementById('loginBtnFace').disabled=!empSelected;}
     }
-    function showPanel(id){document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});document.getElementById(id).classList.add('active')}
-    function showError(msg){document.getElementById('loginError').textContent=msg}
-    function clearError(){document.getElementById('loginError').textContent=''}
+    function showPanel(id){document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});document.getElementById(id).classList.add('active');}
+    function showError(msg){document.getElementById('loginError').textContent=msg;}
+    function clearError(){document.getElementById('loginError').textContent='';}
 
-    // ============ SHARED PRE-CHECKS ============
     async function runPreChecks(empId){
-      if(!isPortalOpen()){showClosedPanel();return false}
-      if(!geoReady){showError('Still checking location...');return false}
-      if(geoError){showError('Enable GPS and refresh.');return false}
-      if(!empId){showError('Select an employee.');return false}
+      if(!isPortalOpen()){showClosedPanel();return false;}
+      if(!geoReady){showError('Still checking location...');return false;}
+      if(geoError){showError('Enable GPS and refresh.');return false;}
+      if(!empId){showError('Select an employee.');return false;}
       clearError();
-      var lk=getDeviceLock();if(lk&&lk.empId!==empId){showError('Device locked to '+lk.empName+' for today.');return false}
-      var ai=EMPLOYEE_LOCATION_MAP[empId];if(!ai){showError('No location assigned.');return false}
+      var lk=getDeviceLock();
+      if(lk&&lk.empId!==empId){showError('Device locked to '+lk.empName+' for today.');return false;}
+      var ai=EMPLOYEE_LOCATION_MAP[empId];
+      if(!ai){showError('No location assigned.');return false;}
       var gr=checkGeofence(userLocation.lat,userLocation.lng,ai);
-      if(!gr.inside){showError('You are '+gr.distance+'m from '+gr.closest+'. Check in at your assigned branch only.');return false}
+      if(!gr.inside){showError('You are '+gr.distance+'m from '+gr.closest+'. Check in at your assigned branch only.');return false;}
       showLoading();
       try{
         var checkRes=await fetch(API_URL+'?action=getTodayActions&employeeId='+encodeURIComponent(empId));
-        var checkResult=await checkRes.json();hideLoading();
+        var checkResult=await checkRes.json();
+        hideLoading();
         if(checkResult.success&&checkResult.actions&&checkResult.actions.length>0){
-          var hasIn=checkResult.actions.some(function(a){return a.action==='Check In'});
-          var hasOut=checkResult.actions.some(function(a){return a.action==='Check Out'});
+          var hasIn=checkResult.actions.some(function(a){return a.action==='Check In';});
+          var hasOut=checkResult.actions.some(function(a){return a.action==='Check Out';});
           var isLockedDevice=lk&&lk.empId===empId;
-          if(hasIn&&hasOut){showError('Already checked in and out today.');return false}
-          if(hasIn&&!isLockedDevice){showError('Already checked in on another device.');return false}
+          if(hasIn&&hasOut){showError('Already checked in and out today.');return false;}
+          if(hasIn&&!isLockedDevice){showError('Already checked in on another device.');return false;}
         }
-      }catch(err){hideLoading()}
+      }catch(err){hideLoading();}
       return true;
     }
 
     function completeLogin(empId){
-      loggedInEmployee=employees.find(function(e){return e.id===empId});
-      if(!loggedInEmployee){showError('Employee not found.');return}
+      loggedInEmployee=employees.find(function(e){return e.id===empId;});
+      if(!loggedInEmployee){showError('Employee not found.');return;}
       setDeviceLock(loggedInEmployee.id,loggedInEmployee.name);
-      populateAttendancePanel().then(function(){showPanel('panelAttendance')}).catch(function(err){alert('Error: '+err.message)});
+      populateAttendancePanel().then(function(){showPanel('panelAttendance');}).catch(function(err){alert('Error: '+err.message);});
     }
 
     async function handlePinLogin(){
-      var empId=document.getElementById('loginEmployeeSelect').value,pin=getPin();
+      var empId=document.getElementById('loginEmployeeSelect').value;
+      var pin=getPin();
       if(!empId||pin.length!==6)return;
       var cp=PIN_MAP[empId];
-      if(!cp){clearPinOnly();showError('No PIN configured.');document.getElementById('pin1').focus();return}
-      if(pin!==cp){clearPinOnly();showError('Incorrect PIN.');document.getElementById('pin1').focus();return}
+      if(!cp){clearPinOnly();showError('No PIN configured.');document.getElementById('pin1').focus();return;}
+      if(pin!==cp){clearPinOnly();showError('Incorrect PIN.');document.getElementById('pin1').focus();return;}
       var ok=await runPreChecks(empId);
-      if(!ok){clearPinOnly();document.getElementById('pin1').focus();return}
+      if(!ok){clearPinOnly();document.getElementById('pin1').focus();return;}
       completeLogin(empId);
     }
 
@@ -556,59 +699,98 @@
       if(!empId)return;
       var ok=await runPreChecks(empId);
       if(!ok)return;
-      var emp=employees.find(function(e){return e.id===empId});
-      if(!emp){showError('Employee not found.');return}
+      var emp=employees.find(function(e){return e.id===empId;});
+      if(!emp){showError('Employee not found.');return;}
       pendingEmployee=emp;
       openFaceScan(empId,emp.name);
     }
 
-    // ============ ATTENDANCE ============
     async function populateAttendancePanel(){
       document.getElementById('infoName').textContent=loggedInEmployee.name;
       document.getElementById('infoId').textContent=loggedInEmployee.id;
       document.getElementById('infoMainBranch').textContent=loggedInEmployee.mainBranch||'-';
       document.getElementById('infoProvince').textContent=loggedInEmployee.provinceBranch||'-';
       document.getElementById('infoDistrict').textContent=loggedInEmployee.district||'-';
-      selectedAction='';document.getElementById('btnCheckIn').classList.remove('selected');document.getElementById('btnCheckOut').classList.remove('selected');
-      document.getElementById('submitBtn').disabled=true;document.getElementById('completedBanner').style.display='none';document.getElementById('actionSection').style.display='block';
+      selectedAction='';
+      document.getElementById('btnCheckIn').classList.remove('selected');
+      document.getElementById('btnCheckOut').classList.remove('selected');
+      document.getElementById('submitBtn').disabled=true;
+      document.getElementById('completedBanner').style.display='none';
+      document.getElementById('actionSection').style.display='block';
       document.getElementById('infoStatus').innerHTML='<span class="status-badge status-none">Loading...</span>';
-      try{var res=await fetch(API_URL+'?action=getTodayActions&employeeId='+encodeURIComponent(loggedInEmployee.id));
-        var result=await res.json();var el=document.getElementById('infoStatus');
-        var bI=document.getElementById('btnCheckIn'),bO=document.getElementById('btnCheckOut');
-        if(!result.success){el.innerHTML='<span class="status-badge status-none">Error</span>';return}
-        var ac=result.actions||[];var hI=ac.some(function(a){return a.action==='Check In'});var hO=ac.some(function(a){return a.action==='Check Out'});
-        if(hI&&hO){el.innerHTML='<span class="status-badge status-out">Checked Out</span>';document.getElementById('completedBanner').style.display='block';document.getElementById('actionSection').style.display='none'}
-        else if(hI){el.innerHTML='<span class="status-badge status-in">Checked In</span>';bI.disabled=true;bO.disabled=false}
-        else{el.innerHTML='<span class="status-badge status-none">No Record Today</span>';bI.disabled=false;bO.disabled=true}
-      }catch(err){document.getElementById('infoStatus').innerHTML='<span class="status-badge status-none">Error</span>'}
+      try{
+        var res=await fetch(API_URL+'?action=getTodayActions&employeeId='+encodeURIComponent(loggedInEmployee.id));
+        var result=await res.json();
+        var el=document.getElementById('infoStatus');
+        var bI=document.getElementById('btnCheckIn');
+        var bO=document.getElementById('btnCheckOut');
+        if(!result.success){el.innerHTML='<span class="status-badge status-none">Error</span>';return;}
+        var ac=result.actions||[];
+        var hI=ac.some(function(a){return a.action==='Check In';});
+        var hO=ac.some(function(a){return a.action==='Check Out';});
+        if(hI&&hO){
+          el.innerHTML='<span class="status-badge status-out">Checked Out</span>';
+          document.getElementById('completedBanner').style.display='block';
+          document.getElementById('actionSection').style.display='none';
+        }else if(hI){
+          el.innerHTML='<span class="status-badge status-in">Checked In</span>';
+          bI.disabled=true;bO.disabled=false;
+        }else{
+          el.innerHTML='<span class="status-badge status-none">No Record Today</span>';
+          bI.disabled=false;bO.disabled=true;
+        }
+      }catch(err){document.getElementById('infoStatus').innerHTML='<span class="status-badge status-none">Error</span>';}
     }
 
-    function selectAction(a){selectedAction=a;document.getElementById('btnCheckIn').classList.toggle('selected',a==='Check In');document.getElementById('btnCheckOut').classList.toggle('selected',a==='Check Out');document.getElementById('submitBtn').disabled=false}
+    function selectAction(a){
+      selectedAction=a;
+      document.getElementById('btnCheckIn').classList.toggle('selected',a==='Check In');
+      document.getElementById('btnCheckOut').classList.toggle('selected',a==='Check Out');
+      document.getElementById('submitBtn').disabled=false;
+    }
 
     async function submitAttendance(){
-      if(!isPortalOpen()){showClosedPanel();return}
-      if(userLocation){var ai=EMPLOYEE_LOCATION_MAP[loggedInEmployee.id];var gc=checkGeofence(userLocation.lat,userLocation.lng,ai);
-        if(!gc.inside){var g=document.getElementById('geoStatusAttendance');g.style.display='block';g.className='geo-status geo-fail';g.textContent='You moved out of your branch zone.';return}}
-      if(!loggedInEmployee||!selectedAction)return;showLoading();document.getElementById('submitBtn').disabled=true;
-      try{var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'logAttendance',data:{employeeAction:selectedAction,employeeName:loggedInEmployee.name,employeeId:loggedInEmployee.id,mainBranch:loggedInEmployee.mainBranch,provinceBranch:loggedInEmployee.provinceBranch,district:loggedInEmployee.district}})});
-        var result=await res.json();hideLoading();if(result.success)showSuccessPanel();else{showToast(result.error,'error');document.getElementById('submitBtn').disabled=false}
-      }catch(err){hideLoading();showToast('Failed: '+err.message,'error');document.getElementById('submitBtn').disabled=false}
+      if(!isPortalOpen()){showClosedPanel();return;}
+      if(userLocation){
+        var ai=EMPLOYEE_LOCATION_MAP[loggedInEmployee.id];
+        var gc=checkGeofence(userLocation.lat,userLocation.lng,ai);
+        if(!gc.inside){
+          var g=document.getElementById('geoStatusAttendance');
+          g.style.display='block';g.className='geo-status geo-fail';
+          g.textContent='You moved out of your branch zone.';return;
+        }
+      }
+      if(!loggedInEmployee||!selectedAction)return;
+      showLoading();
+      document.getElementById('submitBtn').disabled=true;
+      try{
+        var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'logAttendance',data:{employeeAction:selectedAction,employeeName:loggedInEmployee.name,employeeId:loggedInEmployee.id,mainBranch:loggedInEmployee.mainBranch,provinceBranch:loggedInEmployee.provinceBranch,district:loggedInEmployee.district}})});
+        var result=await res.json();
+        hideLoading();
+        if(result.success)showSuccessPanel();
+        else{showToast(result.error,'error');document.getElementById('submitBtn').disabled=false;}
+      }catch(err){hideLoading();showToast('Failed: '+err.message,'error');document.getElementById('submitBtn').disabled=false;}
     }
 
     function showSuccessPanel(){
-      var c=selectedAction==='Check In';document.getElementById('successTitle').textContent=selectedAction+' Successful!';
-      var b=document.getElementById('successActionBadge');b.textContent=selectedAction;b.className='success-action '+(c?'checkin':'checkout');
+      var c=selectedAction==='Check In';
+      document.getElementById('successTitle').textContent=selectedAction+' Successful!';
+      var b=document.getElementById('successActionBadge');
+      b.textContent=selectedAction;
+      b.className='success-action '+(c?'checkin':'checkout');
       document.getElementById('successDate').textContent=getDateStr();
-      document.getElementById('successName').textContent=loggedInEmployee.name;document.getElementById('successId').textContent=loggedInEmployee.id;
-      document.getElementById('successBranch').textContent=loggedInEmployee.mainBranch||'-';document.getElementById('successProvince').textContent=loggedInEmployee.provinceBranch||'-';
+      document.getElementById('successName').textContent=loggedInEmployee.name;
+      document.getElementById('successId').textContent=loggedInEmployee.id;
+      document.getElementById('successBranch').textContent=loggedInEmployee.mainBranch||'-';
+      document.getElementById('successProvince').textContent=loggedInEmployee.provinceBranch||'-';
       document.getElementById('successDistrict').textContent=loggedInEmployee.district||'-';
       document.getElementById('successTimestamp').textContent=new Date().toLocaleString('en-US',{weekday:'short',year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});
-      showPanel('panelSuccess')
+      showPanel('panelSuccess');
     }
 
-    function showLoading(){document.getElementById('loadingOverlay').classList.add('visible')}
-    function hideLoading(){document.getElementById('loadingOverlay').classList.remove('visible')}
-    function showToast(m,t){var e=document.getElementById('toast');e.textContent=m;e.className='toast '+t+' show';setTimeout(function(){e.classList.remove('show')},4000)}
+    function showLoading(){document.getElementById('loadingOverlay').classList.add('visible');}
+    function hideLoading(){document.getElementById('loadingOverlay').classList.remove('visible');}
+    function showToast(m,t){var e=document.getElementById('toast');e.textContent=m;e.className='toast '+t+' show';setTimeout(function(){e.classList.remove('show');},4000);}
   </script>
 </body>
 </html>
