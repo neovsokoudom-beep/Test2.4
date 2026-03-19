@@ -80,13 +80,27 @@
     .face-scan-status.success{background:#e6f9ee;color:#1b9e4b}
     .face-scan-status.fail{background:#ffebee;color:#c62828}
     .face-scan-status.loading{background:#f5f5f5;color:#888}
+    .face-scan-status.blink{background:#fff3e0;color:#e65100}
     .face-btn-row{display:flex;justify-content:center;gap:12px}
     .face-cancel-btn{padding:14px 28px;font-size:18px;font-weight:600;background:#f0f0f0;color:#555;border:none;border-radius:12px;cursor:pointer}
     .face-cancel-btn:hover{background:#e0e0e0}
     .face-retry-btn{padding:14px 28px;font-size:18px;font-weight:600;background:#4361ee;color:#fff;border:none;border-radius:12px;cursor:pointer}
     .face-retry-btn:hover{background:#3a56d4}
     .models-loading{font-size:14px;color:#888;margin-bottom:16px}
-    @media(max-width:480px){.container{padding:28px 18px;border-radius:16px}.header h1{font-size:28px}.header p{font-size:16px}label{font-size:18px}select,input[type="text"],input[type="password"]{font-size:20px;padding:14px 16px}.pin-container{gap:6px}.pin-input{width:46px;height:62px;font-size:28px;border-radius:12px}.action-btn{padding:20px 10px;font-size:22px}.primary-btn{padding:20px;font-size:22px}.info-row{font-size:17px;padding:8px 0}.success-details .detail-row{font-size:17px}.geo-status{font-size:15px;padding:10px 14px}.device-lock-banner{font-size:15px}.face-scan-container{padding:20px}.face-scan-title{font-size:20px}.camera-wrapper{max-width:280px;height:280px}}
+    .login-method-buttons{display:flex;gap:14px;margin-bottom:24px}
+    .login-method-btn{flex:1;padding:20px 16px;font-size:20px;font-weight:700;border:3px solid transparent;border-radius:16px;cursor:pointer;transition:all 0.2s;text-align:center}
+    .btn-pin-login{background:#e3f2fd;color:#1565c0;border-color:#bbdefb}
+    .btn-pin-login:hover{background:#bbdefb}
+    .btn-pin-login.selected{background:#1565c0;color:#fff;border-color:#1565c0}
+    .btn-face-login{background:#f3e5f5;color:#7b1fa2;border-color:#e1bee7}
+    .btn-face-login:hover{background:#e1bee7}
+    .btn-face-login.selected{background:#7b1fa2;color:#fff;border-color:#7b1fa2}
+    .pin-section{display:none}
+    .pin-section.visible{display:block}
+    .face-login-section{display:none;text-align:center;padding:20px 0}
+    .face-login-section.visible{display:block}
+    .face-login-section p{font-size:17px;color:#888;margin-bottom:16px}
+    @media(max-width:480px){.container{padding:28px 18px;border-radius:16px}.header h1{font-size:28px}.header p{font-size:16px}label{font-size:18px}select,input[type="text"],input[type="password"]{font-size:20px;padding:14px 16px}.pin-container{gap:6px}.pin-input{width:46px;height:62px;font-size:28px;border-radius:12px}.action-btn{padding:20px 10px;font-size:22px}.primary-btn{padding:20px;font-size:22px}.info-row{font-size:17px;padding:8px 0}.success-details .detail-row{font-size:17px}.geo-status{font-size:15px;padding:10px 14px}.device-lock-banner{font-size:15px}.face-scan-container{padding:20px}.face-scan-title{font-size:20px}.camera-wrapper{max-width:280px;height:280px}.login-method-btn{font-size:18px;padding:18px 12px}}
   </style>
 </head>
 <body>
@@ -136,19 +150,39 @@
     <div id="noEmployeesMsg" class="no-employees-msg" style="display:none;"></div>
     <div id="loginFormSection">
       <div class="form-group"><label for="loginEmployeeSelect">Employee ID</label><select id="loginEmployeeSelect"><option value="">-- Select Employee ID --</option></select></div>
+
+      <!-- LOGIN METHOD TOGGLE -->
       <div class="form-group">
-        <label>Enter 6-Digit PIN</label>
-        <div class="pin-container">
-          <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin1" oninput="pinNext(1)" onkeydown="pinBack(event,1)">
-          <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin2" oninput="pinNext(2)" onkeydown="pinBack(event,2)">
-          <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin3" oninput="pinNext(3)" onkeydown="pinBack(event,3)">
-          <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin4" oninput="pinNext(4)" onkeydown="pinBack(event,4)">
-          <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin5" oninput="pinNext(5)" onkeydown="pinBack(event,5)">
-          <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin6" oninput="pinNext(6)" onkeydown="pinBack(event,6)">
+        <label>Login Method</label>
+        <div class="login-method-buttons">
+          <button class="login-method-btn btn-pin-login selected" id="btnMethodPin" onclick="selectLoginMethod('pin')">🔢 PIN</button>
+          <button class="login-method-btn btn-face-login" id="btnMethodFace" onclick="selectLoginMethod('face')">📸 Face ID</button>
         </div>
-        <div class="error-msg" id="loginError"></div>
       </div>
-      <button class="primary-btn" id="loginBtn" onclick="handleLogin()" disabled>Login</button>
+
+      <!-- PIN SECTION -->
+      <div class="pin-section visible" id="pinSection">
+        <div class="form-group">
+          <label>Enter 6-Digit PIN</label>
+          <div class="pin-container">
+            <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin1" oninput="pinNext(1)" onkeydown="pinBack(event,1)">
+            <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin2" oninput="pinNext(2)" onkeydown="pinBack(event,2)">
+            <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin3" oninput="pinNext(3)" onkeydown="pinBack(event,3)">
+            <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin4" oninput="pinNext(4)" onkeydown="pinBack(event,4)">
+            <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin5" oninput="pinNext(5)" onkeydown="pinBack(event,5)">
+            <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin6" oninput="pinNext(6)" onkeydown="pinBack(event,6)">
+          </div>
+        </div>
+        <button class="primary-btn" id="loginBtnPin" onclick="handlePinLogin()" disabled>Login with PIN</button>
+      </div>
+
+      <!-- FACE ID SECTION -->
+      <div class="face-login-section" id="faceSection">
+        <p>Select your Employee ID above, then tap the button below to verify your face.</p>
+        <button class="primary-btn" id="loginBtnFace" onclick="handleFaceLogin()" disabled style="background:#7b1fa2;">Login with Face ID 📸</button>
+      </div>
+
+      <div class="error-msg" id="loginError"></div>
     </div>
   </div>
 
@@ -191,27 +225,26 @@
     const FACE_MODELS_URL='https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/model/';
     const FACE_PHOTOS_PATH='./faces/';
     const FACE_MATCH_THRESHOLD=0.45;
+    const BLINK_THRESHOLD=0.26;
 
     const OPEN_HOUR=7,CLOSE_HOUR=22,BLOCKED_DAYS=[0];
     const HOLIDAYS=['2026-01-01','2026-01-07','2026-03-08','2026-04-14','2026-04-15','2026-04-16','2026-05-01','2026-05-14','2026-05-15','2026-05-16','2026-06-18','2026-09-24','2026-10-15','2026-10-29','2026-11-09','2026-11-18','2026-11-19','2026-11-20'];
 
-    // ============ GEOFENCE LOCATIONS (index 0-11) ============
     const ALLOWED_LOCATIONS=[
-      {name:'ស្នាក់ការកណ្ដាល (HQ)',lat:11.574984,lng:104.925366,radius:300},            // 0
-      {name:'ទឹកល្អក់',lat:11.567364,lng:104.900508,radius:50},                          // 1
-      {name:'ដង្កោ (Dangkor)',lat:11.562540,lng:104.856171,radius:50},                    // 2
-      {name:'បឹងសាឡាង',lat:11.549739,lng:104.899910,radius:50},                         // 3
-      {name:'អូឡាំពិក (Olympic)',lat:11.558100,lng:104.919700,radius:50},                 // 4
-      {name:'ច្បារអំពៅ (Chbar Ampov)',lat:11.530928,lng:104.944263,radius:50},            // 5
-      {name:'បឹងប្រលិត (Boeung Prolit)',lat:11.555993,lng:104.918761,radius:50},          // 6
-      {name:'រោងចក្រកែវ',lat:11.498345,lng:104.892716,radius:50},                         // 7
-      {name:'អ៊ីអនម៉លទន្លេបាសាក់ (AEON Tonle Bassac)',lat:11.547982,lng:104.932870,radius:50}, // 8
-      {name:'អ៊ីអនម៉លសែនសុខ (AEON Sen Sok)',lat:11.599664,lng:104.885370,radius:50},     // 9
-      {name:'អ៊ីអនម៉លមានជ័យ (AEON Mean Chey)',lat:11.484916,lng:104.918083,radius:50},    // 10
-      {name:'ពោធិ៍ចិនតុង (Pochentong)',lat:11.552512,lng:104.844986,radius:50}             // 11
+      {name:'ស្នាក់ការកណ្ដាល (HQ)',lat:11.574984,lng:104.925366,radius:300},
+      {name:'ទឹកល្អក់',lat:11.567364,lng:104.900508,radius:50},
+      {name:'ដង្កោ (Dangkor)',lat:11.562540,lng:104.856171,radius:50},
+      {name:'បឹងសាឡាង',lat:11.549739,lng:104.899910,radius:50},
+      {name:'អូឡាំពិក (Olympic)',lat:11.558100,lng:104.919700,radius:50},
+      {name:'ច្បារអំពៅ (Chbar Ampov)',lat:11.530928,lng:104.944263,radius:50},
+      {name:'បឹងប្រលិត (Boeung Prolit)',lat:11.555993,lng:104.918761,radius:50},
+      {name:'រោងចក្រកែវ',lat:11.498345,lng:104.892716,radius:50},
+      {name:'អ៊ីអនម៉លទន្លេបាសាក់ (AEON Tonle Bassac)',lat:11.547982,lng:104.932870,radius:50},
+      {name:'អ៊ីអនម៉លសែនសុខ (AEON Sen Sok)',lat:11.599664,lng:104.885370,radius:50},
+      {name:'អ៊ីអនម៉លមានជ័យ (AEON Mean Chey)',lat:11.484916,lng:104.918083,radius:50},
+      {name:'ពោធិ៍ចិនតុង (Pochentong)',lat:11.552512,lng:104.844986,radius:50}
     ];
 
-    // ============ PIN MAP (Employee ID : 6-digit PIN) ============
     const PIN_MAP={
       '001':'000001','002':'000002','003':'000003','004':'000004',
       '005':'000005','006':'000006','007':'000007','008':'000008',
@@ -219,28 +252,17 @@
       '013':'000013','014':'000014'
     };
 
-    // ============ EMPLOYEE → ALLOWED LOCATION INDEXES ============
     const EMPLOYEE_LOCATION_MAP={
-      '001':[0],   // A → ស្នាក់ការកណ្ដាល (HQ)
-      '002':[0],   // B → ស្នាក់ការកណ្ដាល (HQ)
-      '003':[0],   // C → ស្នាក់ការកណ្ដាល (HQ)
-      '004':[1],   // D → ទឹកល្អក់
-      '005':[2],   // E → ដង្កោ (Dangkor)
-      '006':[3],   // F → បឹងសាឡាង
-      '007':[4],   // G → អូឡាំពិក (Olympic)
-      '008':[5],   // H → ច្បារអំពៅ (Chbar Ampov)
-      '009':[6],   // I → បឹងប្រលិត (Boeung Prolit)
-      '010':[7],   // J → រោងចក្រកែវ
-      '011':[8],   // K → អ៊ីអនម៉លទន្លេបាសាក់ (AEON Tonle Bassac)
-      '012':[9],   // L → អ៊ីអនម៉លសែនសុខ (AEON Sen Sok)
-      '013':[10],  // M → អ៊ីអនម៉លមានជ័យ (AEON Mean Chey)
-      '014':[11]   // N → ពោធិ៍ចិនតុង (Pochentong)
+      '001':[0],'002':[0],'003':[0],
+      '004':[1],'005':[2],'006':[3],'007':[4],'008':[5],
+      '009':[6],'010':[7],'011':[8],'012':[9],'013':[10],'014':[11]
     };
 
     let employees=[],loggedInEmployee=null,selectedAction='',closedTimeInterval=null;
     let userLocation=null,geoReady=false,geoError=false;
     let detectedLocationName=null,detectedLocationIndex=-1;
     let faceModelsLoaded=false,faceStream=null,faceScanInterval=null,pendingEmployee=null;
+    let loginMethod='pin';
 
     function getDateStr(){return new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}
     function getTodayISO(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
@@ -266,6 +288,7 @@
       if(vc===0){document.getElementById('noEmployeesMsg').style.display='block';document.getElementById('noEmployeesMsg').textContent='⚠️ No employees assigned here.';document.getElementById('loginFormSection').style.display='none'}
       else{document.getElementById('noEmployeesMsg').style.display='none';document.getElementById('loginFormSection').style.display='block'}
       var lk=getDeviceLock();if(lk&&ids.indexOf(lk.empId)!==-1){sel.value=lk.empId;sel.disabled=true}
+      checkLoginReady();
     }
 
     function requestLocation(){
@@ -286,7 +309,17 @@
       },{enableHighAccuracy:true,timeout:15000,maximumAge:0})
     }
 
-    // ============ FACE RECOGNITION ============
+    // ============ LOGIN METHOD TOGGLE ============
+    function selectLoginMethod(method){
+      loginMethod=method;
+      document.getElementById('btnMethodPin').classList.toggle('selected',method==='pin');
+      document.getElementById('btnMethodFace').classList.toggle('selected',method==='face');
+      document.getElementById('pinSection').classList.toggle('visible',method==='pin');
+      document.getElementById('faceSection').classList.toggle('visible',method==='face');
+      clearError();checkLoginReady();
+    }
+
+    // ============ FACE RECOGNITION WITH BLINK DETECTION ============
     async function loadFaceModels(){
       if(faceModelsLoaded)return true;
       try{document.getElementById('modelsLoading').style.display='block';
@@ -302,6 +335,24 @@
       var det=await faceapi.detectSingleFace(img,new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
       if(!det)throw new Error('No face detected in reference photo for '+empId);
       return det.descriptor
+    }
+
+    // Eye Aspect Ratio for blink detection
+    function getEAR(landmarks,eyePoints){
+      var pts=eyePoints.map(function(i){return landmarks.positions[i]});
+      var a=Math.sqrt(Math.pow(pts[1].x-pts[5].x,2)+Math.pow(pts[1].y-pts[5].y,2));
+      var b=Math.sqrt(Math.pow(pts[2].x-pts[4].x,2)+Math.pow(pts[2].y-pts[4].y,2));
+      var c=Math.sqrt(Math.pow(pts[0].x-pts[3].x,2)+Math.pow(pts[0].y-pts[3].y,2));
+      return(a+b)/(2.0*c);
+    }
+
+    function detectBlink(landmarks){
+      var leftEye=[36,37,38,39,40,41];
+      var rightEye=[42,43,44,45,46,47];
+      var leftEAR=getEAR(landmarks,leftEye);
+      var rightEAR=getEAR(landmarks,rightEye);
+      var avgEAR=(leftEAR+rightEAR)/2.0;
+      return avgEAR<BLINK_THRESHOLD;
     }
 
     function stopCamera(){
@@ -332,20 +383,33 @@
 
       st.className='face-scan-status scanning';st.textContent='📸 Look at the camera...';
 
+      var faceMatched=false,blinkDetected=false;
+
       setTimeout(function(){
         var attempts=0,maxAttempts=30;
         faceScanInterval=setInterval(async function(){
           attempts++;
-          if(attempts>maxAttempts){clearInterval(faceScanInterval);faceScanInterval=null;st.className='face-scan-status fail';st.textContent='⏰ Timed out. Try again.';rb.style.display='inline-block';stopCamera();return}
+          if(attempts>maxAttempts){clearInterval(faceScanInterval);faceScanInterval=null;
+            if(faceMatched&&!blinkDetected){st.className='face-scan-status fail';st.textContent='⏰ Face matched but no blink detected. Try again.';}
+            else{st.className='face-scan-status fail';st.textContent='⏰ Timed out. Try again.';}
+            rb.style.display='inline-block';stopCamera();return}
           var video=document.getElementById('faceVideo');if(!video||video.readyState<2||video.videoWidth===0)return;
           try{
             var det=await faceapi.detectSingleFace(video,new faceapi.TinyFaceDetectorOptions({inputSize:416,scoreThreshold:0.5})).withFaceLandmarks().withFaceDescriptor();
             if(!det){st.textContent='📸 No face detected... ('+attempts+'/'+maxAttempts+')';return}
             var dist=faceapi.euclideanDistance(det.descriptor,refDesc);
             if(dist<FACE_MATCH_THRESHOLD){
-              clearInterval(faceScanInterval);faceScanInterval=null;
-              st.className='face-scan-status success';st.textContent='✅ Face verified! Welcome, '+empName+'!';
-              setTimeout(function(){stopCamera();document.getElementById('faceScanModal').classList.remove('visible');onFaceVerified()},1500)
+              faceMatched=true;
+              // Check for blink
+              var isBlink=detectBlink(det.landmarks);
+              if(isBlink){blinkDetected=true;}
+              if(faceMatched&&blinkDetected){
+                clearInterval(faceScanInterval);faceScanInterval=null;
+                st.className='face-scan-status success';st.textContent='✅ Face verified! Welcome, '+empName+'!';
+                setTimeout(function(){stopCamera();document.getElementById('faceScanModal').classList.remove('visible');onFaceVerified()},1500);
+              }else if(faceMatched&&!blinkDetected){
+                st.className='face-scan-status blink';st.textContent='👁️ Face matched! Please BLINK to confirm you are real.';
+              }
             }else{st.textContent='📸 Keep looking... ('+attempts+'/'+maxAttempts+')'}
           }catch(err){st.textContent='📸 Scanning... ('+attempts+'/'+maxAttempts+')'}
         },1000);
@@ -382,7 +446,7 @@
     function devClearAllStorage(){localStorage.clear();alert('✅ All storage cleared!');closeDevPanel();location.reload()}
     function devShowInfo(){
       var info=document.getElementById('devInfo');var lock=localStorage.getItem('attendanceLock');
-      var data='📅 Today: '+getTodayISO()+'\n🔒 Lock: '+(lock||'None')+'\n📍 GPS: '+(userLocation?userLocation.lat.toFixed(6)+', '+userLocation.lng.toFixed(6):'Not detected')+'\n🏢 Branch: '+(detectedLocationName||'None')+' (index: '+detectedLocationIndex+')\n👤 Employees: '+employees.length+'\n🧠 Face models: '+(faceModelsLoaded?'Loaded':'Not loaded')+'\n⏰ Open: '+isPortalOpen();
+      var data='📅 Today: '+getTodayISO()+'\n🔒 Lock: '+(lock||'None')+'\n📍 GPS: '+(userLocation?userLocation.lat.toFixed(6)+', '+userLocation.lng.toFixed(6):'Not detected')+'\n🏢 Branch: '+(detectedLocationName||'None')+' (index: '+detectedLocationIndex+')\n👤 Employees: '+employees.length+'\n🧠 Face models: '+(faceModelsLoaded?'Loaded':'Not loaded')+'\n⏰ Open: '+isPortalOpen()+'\n🔑 Method: '+loginMethod;
       info.textContent=data;info.style.display=info.style.display==='none'?'block':'none'}
 
     // ============ INIT ============
@@ -404,26 +468,28 @@
     function pinBack(e,n){if(e.key==='Backspace'&&!document.getElementById('pin'+n).value&&n>1)document.getElementById('pin'+(n-1)).focus()}
     function getPin(){var p='';for(var i=1;i<=6;i++)p+=document.getElementById('pin'+i).value;return p}
     function clearPinOnly(){for(var i=1;i<=6;i++)document.getElementById('pin'+i).value=''}
-    function checkLoginReady(){document.getElementById('loginBtn').disabled=!(document.getElementById('loginEmployeeSelect').value&&getPin().length===6)}
+    function checkLoginReady(){
+      var empSelected=!!document.getElementById('loginEmployeeSelect').value;
+      if(loginMethod==='pin'){document.getElementById('loginBtnPin').disabled=!(empSelected&&getPin().length===6)}
+      else{document.getElementById('loginBtnFace').disabled=!empSelected}
+    }
     function showPanel(id){document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});document.getElementById(id).classList.add('active')}
     function showError(msg){document.getElementById('loginError').textContent=msg}
     function clearError(){document.getElementById('loginError').textContent=''}
 
-    // ============ LOGIN ============
-    async function handleLogin(){
-      if(!isPortalOpen()){showClosedPanel();return}
-      if(!geoReady){showError('Still checking location...');return}
-      if(geoError){showError('Enable GPS and refresh.');return}
-      var empId=document.getElementById('loginEmployeeSelect').value,pin=getPin();
-      if(!empId||pin.length!==6)return;clearError();
+    // ============ SHARED PRE-CHECKS (GPS + device lock + multi-device) ============
+    async function runPreChecks(empId){
+      if(!isPortalOpen()){showClosedPanel();return false}
+      if(!geoReady){showError('Still checking location...');return false}
+      if(geoError){showError('Enable GPS and refresh.');return false}
+      if(!empId){showError('Select an employee.');return false}
+      clearError();
 
-      var lk=getDeviceLock();if(lk&&lk.empId!==empId){clearPinOnly();showError('Device locked to '+lk.empName+' for today.');document.getElementById('pin1').focus();return}
-      var cp=PIN_MAP[empId];if(!cp){clearPinOnly();showError('No PIN configured.');document.getElementById('pin1').focus();return}
-      if(pin!==cp){clearPinOnly();showError('Incorrect PIN.');document.getElementById('pin1').focus();return}
+      var lk=getDeviceLock();if(lk&&lk.empId!==empId){showError('Device locked to '+lk.empName+' for today.');return false}
 
-      var ai=EMPLOYEE_LOCATION_MAP[empId];if(!ai){showError('No location assigned.');return}
+      var ai=EMPLOYEE_LOCATION_MAP[empId];if(!ai){showError('No location assigned.');return false}
       var gr=checkGeofence(userLocation.lat,userLocation.lng,ai);
-      if(!gr.inside){clearPinOnly();showError('❌ You are '+gr.distance+'m from '+gr.closest+'. Check in at your assigned branch only.');document.getElementById('pin1').focus();return}
+      if(!gr.inside){showError('❌ You are '+gr.distance+'m from '+gr.closest+'. Check in at your assigned branch only.');return false}
 
       // Multi-device block
       showLoading();
@@ -434,12 +500,43 @@
           var hasIn=checkResult.actions.some(function(a){return a.action==='Check In'});
           var hasOut=checkResult.actions.some(function(a){return a.action==='Check Out'});
           var isLockedDevice=lk&&lk.empId===empId;
-          if(hasIn&&hasOut){showError('❌ Already checked in and out today. Attendance complete.');return}
-          if(hasIn&&!isLockedDevice){showError('❌ Already checked in on another device. Use that device to check out.');return}
+          if(hasIn&&hasOut){showError('❌ Already checked in and out today.');return false}
+          if(hasIn&&!isLockedDevice){showError('❌ Already checked in on another device.');return false}
         }
       }catch(err){hideLoading()}
+      return true;
+    }
 
-      // All pre-checks passed → Face scan
+    function completeLogin(empId){
+      loggedInEmployee=employees.find(function(e){return e.id===empId});
+      if(!loggedInEmployee){showError('Employee not found.');return}
+      setDeviceLock(loggedInEmployee.id,loggedInEmployee.name);
+      populateAttendancePanel().then(function(){showPanel('panelAttendance')}).catch(function(err){alert('Error: '+err.message)});
+    }
+
+    // ============ PIN LOGIN ============
+    async function handlePinLogin(){
+      var empId=document.getElementById('loginEmployeeSelect').value,pin=getPin();
+      if(!empId||pin.length!==6)return;
+
+      var cp=PIN_MAP[empId];
+      if(!cp){clearPinOnly();showError('No PIN configured.');document.getElementById('pin1').focus();return}
+      if(pin!==cp){clearPinOnly();showError('Incorrect PIN.');document.getElementById('pin1').focus();return}
+
+      var ok=await runPreChecks(empId);
+      if(!ok){clearPinOnly();document.getElementById('pin1').focus();return}
+
+      completeLogin(empId);
+    }
+
+    // ============ FACE ID LOGIN ============
+    async function handleFaceLogin(){
+      var empId=document.getElementById('loginEmployeeSelect').value;
+      if(!empId)return;
+
+      var ok=await runPreChecks(empId);
+      if(!ok)return;
+
       var emp=employees.find(function(e){return e.id===empId});
       if(!emp){showError('Employee not found.');return}
       pendingEmployee=emp;
