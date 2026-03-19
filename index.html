@@ -21,14 +21,14 @@
     .info-row{display:flex;justify-content:space-between;padding:10px 0;font-size:19px}
     .info-row .label{color:#888;font-weight:500}
     .info-row .value{color:#333;font-weight:600;text-align:right;max-width:60%}
-    .status-badge{display:inline-block;padding:6px 16px;border-radius:24px;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+    .status-badge{display:inline-block;padding:6px 16px;border-radius:24px;font-size:16px;font-weight:700;text-transform:uppercase}
     .status-in{background:#e6f9ee;color:#1b9e4b}.status-out{background:#fef3e6;color:#d4830a}.status-none{background:#f0f0f0;color:#888}
     .action-buttons{display:flex;gap:14px;margin-bottom:24px}
     .action-btn{flex:1;padding:22px;font-size:24px;font-weight:700;border:3px solid transparent;border-radius:16px;cursor:pointer;transition:all 0.2s;text-align:center}
     .action-btn:disabled{opacity:0.4;cursor:not-allowed}
-    .btn-checkin{background:#e8f5e9;color:#2e7d32;border-color:#c8e6c9}.btn-checkin:hover:not(:disabled){background:#c8e6c9}.btn-checkin.selected{background:#2e7d32;color:#fff;border-color:#2e7d32}
-    .btn-checkout{background:#fff3e0;color:#e65100;border-color:#ffe0b2}.btn-checkout:hover:not(:disabled){background:#ffe0b2}.btn-checkout.selected{background:#e65100;color:#fff;border-color:#e65100}
-    .primary-btn{width:100%;padding:22px;font-size:24px;font-weight:700;color:#fff;background:#4361ee;border:none;border-radius:16px;cursor:pointer;transition:all 0.2s}
+    .btn-checkin{background:#e8f5e9;color:#2e7d32;border-color:#c8e6c9}.btn-checkin:hover:not(:disabled){background:#c8e6c9}.btn-checkin.selected{background:#2e7d32;color:#fff}
+    .btn-checkout{background:#fff3e0;color:#e65100;border-color:#ffe0b2}.btn-checkout:hover:not(:disabled){background:#ffe0b2}.btn-checkout.selected{background:#e65100;color:#fff}
+    .primary-btn{width:100%;padding:22px;font-size:24px;font-weight:700;color:#fff;background:#4361ee;border:none;border-radius:16px;cursor:pointer}
     .primary-btn:hover{background:#3a56d4}.primary-btn:disabled{background:#bbb;cursor:not-allowed}
     .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);padding:18px 30px;border-radius:14px;font-size:18px;font-weight:600;color:#fff;z-index:1000;transition:transform 0.4s ease;max-width:92%;text-align:center}
     .toast.show{transform:translateX(-50%) translateY(0)}.toast.success{background:#2e7d32}.toast.error{background:#c62828}
@@ -75,32 +75,34 @@
     .face-scan-subtitle{font-size:16px;color:#888;margin-bottom:20px}
     .camera-wrapper{position:relative;width:100%;max-width:320px;height:320px;margin:0 auto 20px;border-radius:16px;overflow:hidden;background:#000}
     .camera-wrapper video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:block}
+    .direction-overlay{position:absolute;top:0;left:0;width:100%;height:100%;display:none;align-items:center;justify-content:center;pointer-events:none;z-index:5}
+    .direction-overlay.visible{display:flex}
+    .direction-arrow{font-size:120px;color:rgba(255,255,255,0.85);text-shadow:0 0 30px rgba(0,0,0,0.7);animation:pulse 1s ease-in-out infinite}
+    .direction-label{position:absolute;bottom:20px;left:0;right:0;text-align:center;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.8);background:rgba(0,0,0,0.5);padding:8px;border-radius:8px;margin:0 20px}
+    .direction-check{font-size:80px;color:#4caf50;text-shadow:0 0 30px rgba(76,175,80,0.5)}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(1.1)}}
     .face-scan-status{font-size:18px;font-weight:600;padding:12px;border-radius:10px;margin-bottom:16px}
     .face-scan-status.scanning{background:#e3f2fd;color:#1565c0}
     .face-scan-status.success{background:#e6f9ee;color:#1b9e4b}
     .face-scan-status.fail{background:#ffebee;color:#c62828}
     .face-scan-status.loading{background:#f5f5f5;color:#888}
-    .face-scan-status.blink{background:#fff3e0;color:#e65100}
+    .face-scan-status.turn{background:#fff3e0;color:#e65100}
     .face-btn-row{display:flex;justify-content:center;gap:12px}
     .face-cancel-btn{padding:14px 28px;font-size:18px;font-weight:600;background:#f0f0f0;color:#555;border:none;border-radius:12px;cursor:pointer}
-    .face-cancel-btn:hover{background:#e0e0e0}
     .face-retry-btn{padding:14px 28px;font-size:18px;font-weight:600;background:#4361ee;color:#fff;border:none;border-radius:12px;cursor:pointer}
-    .face-retry-btn:hover{background:#3a56d4}
     .models-loading{font-size:14px;color:#888;margin-bottom:16px}
     .login-method-buttons{display:flex;gap:14px;margin-bottom:24px}
     .login-method-btn{flex:1;padding:20px 16px;font-size:20px;font-weight:700;border:3px solid transparent;border-radius:16px;cursor:pointer;transition:all 0.2s;text-align:center}
-    .btn-pin-login{background:#e3f2fd;color:#1565c0;border-color:#bbdefb}
-    .btn-pin-login:hover{background:#bbdefb}
-    .btn-pin-login.selected{background:#1565c0;color:#fff;border-color:#1565c0}
-    .btn-face-login{background:#f3e5f5;color:#7b1fa2;border-color:#e1bee7}
-    .btn-face-login:hover{background:#e1bee7}
-    .btn-face-login.selected{background:#7b1fa2;color:#fff;border-color:#7b1fa2}
-    .pin-section{display:none}
-    .pin-section.visible{display:block}
-    .face-login-section{display:none;text-align:center;padding:20px 0}
-    .face-login-section.visible{display:block}
+    .btn-pin-login{background:#e3f2fd;color:#1565c0;border-color:#bbdefb}.btn-pin-login:hover{background:#bbdefb}.btn-pin-login.selected{background:#1565c0;color:#fff}
+    .btn-face-login{background:#f3e5f5;color:#7b1fa2;border-color:#e1bee7}.btn-face-login:hover{background:#e1bee7}.btn-face-login.selected{background:#7b1fa2;color:#fff}
+    .pin-section{display:none}.pin-section.visible{display:block}
+    .face-login-section{display:none;text-align:center;padding:20px 0}.face-login-section.visible{display:block}
     .face-login-section p{font-size:17px;color:#888;margin-bottom:16px}
-    @media(max-width:480px){.container{padding:28px 18px;border-radius:16px}.header h1{font-size:28px}.header p{font-size:16px}label{font-size:18px}select,input[type="text"],input[type="password"]{font-size:20px;padding:14px 16px}.pin-container{gap:6px}.pin-input{width:46px;height:62px;font-size:28px;border-radius:12px}.action-btn{padding:20px 10px;font-size:22px}.primary-btn{padding:20px;font-size:22px}.info-row{font-size:17px;padding:8px 0}.success-details .detail-row{font-size:17px}.geo-status{font-size:15px;padding:10px 14px}.device-lock-banner{font-size:15px}.face-scan-container{padding:20px}.face-scan-title{font-size:20px}.camera-wrapper{max-width:280px;height:280px}.login-method-btn{font-size:18px;padding:18px 12px}}
+    .step-indicators{display:flex;justify-content:center;gap:8px;margin-bottom:16px}
+    .step-dot{width:12px;height:12px;border-radius:50%;background:#ddd;transition:all 0.3s}
+    .step-dot.active{background:#4361ee;transform:scale(1.3)}
+    .step-dot.done{background:#4caf50}
+    @media(max-width:480px){.container{padding:28px 18px}.header h1{font-size:28px}label{font-size:18px}select,input[type="text"],input[type="password"]{font-size:20px;padding:14px 16px}.pin-container{gap:6px}.pin-input{width:46px;height:62px;font-size:28px}.action-btn{padding:20px 10px;font-size:22px}.primary-btn{padding:20px;font-size:22px}.info-row{font-size:17px}.success-details .detail-row{font-size:17px}.geo-status{font-size:15px}.login-method-btn{font-size:18px;padding:18px 12px}.camera-wrapper{max-width:280px;height:280px}.direction-arrow{font-size:90px}.direction-label{font-size:18px}}
   </style>
 </head>
 <body>
@@ -112,11 +114,18 @@
     <div class="face-scan-container">
       <div class="face-scan-title">🔍 Face Verification</div>
       <div class="face-scan-subtitle" id="faceScanName">Verifying identity...</div>
-      <div class="camera-wrapper"><video id="faceVideo" autoplay muted playsinline webkit-playsinline></video></div>
-      <div class="face-scan-status loading" id="faceScanStatus">⏳ Loading...</div>
-      <div id="modelsLoading" class="models-loading" style="display:none;">Loading face recognition models...</div>
+      <div class="step-indicators"><div class="step-dot" id="step1"></div><div class="step-dot" id="step2"></div><div class="step-dot" id="step3"></div><div class="step-dot" id="step4"></div></div>
+      <div class="camera-wrapper">
+        <video id="faceVideo" autoplay muted playsinline webkit-playsinline></video>
+        <div class="direction-overlay" id="directionOverlay">
+          <div id="directionArrow" class="direction-arrow"></div>
+          <div id="directionLabel" class="direction-label"></div>
+        </div>
+      </div>
+      <div class="face-scan-status loading" id="faceScanStatus">Loading...</div>
+      <div id="modelsLoading" class="models-loading" style="display:none;"></div>
       <div class="face-btn-row">
-        <button class="face-retry-btn" id="faceRetryBtn" onclick="retryFaceScan()" style="display:none;">🔄 Retry</button>
+        <button class="face-retry-btn" id="faceRetryBtn" onclick="retryFaceScan()" style="display:none;">Retry</button>
         <button class="face-cancel-btn" onclick="cancelFaceScan()">Cancel</button>
       </div>
     </div>
@@ -125,45 +134,39 @@
   <!-- HIDDEN DEVELOPER PANEL -->
   <div id="devPanel" class="dev-panel">
     <div class="dev-container">
-      <div style="font-size:36px;text-align:center;margin-bottom:12px;">🛠️</div>
+      <div style="font-size:36px;text-align:center;margin-bottom:12px;">&#x1F6E0;&#xFE0F;</div>
       <h2 style="text-align:center;font-size:20px;margin-bottom:20px;color:#1a1a2e;">Developer Tools</h2>
-      <button class="dev-btn dev-btn-red" onclick="devClearDeviceLock()">🔓 Clear Device Lock</button>
-      <button class="dev-btn dev-btn-blue" onclick="devClearAllStorage()">🗑️ Clear All Storage</button>
-      <button class="dev-btn dev-btn-gray" onclick="devShowInfo()">📋 Show Debug Info</button>
+      <button class="dev-btn dev-btn-red" onclick="devClearDeviceLock()">Clear Device Lock</button>
+      <button class="dev-btn dev-btn-blue" onclick="devClearAllStorage()">Clear All Storage</button>
+      <button class="dev-btn dev-btn-gray" onclick="devShowInfo()">Show Debug Info</button>
       <div id="devInfo" style="display:none;margin-top:16px;padding:14px;background:#f5f5f5;border-radius:10px;font-size:13px;color:#555;word-break:break-all;white-space:pre-wrap;"></div>
-      <button class="dev-btn dev-btn-gray" onclick="closeDevPanel()" style="margin-top:12px;">✖ Close</button>
+      <button class="dev-btn dev-btn-gray" onclick="closeDevPanel()" style="margin-top:12px;">Close</button>
     </div>
   </div>
 
   <!-- PANEL 0: CLOSED -->
   <div class="container panel" id="panelClosed">
-    <div class="header"><div class="closed-icon lock-icon">🚫</div><h1>Portal Closed</h1><p id="closedDate"></p></div>
+    <div class="header"><div class="closed-icon lock-icon">&#x1F6AB;</div><h1>Portal Closed</h1><p id="closedDate"></p></div>
     <div class="closed-time" id="closedCurrentTime"></div>
-    <div class="closed-hours">Operating hours:<br><strong>7:00 AM — 10:00 PM</strong><br><strong>Monday — Saturday</strong><br><br>Please come back during operating hours.</div>
+    <div class="closed-hours">Operating hours:<br><strong>7:00 AM - 10:00 PM</strong><br><strong>Monday - Saturday</strong></div>
   </div>
 
   <!-- PANEL 1: LOGIN -->
   <div class="container panel active" id="panelLogin">
-    <div class="header"><div class="lock-icon" id="lockIcon">🔐</div><h1>Employee Login</h1><p id="loginDate"></p></div>
-    <div id="geoStatus" class="geo-status geo-loading">📍 Checking your location...</div>
+    <div class="header"><div class="lock-icon" id="lockIcon">&#x1F510;</div><h1>Employee Login</h1><p id="loginDate"></p></div>
+    <div id="geoStatus" class="geo-status geo-loading">Checking your location...</div>
     <div class="device-lock-banner" id="deviceLockBanner" style="display:none;"></div>
     <div id="noEmployeesMsg" class="no-employees-msg" style="display:none;"></div>
     <div id="loginFormSection">
-      <div class="form-group"><label for="loginEmployeeSelect">Employee ID</label><select id="loginEmployeeSelect"><option value="">-- Select Employee ID --</option></select></div>
-
-      <!-- LOGIN METHOD TOGGLE -->
-      <div class="form-group">
-        <label>Login Method</label>
+      <div class="form-group"><label>Employee ID</label><select id="loginEmployeeSelect"><option value="">-- Select Employee ID --</option></select></div>
+      <div class="form-group"><label>Login Method</label>
         <div class="login-method-buttons">
-          <button class="login-method-btn btn-pin-login selected" id="btnMethodPin" onclick="selectLoginMethod('pin')">🔢 PIN</button>
-          <button class="login-method-btn btn-face-login" id="btnMethodFace" onclick="selectLoginMethod('face')">📸 Face ID</button>
+          <button class="login-method-btn btn-pin-login selected" id="btnMethodPin" onclick="selectLoginMethod('pin')">PIN</button>
+          <button class="login-method-btn btn-face-login" id="btnMethodFace" onclick="selectLoginMethod('face')">Face ID</button>
         </div>
       </div>
-
-      <!-- PIN SECTION -->
       <div class="pin-section visible" id="pinSection">
-        <div class="form-group">
-          <label>Enter 6-Digit PIN</label>
+        <div class="form-group"><label>Enter 6-Digit PIN</label>
           <div class="pin-container">
             <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin1" oninput="pinNext(1)" onkeydown="pinBack(event,1)">
             <input type="password" inputmode="numeric" class="pin-input" maxlength="1" id="pin2" oninput="pinNext(2)" onkeydown="pinBack(event,2)">
@@ -175,20 +178,17 @@
         </div>
         <button class="primary-btn" id="loginBtnPin" onclick="handlePinLogin()" disabled>Login with PIN</button>
       </div>
-
-      <!-- FACE ID SECTION -->
       <div class="face-login-section" id="faceSection">
-        <p>Select your Employee ID above, then tap the button below to verify your face.</p>
-        <button class="primary-btn" id="loginBtnFace" onclick="handleFaceLogin()" disabled style="background:#7b1fa2;">Login with Face ID 📸</button>
+        <p>Select your Employee ID, then tap below to verify your face.</p>
+        <button class="primary-btn" id="loginBtnFace" onclick="handleFaceLogin()" disabled style="background:#7b1fa2;">Login with Face ID</button>
       </div>
-
       <div class="error-msg" id="loginError"></div>
     </div>
   </div>
 
   <!-- PANEL 2: ATTENDANCE -->
   <div class="container panel" id="panelAttendance">
-    <div class="header"><h1>📋 Attendance Portal</h1><p id="attendanceDate"></p></div>
+    <div class="header"><h1>Attendance Portal</h1><p id="attendanceDate"></p></div>
     <div id="geoStatusAttendance" class="geo-status geo-ok" style="display:none;"></div>
     <div id="infoCard" class="info-card visible">
       <div class="info-row"><span class="label">Name</span><span class="value" id="infoName">-</span></div>
@@ -198,16 +198,16 @@
       <div class="info-row"><span class="label">District</span><span class="value" id="infoDistrict">-</span></div>
       <div class="info-row"><span class="label">Last Status</span><span class="value" id="infoStatus"><span class="status-badge status-none">No Record</span></span></div>
     </div>
-    <div id="completedBanner" class="completed-banner" style="display:none;"><span class="big-icon">🎉</span>Attendance completed for today!</div>
+    <div id="completedBanner" class="completed-banner" style="display:none;"><span class="big-icon">&#x1F389;</span>Attendance completed for today!</div>
     <div id="actionSection">
-      <div class="form-group"><label>Action</label><div class="action-buttons"><button class="action-btn btn-checkin" id="btnCheckIn" onclick="selectAction('Check In')">✅ Check In</button><button class="action-btn btn-checkout" id="btnCheckOut" onclick="selectAction('Check Out')">🚪 Check Out</button></div></div>
+      <div class="form-group"><label>Action</label><div class="action-buttons"><button class="action-btn btn-checkin" id="btnCheckIn" onclick="selectAction('Check In')">Check In</button><button class="action-btn btn-checkout" id="btnCheckOut" onclick="selectAction('Check Out')">Check Out</button></div></div>
       <button class="primary-btn" id="submitBtn" onclick="submitAttendance()" disabled>Submit Attendance</button>
     </div>
   </div>
 
   <!-- PANEL 3: SUCCESS -->
   <div class="container panel" id="panelSuccess">
-    <div class="header"><div class="success-icon">✅</div><h1 id="successTitle">Check In Successful!</h1><p>Your attendance has been recorded</p></div>
+    <div class="header"><div class="success-icon">&#x2705;</div><h1 id="successTitle">Check In Successful!</h1><p>Your attendance has been recorded</p></div>
     <div class="date-banner" id="successDate"></div>
     <div style="text-align:center;margin:24px 0;"><span class="success-action" id="successActionBadge">Check In</span></div>
     <div class="success-details">
@@ -221,55 +221,41 @@
   </div>
 
   <script>
-    const API_URL='https://script.google.com/macros/s/AKfycbwPOoq46rC2nZmuwcLrS00o4BFar6u-hKeM2tf7Tm9T28Mx9QWtWmQ4sOrq6YDIPVIpXw/exec';
-    const FACE_MODELS_URL='https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/model/';
-    const FACE_PHOTOS_PATH='./faces/';
-    const FACE_MATCH_THRESHOLD=0.45;
-    const BLINK_THRESHOLD=0.26;
-
-    const OPEN_HOUR=7,CLOSE_HOUR=22,BLOCKED_DAYS=[0];
-    const HOLIDAYS=['2026-01-01','2026-01-07','2026-03-08','2026-04-14','2026-04-15','2026-04-16','2026-05-01','2026-05-14','2026-05-15','2026-05-16','2026-06-18','2026-09-24','2026-10-15','2026-10-29','2026-11-09','2026-11-18','2026-11-19','2026-11-20'];
-
-    const ALLOWED_LOCATIONS=[
-      {name:'ស្នាក់ការកណ្ដាល (HQ)',lat:11.574984,lng:104.925366,radius:300},
-      {name:'ទឹកល្អក់',lat:11.567364,lng:104.900508,radius:50},
-      {name:'ដង្កោ (Dangkor)',lat:11.562540,lng:104.856171,radius:50},
-      {name:'បឹងសាឡាង',lat:11.549739,lng:104.899910,radius:50},
-      {name:'អូឡាំពិក (Olympic)',lat:11.558100,lng:104.919700,radius:50},
-      {name:'ច្បារអំពៅ (Chbar Ampov)',lat:11.530928,lng:104.944263,radius:50},
-      {name:'បឹងប្រលិត (Boeung Prolit)',lat:11.555993,lng:104.918761,radius:50},
-      {name:'រោងចក្រកែវ',lat:11.498345,lng:104.892716,radius:50},
-      {name:'អ៊ីអនម៉លទន្លេបាសាក់ (AEON Tonle Bassac)',lat:11.547982,lng:104.932870,radius:50},
-      {name:'អ៊ីអនម៉លសែនសុខ (AEON Sen Sok)',lat:11.599664,lng:104.885370,radius:50},
-      {name:'អ៊ីអនម៉លមានជ័យ (AEON Mean Chey)',lat:11.484916,lng:104.918083,radius:50},
-      {name:'ពោធិ៍ចិនតុង (Pochentong)',lat:11.552512,lng:104.844986,radius:50}
+    var API_URL='https://script.google.com/macros/s/AKfycbwPOoq46rC2nZmuwcLrS00o4BFar6u-hKeM2tf7Tm9T28Mx9QWtWmQ4sOrq6YDIPVIpXw/exec';
+    var FACE_MODELS_URL='https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/model/';
+    var FACE_PHOTOS_PATH='./faces/';
+    var FACE_MATCH_THRESHOLD=0.45;
+    var HEAD_TURN_THRESHOLD=15;
+    var OPEN_HOUR=7,CLOSE_HOUR=22,BLOCKED_DAYS=[0];
+    var HOLIDAYS=['2026-01-01','2026-01-07','2026-03-08','2026-04-14','2026-04-15','2026-04-16','2026-05-01','2026-05-14','2026-05-15','2026-05-16','2026-06-18','2026-09-24','2026-10-15','2026-10-29','2026-11-09','2026-11-18','2026-11-19','2026-11-20'];
+    var ALLOWED_LOCATIONS=[
+      {name:'\u179F\u17D2\u1793\u17B6\u1780\u17CB\u1780\u17B6\u179A\u1780\u178E\u17D2\u178F\u17B6\u179B (HQ)',lat:11.574984,lng:104.925366,radius:300},
+      {name:'\u1791\u17B9\u1780\u179B\u17D2\u17A2\u1780\u17CB',lat:11.567364,lng:104.900508,radius:50},
+      {name:'\u178A\u1784\u17D2\u1780\u17C4 (Dangkor)',lat:11.562540,lng:104.856171,radius:50},
+      {name:'\u1794\u17B9\u1784\u179F\u17B6\u17A1\u17B6\u1784',lat:11.549739,lng:104.899910,radius:50},
+      {name:'\u17A2\u17BC\u17A1\u17B6\u17C6\u1796\u17B7\u1780 (Olympic)',lat:11.558100,lng:104.919700,radius:50},
+      {name:'\u1785\u17D2\u1794\u17B6\u179A\u17A2\u17C6\u1796\u17C5 (Chbar Ampov)',lat:11.530928,lng:104.944263,radius:50},
+      {name:'\u1794\u17B9\u1784\u1794\u17D2\u179A\u179B\u17B7\u178F (Boeung Prolit)',lat:11.555993,lng:104.918761,radius:50},
+      {name:'\u179A\u17C4\u1784\u1785\u1780\u17D2\u179A\u1780\u17C2\u179C',lat:11.498345,lng:104.892716,radius:50},
+      {name:'AEON Tonle Bassac',lat:11.547982,lng:104.932870,radius:50},
+      {name:'AEON Sen Sok',lat:11.599664,lng:104.885370,radius:50},
+      {name:'AEON Mean Chey',lat:11.484916,lng:104.918083,radius:50},
+      {name:'\u1796\u17C4\u1792\u17B7\u17CD\u1785\u17B7\u1793\u178F\u17BB\u1784 (Pochentong)',lat:11.552512,lng:104.844986,radius:50}
     ];
+    var PIN_MAP={'001':'000001','002':'000002','003':'000003','004':'000004','005':'000005','006':'000006','007':'000007','008':'000008','009':'000009','010':'000010','011':'000011','012':'000012','013':'000013','014':'000014'};
+    var EMPLOYEE_LOCATION_MAP={'001':[0],'002':[0],'003':[0],'004':[1],'005':[2],'006':[3],'007':[4],'008':[5],'009':[6],'010':[7],'011':[8],'012':[9],'013':[10],'014':[11]};
 
-    const PIN_MAP={
-      '001':'000001','002':'000002','003':'000003','004':'000004',
-      '005':'000005','006':'000006','007':'000007','008':'000008',
-      '009':'000009','010':'000010','011':'000011','012':'000012',
-      '013':'000013','014':'000014'
-    };
-
-    const EMPLOYEE_LOCATION_MAP={
-      '001':[0],'002':[0],'003':[0],
-      '004':[1],'005':[2],'006':[3],'007':[4],'008':[5],
-      '009':[6],'010':[7],'011':[8],'012':[9],'013':[10],'014':[11]
-    };
-
-    let employees=[],loggedInEmployee=null,selectedAction='',closedTimeInterval=null;
-    let userLocation=null,geoReady=false,geoError=false;
-    let detectedLocationName=null,detectedLocationIndex=-1;
-    let faceModelsLoaded=false,faceStream=null,faceScanInterval=null,pendingEmployee=null;
-    let loginMethod='pin';
+    var employees=[],loggedInEmployee=null,selectedAction='',closedTimeInterval=null;
+    var userLocation=null,geoReady=false,geoError=false;
+    var detectedLocationName=null,detectedLocationIndex=-1;
+    var faceModelsLoaded=false,faceStream=null,faceScanInterval=null,pendingEmployee=null;
+    var loginMethod='pin';
 
     function getDateStr(){return new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}
     function getTodayISO(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
     function isHoliday(){return HOLIDAYS.indexOf(getTodayISO())!==-1}
     function isBlockedDay(){return BLOCKED_DAYS.indexOf(new Date().getDay())!==-1}
     function isPortalOpen(){if(isBlockedDay()||isHoliday())return false;var h=new Date().getHours();return h>=OPEN_HOUR&&h<CLOSE_HOUR}
-
     function getDistanceMeters(a,b,c,d){var R=6371000,dLat=(c-a)*Math.PI/180,dLng=(d-b)*Math.PI/180;var x=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
 
     function checkGeofence(lat,lng,idx){
@@ -285,31 +271,30 @@
       var sel=document.getElementById('loginEmployeeSelect'),opts=sel.querySelectorAll('option'),vc=0;
       for(var j=1;j<opts.length;j++){if(ids.indexOf(opts[j].value)===-1){opts[j].style.display='none';opts[j].disabled=true}else{opts[j].style.display='';opts[j].disabled=false;vc++}}
       if(vc===1)sel.value=ids[0];
-      if(vc===0){document.getElementById('noEmployeesMsg').style.display='block';document.getElementById('noEmployeesMsg').textContent='⚠️ No employees assigned here.';document.getElementById('loginFormSection').style.display='none'}
+      if(vc===0){document.getElementById('noEmployeesMsg').style.display='block';document.getElementById('noEmployeesMsg').textContent='No employees assigned here.';document.getElementById('loginFormSection').style.display='none'}
       else{document.getElementById('noEmployeesMsg').style.display='none';document.getElementById('loginFormSection').style.display='block'}
       var lk=getDeviceLock();if(lk&&ids.indexOf(lk.empId)!==-1){sel.value=lk.empId;sel.disabled=true}
       checkLoginReady();
     }
 
     function requestLocation(){
-      var el=document.getElementById('geoStatus');el.className='geo-status geo-loading';el.textContent='📍 Checking your location...';
-      if(!navigator.geolocation){el.className='geo-status geo-denied';el.textContent='⚠️ Geolocation not supported.';geoReady=true;geoError=true;return}
+      var el=document.getElementById('geoStatus');el.className='geo-status geo-loading';el.textContent='Checking your location...';
+      if(!navigator.geolocation){el.className='geo-status geo-denied';el.textContent='Geolocation not supported.';geoReady=true;geoError=true;return}
       navigator.geolocation.getCurrentPosition(function(pos){
         userLocation={lat:pos.coords.latitude,lng:pos.coords.longitude};geoReady=true;geoError=false;
         var r=checkGeofence(userLocation.lat,userLocation.lng,null);
-        if(r.inside){el.className='geo-status geo-ok';el.textContent='📍 '+r.location;detectedLocationName=r.location;
+        if(r.inside){el.className='geo-status geo-ok';el.textContent=r.location;detectedLocationName=r.location;
           for(var i=0;i<ALLOWED_LOCATIONS.length;i++){if(ALLOWED_LOCATIONS[i].name===detectedLocationName){detectedLocationIndex=i;break}}
           filterEmployeesByLocation()}
-        else{el.className='geo-status geo-fail';el.textContent='❌ You are '+r.distance+'m from '+r.closest+'. Move closer.';
-          document.getElementById('noEmployeesMsg').style.display='block';document.getElementById('noEmployeesMsg').textContent='⚠️ Move within 50m of your branch to log in.';document.getElementById('loginFormSection').style.display='none'}
+        else{el.className='geo-status geo-fail';el.textContent='You are '+r.distance+'m from '+r.closest+'. Move closer.';
+          document.getElementById('noEmployeesMsg').style.display='block';document.getElementById('noEmployeesMsg').textContent='Move within 50m of your branch to log in.';document.getElementById('loginFormSection').style.display='none'}
       },function(err){geoReady=true;geoError=true;el.className='geo-status geo-denied';
-        if(err.code===1)el.textContent='⚠️ Location denied. Enable GPS and refresh.';
-        else if(err.code===2)el.textContent='⚠️ Location unavailable.';
-        else el.textContent='⚠️ Location timed out. Refresh.';
+        if(err.code===1)el.textContent='Location denied. Enable GPS and refresh.';
+        else if(err.code===2)el.textContent='Location unavailable.';
+        else el.textContent='Location timed out. Refresh.';
       },{enableHighAccuracy:true,timeout:15000,maximumAge:0})
     }
 
-    // ============ LOGIN METHOD TOGGLE ============
     function selectLoginMethod(method){
       loginMethod=method;
       document.getElementById('btnMethodPin').classList.toggle('selected',method==='pin');
@@ -319,7 +304,7 @@
       clearError();checkLoginReady();
     }
 
-    // ============ FACE RECOGNITION WITH BLINK DETECTION ============
+    // ============ FACE RECOGNITION WITH HEAD TURN ============
     async function loadFaceModels(){
       if(faceModelsLoaded)return true;
       try{document.getElementById('modelsLoading').style.display='block';
@@ -327,92 +312,137 @@
         await faceapi.nets.faceLandmark68Net.loadFromUri(FACE_MODELS_URL);
         await faceapi.nets.faceRecognitionNet.loadFromUri(FACE_MODELS_URL);
         faceModelsLoaded=true;document.getElementById('modelsLoading').style.display='none';return true}
-      catch(err){document.getElementById('modelsLoading').textContent='❌ Failed to load models.';return false}
+      catch(err){document.getElementById('modelsLoading').textContent='Failed to load models.';return false}
     }
 
     async function getReferenceDescriptor(empId){
       var img=await new Promise(function(res,rej){var i=new Image();i.crossOrigin='anonymous';i.onload=function(){res(i)};i.onerror=function(){rej(new Error('Photo not found: faces/'+empId+'.jpg'))};i.src=FACE_PHOTOS_PATH+empId+'.jpg'});
       var det=await faceapi.detectSingleFace(img,new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
-      if(!det)throw new Error('No face detected in reference photo for '+empId);
+      if(!det)throw new Error('No face in reference photo for '+empId);
       return det.descriptor
     }
 
-    // Eye Aspect Ratio for blink detection
-    function getEAR(landmarks,eyePoints){
-      var pts=eyePoints.map(function(i){return landmarks.positions[i]});
-      var a=Math.sqrt(Math.pow(pts[1].x-pts[5].x,2)+Math.pow(pts[1].y-pts[5].y,2));
-      var b=Math.sqrt(Math.pow(pts[2].x-pts[4].x,2)+Math.pow(pts[2].y-pts[4].y,2));
-      var c=Math.sqrt(Math.pow(pts[0].x-pts[3].x,2)+Math.pow(pts[0].y-pts[3].y,2));
-      return(a+b)/(2.0*c);
+    function getHeadYaw(landmarks){
+      var nose=landmarks.positions[30];
+      var leftEye=landmarks.positions[36];
+      var rightEye=landmarks.positions[45];
+      var eyeCenter={(leftEye.x+rightEye.x)/2};
+      var eyeWidth=Math.abs(rightEye.x-leftEye.x);
+      if(eyeWidth===0)return 0;
+      var offset=((nose.x-eyeCenter)/eyeWidth)*100;
+      return offset;
     }
 
-    function detectBlink(landmarks){
-      var leftEye=[36,37,38,39,40,41];
-      var rightEye=[42,43,44,45,46,47];
-      var leftEAR=getEAR(landmarks,leftEye);
-      var rightEAR=getEAR(landmarks,rightEye);
-      var avgEAR=(leftEAR+rightEAR)/2.0;
-      return avgEAR<BLINK_THRESHOLD;
+    function showDirection(arrow,label){
+      var overlay=document.getElementById('directionOverlay');
+      var arrowEl=document.getElementById('directionArrow');
+      var labelEl=document.getElementById('directionLabel');
+      overlay.classList.add('visible');
+      arrowEl.innerHTML=arrow;
+      labelEl.textContent=label;
+    }
+
+    function hideDirection(){
+      document.getElementById('directionOverlay').classList.remove('visible');
+    }
+
+    function updateSteps(current){
+      for(var i=1;i<=4;i++){
+        var dot=document.getElementById('step'+i);
+        dot.classList.remove('active','done');
+        if(i<current)dot.classList.add('done');
+        else if(i===current)dot.classList.add('active');
+      }
     }
 
     function stopCamera(){
       if(faceScanInterval){clearInterval(faceScanInterval);faceScanInterval=null}
       if(faceStream){faceStream.getTracks().forEach(function(t){t.stop()});faceStream=null}
       var video=document.getElementById('faceVideo');if(video)video.srcObject=null;
+      hideDirection();
     }
 
     async function openFaceScan(empId,empName){
       var st=document.getElementById('faceScanStatus'),rb=document.getElementById('faceRetryBtn');
-      rb.style.display='none';
+      rb.style.display='none';hideDirection();updateSteps(1);
       document.getElementById('faceScanName').textContent='Verifying: '+empName;
-      st.className='face-scan-status loading';st.textContent='⏳ Loading face recognition...';
+      st.className='face-scan-status loading';st.textContent='Loading face recognition...';
       document.getElementById('faceScanModal').classList.add('visible');
 
       var ok=await loadFaceModels();
-      if(!ok){st.className='face-scan-status fail';st.textContent='❌ Could not load models. Check internet.';rb.style.display='inline-block';return}
+      if(!ok){st.className='face-scan-status fail';st.textContent='Could not load models. Check internet.';rb.style.display='inline-block';return}
 
       var refDesc;
       try{refDesc=await getReferenceDescriptor(empId)}
-      catch(err){st.className='face-scan-status fail';st.textContent='❌ '+err.message;rb.style.display='inline-block';return}
+      catch(err){st.className='face-scan-status fail';st.textContent=err.message;rb.style.display='inline-block';return}
 
       try{
         faceStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:640}}});
         var video=document.getElementById('faceVideo');video.srcObject=faceStream;
         await new Promise(function(resolve){video.onloadedmetadata=function(){video.play().then(resolve).catch(resolve)};setTimeout(resolve,3000)});
-      }catch(err){st.className='face-scan-status fail';st.textContent='❌ Camera access denied.';rb.style.display='inline-block';return}
+      }catch(err){st.className='face-scan-status fail';st.textContent='Camera access denied.';rb.style.display='inline-block';return}
 
-      st.className='face-scan-status scanning';st.textContent='📸 Look at the camera...';
+      st.className='face-scan-status scanning';st.textContent='Look at the camera...';
 
-      var faceMatched=false,blinkDetected=false;
+      // Steps: 1=face match, 2=turn left, 3=turn right, 4=look center
+      var step=1,faceMatched=false,turnedLeft=false,turnedRight=false;
+      updateSteps(1);
 
       setTimeout(function(){
-        var attempts=0,maxAttempts=30;
+        var attempts=0,maxAttempts=45;
         faceScanInterval=setInterval(async function(){
           attempts++;
           if(attempts>maxAttempts){clearInterval(faceScanInterval);faceScanInterval=null;
-            if(faceMatched&&!blinkDetected){st.className='face-scan-status fail';st.textContent='⏰ Face matched but no blink detected. Try again.';}
-            else{st.className='face-scan-status fail';st.textContent='⏰ Timed out. Try again.';}
-            rb.style.display='inline-block';stopCamera();return}
+            st.className='face-scan-status fail';st.textContent='Timed out. Try again.';
+            rb.style.display='inline-block';hideDirection();stopCamera();return}
           var video=document.getElementById('faceVideo');if(!video||video.readyState<2||video.videoWidth===0)return;
           try{
             var det=await faceapi.detectSingleFace(video,new faceapi.TinyFaceDetectorOptions({inputSize:416,scoreThreshold:0.5})).withFaceLandmarks().withFaceDescriptor();
-            if(!det){st.textContent='📸 No face detected... ('+attempts+'/'+maxAttempts+')';return}
-            var dist=faceapi.euclideanDistance(det.descriptor,refDesc);
-            if(dist<FACE_MATCH_THRESHOLD){
-              faceMatched=true;
-              // Check for blink
-              var isBlink=detectBlink(det.landmarks);
-              if(isBlink){blinkDetected=true;}
-              if(faceMatched&&blinkDetected){
-                clearInterval(faceScanInterval);faceScanInterval=null;
-                st.className='face-scan-status success';st.textContent='✅ Face verified! Welcome, '+empName+'!';
-                setTimeout(function(){stopCamera();document.getElementById('faceScanModal').classList.remove('visible');onFaceVerified()},1500);
-              }else if(faceMatched&&!blinkDetected){
-                st.className='face-scan-status blink';st.textContent='👁️ Face matched! Please BLINK to confirm you are real.';
+            if(!det){st.textContent='No face detected... ('+attempts+'/'+maxAttempts+')';hideDirection();return}
+
+            // Step 1: Face match
+            if(step===1){
+              var dist=faceapi.euclideanDistance(det.descriptor,refDesc);
+              if(dist<FACE_MATCH_THRESHOLD){
+                faceMatched=true;step=2;updateSteps(2);
+                st.className='face-scan-status turn';
+                st.textContent='Face matched! Now turn your head LEFT';
+                showDirection('\u2B05\uFE0F','Turn LEFT');
+              }else{
+                st.textContent='Scanning face... ('+attempts+'/'+maxAttempts+')';
+                hideDirection();
               }
-            }else{st.textContent='📸 Keep looking... ('+attempts+'/'+maxAttempts+')'}
-          }catch(err){st.textContent='📸 Scanning... ('+attempts+'/'+maxAttempts+')'}
-        },1000);
+            }
+            // Step 2: Turn left
+            else if(step===2){
+              var yaw=getHeadYaw(det.landmarks);
+              if(yaw>HEAD_TURN_THRESHOLD){
+                turnedLeft=true;step=3;updateSteps(3);
+                st.textContent='Great! Now turn your head RIGHT';
+                showDirection('\u27A1\uFE0F','Turn RIGHT');
+              }
+            }
+            // Step 3: Turn right
+            else if(step===3){
+              var yaw=getHeadYaw(det.landmarks);
+              if(yaw<-HEAD_TURN_THRESHOLD){
+                turnedRight=true;step=4;updateSteps(4);
+                st.textContent='Almost done! Look back at the camera';
+                showDirection('\u2B55','Look at CAMERA');
+              }
+            }
+            // Step 4: Look center
+            else if(step===4){
+              var yaw=getHeadYaw(det.landmarks);
+              if(Math.abs(yaw)<8){
+                clearInterval(faceScanInterval);faceScanInterval=null;
+                updateSteps(5);hideDirection();
+                st.className='face-scan-status success';st.textContent='Face verified! Welcome, '+empName+'!';
+                setTimeout(function(){stopCamera();document.getElementById('faceScanModal').classList.remove('visible');onFaceVerified()},1500);
+              }
+            }
+          }catch(err){st.textContent='Scanning... ('+attempts+'/'+maxAttempts+')'}
+        },800);
       },1000);
     }
 
@@ -426,27 +456,27 @@
     }
 
     // ============ HOURS ============
-    function getClosedReason(){if(isHoliday())return'🎌 Today is a public holiday.';if(isBlockedDay()){return'📅 Closed on '+['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date().getDay()]+'.'}return''}
-    function showClosedPanel(){document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});document.getElementById('panelClosed').classList.add('active');document.getElementById('closedDate').textContent=getDateStr();var r=getClosedReason();if(r)document.querySelector('.closed-hours').innerHTML='<strong>'+r+'</strong><br><br>Operating hours:<br><strong>7:00 AM — 10:00 PM</strong><br><strong>Monday — Saturday</strong>';updateClosedTime();if(closedTimeInterval)clearInterval(closedTimeInterval);closedTimeInterval=setInterval(function(){updateClosedTime();if(isPortalOpen()){clearInterval(closedTimeInterval);location.reload()}},1000)}
+    function getClosedReason(){if(isHoliday())return'Today is a public holiday.';if(isBlockedDay()){return'Closed on '+['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date().getDay()]+'.'}return''}
+    function showClosedPanel(){document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});document.getElementById('panelClosed').classList.add('active');document.getElementById('closedDate').textContent=getDateStr();var r=getClosedReason();if(r)document.querySelector('.closed-hours').innerHTML='<strong>'+r+'</strong><br><br>Operating hours:<br><strong>7:00 AM - 10:00 PM</strong><br><strong>Monday - Saturday</strong>';updateClosedTime();if(closedTimeInterval)clearInterval(closedTimeInterval);closedTimeInterval=setInterval(function(){updateClosedTime();if(isPortalOpen()){clearInterval(closedTimeInterval);location.reload()}},1000)}
     function updateClosedTime(){document.getElementById('closedCurrentTime').textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}
     function startPortalCloseWatcher(){setInterval(function(){if(!isPortalOpen())showClosedPanel()},60000)}
 
     // ============ DEVICE LOCK ============
     function getDeviceLock(){try{var l=JSON.parse(localStorage.getItem('attendanceLock'));if(l&&l.date===getTodayISO())return l;localStorage.removeItem('attendanceLock');return null}catch(e){return null}}
     function setDeviceLock(id,name){localStorage.setItem('attendanceLock',JSON.stringify({date:getTodayISO(),empId:id,empName:name}))}
-    function applyDeviceLock(){var lk=getDeviceLock(),bn=document.getElementById('deviceLockBanner'),sl=document.getElementById('loginEmployeeSelect');if(lk){bn.textContent='🔒 Device locked to '+lk.empName+' ('+lk.empId+') for today';bn.style.display='block';sl.value=lk.empId;sl.disabled=true}else{bn.style.display='none';sl.disabled=false}}
+    function applyDeviceLock(){var lk=getDeviceLock(),bn=document.getElementById('deviceLockBanner'),sl=document.getElementById('loginEmployeeSelect');if(lk){bn.textContent='Device locked to '+lk.empName+' ('+lk.empId+') for today';bn.style.display='block';sl.value=lk.empId;sl.disabled=true}else{bn.style.display='none';sl.disabled=false}}
 
-    // ============ HIDDEN DEVELOPER PANEL ============
+    // ============ DEVELOPER PANEL ============
     var devTapCount=0,devTapTimer=null;
     document.addEventListener('click',function(e){
       if(e.target.closest('.lock-icon')){devTapCount++;if(devTapTimer)clearTimeout(devTapTimer);devTapTimer=setTimeout(function(){devTapCount=0},3000);if(devTapCount>=7){devTapCount=0;document.getElementById('devPanel').classList.add('visible')}}
     });
     function closeDevPanel(){document.getElementById('devPanel').classList.remove('visible')}
-    function devClearDeviceLock(){localStorage.removeItem('attendanceLock');alert('✅ Device lock cleared!');closeDevPanel();location.reload()}
-    function devClearAllStorage(){localStorage.clear();alert('✅ All storage cleared!');closeDevPanel();location.reload()}
+    function devClearDeviceLock(){localStorage.removeItem('attendanceLock');alert('Device lock cleared!');closeDevPanel();location.reload()}
+    function devClearAllStorage(){localStorage.clear();alert('All storage cleared!');closeDevPanel();location.reload()}
     function devShowInfo(){
       var info=document.getElementById('devInfo');var lock=localStorage.getItem('attendanceLock');
-      var data='📅 Today: '+getTodayISO()+'\n🔒 Lock: '+(lock||'None')+'\n📍 GPS: '+(userLocation?userLocation.lat.toFixed(6)+', '+userLocation.lng.toFixed(6):'Not detected')+'\n🏢 Branch: '+(detectedLocationName||'None')+' (index: '+detectedLocationIndex+')\n👤 Employees: '+employees.length+'\n🧠 Face models: '+(faceModelsLoaded?'Loaded':'Not loaded')+'\n⏰ Open: '+isPortalOpen()+'\n🔑 Method: '+loginMethod;
+      var data='Today: '+getTodayISO()+'\nLock: '+(lock||'None')+'\nGPS: '+(userLocation?userLocation.lat.toFixed(6)+', '+userLocation.lng.toFixed(6):'Not detected')+'\nBranch: '+(detectedLocationName||'None')+' (index: '+detectedLocationIndex+')\nEmployees: '+employees.length+'\nFace models: '+(faceModelsLoaded?'Loaded':'Not loaded')+'\nOpen: '+isPortalOpen()+'\nMethod: '+loginMethod;
       info.textContent=data;info.style.display=info.style.display==='none'?'block':'none'}
 
     // ============ INIT ============
@@ -458,7 +488,7 @@
       try{var res=await fetch(API_URL+'?action=getEmployees');var result=await res.json();hideLoading();
         if(!result.success){showToast(result.error,'error');return}
         employees=result.data;var sel=document.getElementById('loginEmployeeSelect');
-        employees.forEach(function(e){var o=document.createElement('option');o.value=e.id;o.textContent=e.id+' — '+e.name;sel.appendChild(o)});
+        employees.forEach(function(e){var o=document.createElement('option');o.value=e.id;o.textContent=e.id+' \u2014 '+e.name;sel.appendChild(o)});
         applyDeviceLock();if(detectedLocationIndex!==-1)filterEmployeesByLocation()}
       catch(err){hideLoading();showToast('Failed: '+err.message,'error')}
       document.getElementById('loginEmployeeSelect').addEventListener('change',checkLoginReady)
@@ -477,21 +507,17 @@
     function showError(msg){document.getElementById('loginError').textContent=msg}
     function clearError(){document.getElementById('loginError').textContent=''}
 
-    // ============ SHARED PRE-CHECKS (GPS + device lock + multi-device) ============
+    // ============ SHARED PRE-CHECKS ============
     async function runPreChecks(empId){
       if(!isPortalOpen()){showClosedPanel();return false}
       if(!geoReady){showError('Still checking location...');return false}
       if(geoError){showError('Enable GPS and refresh.');return false}
       if(!empId){showError('Select an employee.');return false}
       clearError();
-
       var lk=getDeviceLock();if(lk&&lk.empId!==empId){showError('Device locked to '+lk.empName+' for today.');return false}
-
       var ai=EMPLOYEE_LOCATION_MAP[empId];if(!ai){showError('No location assigned.');return false}
       var gr=checkGeofence(userLocation.lat,userLocation.lng,ai);
-      if(!gr.inside){showError('❌ You are '+gr.distance+'m from '+gr.closest+'. Check in at your assigned branch only.');return false}
-
-      // Multi-device block
+      if(!gr.inside){showError('You are '+gr.distance+'m from '+gr.closest+'. Check in at your assigned branch only.');return false}
       showLoading();
       try{
         var checkRes=await fetch(API_URL+'?action=getTodayActions&employeeId='+encodeURIComponent(empId));
@@ -500,8 +526,8 @@
           var hasIn=checkResult.actions.some(function(a){return a.action==='Check In'});
           var hasOut=checkResult.actions.some(function(a){return a.action==='Check Out'});
           var isLockedDevice=lk&&lk.empId===empId;
-          if(hasIn&&hasOut){showError('❌ Already checked in and out today.');return false}
-          if(hasIn&&!isLockedDevice){showError('❌ Already checked in on another device.');return false}
+          if(hasIn&&hasOut){showError('Already checked in and out today.');return false}
+          if(hasIn&&!isLockedDevice){showError('Already checked in on another device.');return false}
         }
       }catch(err){hideLoading()}
       return true;
@@ -514,29 +540,22 @@
       populateAttendancePanel().then(function(){showPanel('panelAttendance')}).catch(function(err){alert('Error: '+err.message)});
     }
 
-    // ============ PIN LOGIN ============
     async function handlePinLogin(){
       var empId=document.getElementById('loginEmployeeSelect').value,pin=getPin();
       if(!empId||pin.length!==6)return;
-
       var cp=PIN_MAP[empId];
       if(!cp){clearPinOnly();showError('No PIN configured.');document.getElementById('pin1').focus();return}
       if(pin!==cp){clearPinOnly();showError('Incorrect PIN.');document.getElementById('pin1').focus();return}
-
       var ok=await runPreChecks(empId);
       if(!ok){clearPinOnly();document.getElementById('pin1').focus();return}
-
       completeLogin(empId);
     }
 
-    // ============ FACE ID LOGIN ============
     async function handleFaceLogin(){
       var empId=document.getElementById('loginEmployeeSelect').value;
       if(!empId)return;
-
       var ok=await runPreChecks(empId);
       if(!ok)return;
-
       var emp=employees.find(function(e){return e.id===empId});
       if(!emp){showError('Employee not found.');return}
       pendingEmployee=emp;
@@ -569,7 +588,7 @@
     async function submitAttendance(){
       if(!isPortalOpen()){showClosedPanel();return}
       if(userLocation){var ai=EMPLOYEE_LOCATION_MAP[loggedInEmployee.id];var gc=checkGeofence(userLocation.lat,userLocation.lng,ai);
-        if(!gc.inside){var g=document.getElementById('geoStatusAttendance');g.style.display='block';g.className='geo-status geo-fail';g.textContent='❌ You moved out of your branch zone.';return}}
+        if(!gc.inside){var g=document.getElementById('geoStatusAttendance');g.style.display='block';g.className='geo-status geo-fail';g.textContent='You moved out of your branch zone.';return}}
       if(!loggedInEmployee||!selectedAction)return;showLoading();document.getElementById('submitBtn').disabled=true;
       try{var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'logAttendance',data:{employeeAction:selectedAction,employeeName:loggedInEmployee.name,employeeId:loggedInEmployee.id,mainBranch:loggedInEmployee.mainBranch,provinceBranch:loggedInEmployee.provinceBranch,district:loggedInEmployee.district}})});
         var result=await res.json();hideLoading();if(result.success)showSuccessPanel();else{showToast(result.error,'error');document.getElementById('submitBtn').disabled=false}
@@ -579,11 +598,11 @@
     function showSuccessPanel(){
       var c=selectedAction==='Check In';document.getElementById('successTitle').textContent=selectedAction+' Successful!';
       var b=document.getElementById('successActionBadge');b.textContent=selectedAction;b.className='success-action '+(c?'checkin':'checkout');
-      document.getElementById('successDate').textContent='📅 '+getDateStr();
+      document.getElementById('successDate').textContent=getDateStr();
       document.getElementById('successName').textContent=loggedInEmployee.name;document.getElementById('successId').textContent=loggedInEmployee.id;
       document.getElementById('successBranch').textContent=loggedInEmployee.mainBranch||'-';document.getElementById('successProvince').textContent=loggedInEmployee.provinceBranch||'-';
       document.getElementById('successDistrict').textContent=loggedInEmployee.district||'-';
-      document.getElementById('successTimestamp').textContent='⏰ '+new Date().toLocaleString('en-US',{weekday:'short',year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+      document.getElementById('successTimestamp').textContent=new Date().toLocaleString('en-US',{weekday:'short',year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});
       showPanel('panelSuccess')
     }
 
