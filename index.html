@@ -145,6 +145,7 @@
     var faceModelsLoaded=false,faceStream=null,faceScanInterval=null,pendingEmployee=null;
     var loginMethod='pin';
     var locationModalDismissed=false;
+    var locationModalSuppressUntil=0;
 
     function getOrCreateDeviceId(){
       try{
@@ -222,7 +223,7 @@
       }catch(e){}
       alert('Please use the app menu to open in Chrome/Safari.');
     }
-    function showLocationModal(reason){var m=document.getElementById('locationModal');var msg=document.getElementById('locationModalMsg');var steps=document.getElementById('locationModalSteps');m.style.display='flex';var title='Turn on Location and allow permission.';if(reason==='denied')title='Location permission is blocked.';if(reason==='unavailable')title='Location is unavailable.';if(reason==='timeout')title='Location request timed out.';msg.textContent=title;var s='';if(isIOS_()){
+    function showLocationModal(reason){if(Date.now()<locationModalSuppressUntil)return;var m=document.getElementById('locationModal');var msg=document.getElementById('locationModalMsg');var steps=document.getElementById('locationModalSteps');m.style.display='flex';var title='Turn on Location and allow permission.';if(reason==='denied')title='Location permission is blocked.';if(reason==='unavailable')title='Location is unavailable.';if(reason==='timeout')title='Location request timed out.';msg.textContent=title;var s='';if(isIOS_()){
       s='iPhone steps:\n1) Settings → Privacy & Security → Location Services → ON\n2) Settings → Safari (or Chrome) → Location → Allow\n3) Return to this page and tap "I turned it on"';
     }else if(isAndroid_()){
       s='Android steps:\n1) Settings → Location → ON\n2) Chrome → Settings → Site settings → Location → Allow\n3) Return to this page and tap "I turned it on"';
@@ -231,7 +232,7 @@
     }
     steps.textContent=s; m.classList.add('visible');}
     function closeLocationModal(){locationModalDismissed=true;var m=document.getElementById('locationModal');m.classList.remove('visible');m.style.display='none';}
-    function retryLocation(){closeLocationModal();locationModalDismissed=true;try{showLoading();}catch(e){}requestLocation();setTimeout(function(){try{hideLoading();}catch(e){}},1200);}
+    function retryLocation(){locationModalSuppressUntil=Date.now()+5000;closeLocationModal();locationModalDismissed=true;try{showLoading();}catch(e){}requestLocation();setTimeout(function(){try{hideLoading();}catch(e){}},1200);}
     function filterEmployeesByLocation(){
       if(detectedLocationIndex===-1)return;
       var ids=[];
