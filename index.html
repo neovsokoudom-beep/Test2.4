@@ -231,7 +231,7 @@
     }
     steps.textContent=s; m.classList.add('visible');}
     function closeLocationModal(){locationModalDismissed=true;document.getElementById('locationModal').classList.remove('visible');}
-    function retryLocation(){locationModalDismissed=false;closeLocationModal();locationModalDismissed=false;try{showLoading();}catch(e){}requestLocation();setTimeout(function(){try{hideLoading();}catch(e){}},1200);}
+    function retryLocation(){closeLocationModal();locationModalDismissed=true;try{showLoading();}catch(e){}requestLocation();setTimeout(function(){try{hideLoading();}catch(e){}},1200);}
     function filterEmployeesByLocation(){
       if(detectedLocationIndex===-1)return;
       var ids=[];
