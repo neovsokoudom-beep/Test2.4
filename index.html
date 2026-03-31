@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="km">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Cambodia Post - Attendance</title>
+  <title>កម្ពុជា ប៉ុស្តិ៍ - ប្រព័ន្ធវត្តមាន</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
   <style>
@@ -143,6 +143,80 @@
     var locationModalDismissed=false;
     var locationModalSuppressUntil=0;
     var LOCATION_MODAL_SHOWN_KEY='attendanceLocationModalShown';
+
+    var KH_TEXT={
+      'Open in Browser':'បើកក្នុង Browser',
+      'Close':'បិទ',
+      'Location Required':'ត្រូវការទីតាំង',
+      'I turned it on':'ខ្ញុំបានបើករួច',
+      'Face Verification':'ផ្ទៀងផ្ទាត់មុខ',
+      'Loading...':'កំពុងដំណើរការ...',
+      'Retry':'ព្យាយាមម្តងទៀត',
+      'Cancel':'បោះបង់',
+      'Portal Closed':'ប្រព័ន្ធបិទ',
+      'Employee Login':'ចូលប្រើបុគ្គលិក',
+      'Detecting location...':'កំពុងកំណត់ទីតាំង...',
+      'Employee ID':'លេខសម្គាល់បុគ្គលិក',
+      'Select employee...':'ជ្រើសបុគ្គលិក...',
+      'Login Method':'វិធីសាស្ត្រចូលប្រើ',
+      'PIN Code':'កូដ PIN',
+      'Face ID':'មុខសញ្ញា',
+      '6-Digit PIN':'PIN ៦ ខ្ទង់',
+      'Sign In':'ចូលប្រើ',
+      'Attendance':'វត្តមាន',
+      'Name':'ឈ្មោះ',
+      'ID':'លេខសម្គាល់',
+      'Branch':'សាខា',
+      'Province':'ខេត្ត',
+      'District':'ស្រុក/ខណ្ឌ',
+      'Status':'ស្ថានភាព',
+      'No Record':'មិនទាន់មានកំណត់ត្រា',
+      'Attendance complete for today':'បានបញ្ចប់វត្តមានសម្រាប់ថ្ងៃនេះ',
+      'Check In':'ចូលធ្វើការ',
+      'Check Out':'ចេញពីការ',
+      'Submit':'បញ្ជូន',
+      'Check In Successful':'ចូលធ្វើការជោគជ័យ',
+      'Attendance recorded':'បានកត់ត្រាវត្តមានរួចរាល់',
+      'Still detecting location...':'កំពុងកំណត់ទីតាំង...',
+      'Enable GPS and refresh.':'សូមបើក GPS ហើយ Refresh ម្តងទៀត។',
+      'Select an employee.':'សូមជ្រើសបុគ្គលិក។',
+      'Employee not found.':'រកមិនឃើញបុគ្គលិក។',
+      'No location assigned.':'មិនទាន់កំណត់ទីតាំងសម្រាប់បុគ្គលិកនេះ។',
+      'Session expired. Please login again.':'សម័យប្រើប្រាស់ផុតកំណត់។ សូមចូលម្តងទៀត។',
+      'Please login again.':'សូមចូលម្តងទៀត។',
+      'Please select Check In or Check Out.':'សូមជ្រើស ចូលធ្វើការ ឬ ចេញពីការ។',
+      'Cannot check in again today.':'មិនអាចចូលធ្វើការម្តងទៀតក្នុងថ្ងៃនេះបានទេ។',
+      'Check in first before check out.':'សូមចូលធ្វើការជាមុនសិន មុនចេញពីការ។',
+      'Already checked out today.':'អ្នកបានចេញពីការហើយក្នុងថ្ងៃនេះ។',
+      'Checked In':'បានចូលធ្វើការ',
+      'Checked Out':'បានចេញពីការ',
+      'Error':'កំហុស',
+      'Failed: ':'បរាជ័យ៖ '
+    };
+
+    function trText_(value){
+      var out=String(value==null?'':value);
+      var keys=Object.keys(KH_TEXT).sort(function(a,b){return b.length-a.length;});
+      for(var i=0;i<keys.length;i++)out=out.split(keys[i]).join(KH_TEXT[keys[i]]);
+      return out;
+    }
+
+    function localizeStaticText_(){
+      try{
+        var walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);
+        var node;
+        while((node=walker.nextNode())){
+          var p=node.parentNode;
+          if(!p||!p.tagName)continue;
+          if(p.tagName==='SCRIPT'||p.tagName==='STYLE')continue;
+          var original=node.nodeValue;
+          var translated=trText_(original);
+          if(translated!==original)node.nodeValue=translated;
+        }
+      }catch(e){}
+    }
+
+    document.addEventListener('DOMContentLoaded',localizeStaticText_);
 
     function hasShownLocationModalToday_(){
       try{return localStorage.getItem(LOCATION_MODAL_SHOWN_KEY)===getTodayISO();}catch(e){return false;}
@@ -359,7 +433,7 @@
     function clearPinOnly(){for(var i=1;i<=6;i++)document.getElementById('pin'+i).value='';}
     function checkLoginReady(){var es=!!document.getElementById('loginEmployeeSelect').value;if(loginMethod==='pin'){document.getElementById('loginBtnPin').disabled=!(es&&getPin().length===6);}else{document.getElementById('loginBtnFace').disabled=!es;}}
     function showPanel(id){document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});document.getElementById(id).classList.add('active');}
-    function showError(msg){document.getElementById('loginError').textContent=msg;}
+    function showError(msg){document.getElementById('loginError').textContent=trText_(msg);}
     function clearError(){document.getElementById('loginError').textContent='';}
     async function runPreChecks(empId){if(!isPortalOpen()){showClosedPanel();return false;}if(!geoReady){showError('Still detecting location...');return false;}if(geoError){showError('Enable GPS and refresh.');return false;}if(!empId){showError('Select an employee.');return false;}clearError();var lk=getDeviceLock();if(lk&&lk.empId!==empId){showError('Device locked to '+lk.empName);return false;}var emp=getEmployeeById_(empId);if(!emp){showError('Employee not found.');return false;}var ai=getAllowedLocationIndexesForEmployee_(emp);if(!ai.length){showError('No location assigned.');return false;}var gr=checkGeofence(userLocation.lat,userLocation.lng,ai);if(!gr.inside){showError(gr.distance+'m from '+gr.closest+'. Go to your assigned branch.');return false;}return true;}
     async function completeLogin(empId){loggedInEmployee=employees.find(function(e){return e.id===empId;});if(!loggedInEmployee){showError('Employee not found.');return;}pendingEmployee=null;setDeviceLock(loggedInEmployee.id,loggedInEmployee.name);try{document.getElementById('infoStatus').innerHTML='<span class="badge badge-none">Loading...</span>';}catch(e){}showPanel('panelAttendance');try{var tok=loadSessionToken();if(!tok){throw new Error('Session expired. Please login again.');}var did=getOrCreateDeviceId();var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'logAttendance',auth:{token:tok,deviceId:did},data:{employeeAction:'Login',employeeName:loggedInEmployee.name,employeeId:loggedInEmployee.id,mainBranch:loggedInEmployee.mainBranch,provinceBranch:loggedInEmployee.provinceBranch,district:loggedInEmployee.district}})});var result=await res.json();if(!result.success){if(result&&String(result.error||'').toLowerCase().indexOf('unauthorized')!==-1){clearSession();showToast('Session expired. Please login again.','error');showPanel('panelLogin');return;}throw new Error(result.error||'Login attendance failed');}await populateAttendancePanel();}catch(err){showError(err.message);showToast(err.message,'error');}}
@@ -371,7 +445,7 @@
     function showSuccessPanel(){var c=selectedAction==='Check In';document.getElementById('successTitle').textContent=selectedAction+' Successful';var b=document.getElementById('successActionBadge');b.textContent=selectedAction;b.className='success-badge '+(c?'ci':'co');document.getElementById('successDate').textContent=getDateStr();document.getElementById('successName').textContent=loggedInEmployee.name;document.getElementById('successId').textContent=loggedInEmployee.id;document.getElementById('successBranch').textContent=loggedInEmployee.mainBranch||'-';document.getElementById('successProvince').textContent=loggedInEmployee.provinceBranch||'-';document.getElementById('successDistrict').textContent=loggedInEmployee.district||'-';document.getElementById('successTimestamp').textContent=new Date().toLocaleString('en-US',{weekday:'short',year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});showPanel('panelSuccess');}
     function showLoading(){document.getElementById('loadingOverlay').classList.add('visible');}
     function hideLoading(){document.getElementById('loadingOverlay').classList.remove('visible');}
-    function showToast(m,t){var e=document.getElementById('toast');e.textContent=m;e.className='toast '+t+' show';setTimeout(function(){e.classList.remove('show');},4000);}
+    function showToast(m,t){var e=document.getElementById('toast');e.textContent=trText_(m);e.className='toast '+t+' show';setTimeout(function(){e.classList.remove('show');},4000);}
   </script>
 </body>
 </html>
