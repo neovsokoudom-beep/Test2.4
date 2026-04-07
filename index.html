@@ -84,29 +84,43 @@
     var deviceId=null;
 
     var ALLOWED_LOCATIONS=[];
-    ALLOWED_LOCATIONS[0]={name:'ស្នាក់ការកណ្ដាល (HQ)',lat:11.574984,lng:104.925366,radius:300};
-    ALLOWED_LOCATIONS[1]={name:'ទឹកល្អក់',lat:11.567364,lng:104.900508,radius:100};
-    ALLOWED_LOCATIONS[2]={name:'ដង្កោ (Dangkor)',lat:11.56254,lng:104.856171,radius:100};
-    ALLOWED_LOCATIONS[3]={name:'បឹងសាឡាង',lat:11.548763,lng:104.899359,radius:100};
-    ALLOWED_LOCATIONS[4]={name:'អូឡាំពិក (Olympic)',lat:11.5478212,lng:104.9044246,radius:100};
-    ALLOWED_LOCATIONS[5]={name:'ច្បារអំពៅ (Chbar Ampov)',lat:11.530877,lng:104.945574,radius:100};
-    ALLOWED_LOCATIONS[6]={name:'បឹងប្រលិត (Boeung Prolit)',lat:11.55605,lng:104.91916,radius:150};
-    ALLOWED_LOCATIONS[7]={name:'រោងចក្រកែវ',lat:11.498345,lng:104.892716,radius:100};
-    ALLOWED_LOCATIONS[8]={name:'AEON Tonle Bassac',lat:11.547982,lng:104.93287,radius:500};
-    ALLOWED_LOCATIONS[9]={name:'AEON Sen Sok',lat:11.599664,lng:104.88537,radius:500};
-    ALLOWED_LOCATIONS[10]={name:'AEON Mean Chey',lat:11.484916,lng:104.918083,radius:500};
-    ALLOWED_LOCATIONS[11]={name:'Pochentong',lat:11.552512,lng:104.844986,radius:100};
-    ALLOWED_LOCATIONS[12]={name:'Siem Reap',lat:13.3596147,lng:103.858838,radius:100};
-    ALLOWED_LOCATIONS[13]={name:'Takeo (Tram Kak)',lat:11.012446,lng:104.672659,radius:100};
-    ALLOWED_LOCATIONS[14]={name:'និរោធ (Nirouth)',lat:11.513345,lng:104.948916,radius:100};
-    ALLOWED_LOCATIONS[15]={name:'Tuek Phos',lat:12.047343,lng:104.521924,radius:100};
-    ALLOWED_LOCATIONS[16]={name:'Kampong Tralach',lat:11.939902,lng:104.714693,radius:100};
-    ALLOWED_LOCATIONS[17]={name:'Boribor',lat:12.4333,lng:104.45,radius:100};
-    ALLOWED_LOCATIONS[18]={name:'Cheung Prey (Kampong Cham)',lat:12.055296,lng:105.066999,radius:100};
-    ALLOWED_LOCATIONS[19]={name:'Ratanak Mondol (Battambang)',lat:12.891107,lng:102.972024,radius:100};
-    ALLOWED_LOCATIONS[20]={name:'Moung Ruessei (Battambang)',lat:12.777698,lng:103.446368,radius:100};
-    ALLOWED_LOCATIONS[21]={name:'Preah Netr Preah',lat:13.623754,lng:103.180275,radius:100};
-    ALLOWED_LOCATIONS[22]={name:'Mongkol Borei',lat:13.5383,lng:103.0217,radius:100};
+    ALLOWED_LOCATIONS[0]={name:'ស្នាក់ការកណ្ដាល (HQ)',lat:11.574984,lng:104.925366,radius:220};
+    ALLOWED_LOCATIONS[1]={name:'ទឹកល្អក់',lat:11.567364,lng:104.900508,radius:130};
+    ALLOWED_LOCATIONS[2]={name:'ដង្កោ (Dangkor)',lat:11.56254,lng:104.856171,radius:150};
+    ALLOWED_LOCATIONS[3]={name:'បឹងសាឡាង',lat:11.548763,lng:104.899359,radius:130};
+    ALLOWED_LOCATIONS[4]={name:'អូឡាំពិក (Olympic)',lat:11.5478212,lng:104.9044246,radius:120};
+    ALLOWED_LOCATIONS[5]={name:'ច្បារអំពៅ (Chbar Ampov)',lat:11.530877,lng:104.945574,radius:140};
+    ALLOWED_LOCATIONS[6]={name:'បឹងប្រលិត (Boeung Prolit)',lat:11.55605,lng:104.91916,radius:130};
+    ALLOWED_LOCATIONS[7]={name:'រោងចក្រកែវ',lat:11.498345,lng:104.892716,radius:160};
+    ALLOWED_LOCATIONS[8]={name:'AEON Tonle Bassac',lat:11.547982,lng:104.93287,radius:300};
+    ALLOWED_LOCATIONS[9]={name:'AEON Sen Sok',lat:11.599664,lng:104.88537,radius:300};
+    ALLOWED_LOCATIONS[10]={name:'AEON Mean Chey',lat:11.484916,lng:104.918083,radius:300};
+    ALLOWED_LOCATIONS[11]={name:'Pochentong',lat:11.552512,lng:104.844986,radius:150};
+    ALLOWED_LOCATIONS[12]={name:'Siem Reap',lat:13.3596147,lng:103.858838,radius:180};
+    ALLOWED_LOCATIONS[13]={name:'Takeo (Tram Kak)',lat:11.012446,lng:104.672659,radius:180};
+    ALLOWED_LOCATIONS[14]={name:'និរោធ (Nirouth)',lat:11.513345,lng:104.948916,radius:140};
+    ALLOWED_LOCATIONS[15]={name:'Tuek Phos',lat:12.047343,lng:104.521924,radius:200};
+    ALLOWED_LOCATIONS[16]={name:'Kampong Tralach',lat:11.939902,lng:104.714693,radius:200};
+    ALLOWED_LOCATIONS[17]={name:'Boribor',lat:12.4333,lng:104.45,radius:220};
+    ALLOWED_LOCATIONS[18]={name:'Cheung Prey (Kampong Cham)',lat:12.055296,lng:105.066999,radius:200};
+    ALLOWED_LOCATIONS[19]={name:'Ratanak Mondol (Battambang)',lat:12.891107,lng:102.972024,radius:200};
+    ALLOWED_LOCATIONS[20]={name:'Moung Ruessei (Battambang)',lat:12.777698,lng:103.446368,radius:200};
+    ALLOWED_LOCATIONS[21]={name:'Preah Netr Preah',lat:13.623754,lng:103.180275,radius:220};
+    ALLOWED_LOCATIONS[22]={name:'Mongkol Borei',lat:13.5383,lng:103.0217,radius:220};
+
+    // Optional strict zone boxes by location index.
+    // If a zone exists for a location, check-in is allowed only inside that zone.
+    // Supported formats:
+    // - Polygon: {points:[{lat:..,lng:..}, ...]}
+    // - Axis-aligned box: {minLat:<south>, maxLat:<north>, minLng:<west>, maxLng:<east>}
+    var LOCATION_BOX_ZONES={
+      0:{points:[
+        {lat:11.575508286304565,lng:104.9249540817195},
+        {lat:11.575618765600636,lng:104.92568485074186},
+        {lat:11.574911697351776,lng:104.92578409097948},
+        {lat:11.574801217776441,lng:104.92502400097781}
+      ]}
+    };
 
     var EMPLOYEE_LOCATION_OVERRIDES={
       '059':[2]
@@ -258,17 +272,31 @@
     function isHiddenEmployee_(emp){var id=String((emp&&emp.id)||'').padStart(3,'0');return !!HIDDEN_EMPLOYEE_IDS[id];}
     function getAllowedLocationIndexesForEmployee_(emp){if(!emp)return[];var empId=String(emp.id||'').padStart(3,'0');if(EMPLOYEE_LOCATION_OVERRIDES[empId]&&EMPLOYEE_LOCATION_OVERRIDES[empId].length)return EMPLOYEE_LOCATION_OVERRIDES[empId].slice();var branchText=normalizeLocationText_([emp.mainBranch,emp.provinceBranch,emp.district].join(' '));if(!branchText)return[];var indexes=[];for(var i=0;i<LOCATION_BRANCH_RULES.length;i++){var rule=LOCATION_BRANCH_RULES[i];for(var j=0;j<rule.keywords.length;j++){var keyword=normalizeLocationText_(rule.keywords[j]);if(keyword&&branchText.indexOf(keyword)!==-1){indexes.push(rule.index);break;}}}return indexes.filter(function(value,index,array){return array.indexOf(value)===index;});}
     function getDistanceMeters(lat1,lng1,lat2,lng2){var R=6371000,dLat=(lat2-lat1)*Math.PI/180,dLng=(lng2-lng1)*Math.PI/180;var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
+    function getLocationBox_(loc,index){if(loc&&loc.box)return loc.box;return LOCATION_BOX_ZONES&&LOCATION_BOX_ZONES.hasOwnProperty(index)?LOCATION_BOX_ZONES[index]:null;}
+    function isInsidePolygon_(lat,lng,points){if(!Array.isArray(points)||points.length<3)return false;var inside=false;for(var i=0,j=points.length-1;i<points.length;j=i++){var xi=Number(points[i].lng),yi=Number(points[i].lat),xj=Number(points[j].lng),yj=Number(points[j].lat);if(!isFinite(xi)||!isFinite(yi)||!isFinite(xj)||!isFinite(yj))continue;var intersect=((yi>lat)!==(yj>lat))&&(lng<((xj-xi)*(lat-yi)/(yj-yi+0.0)+xi));if(intersect)inside=!inside;}return inside;}
+    function isInsideBox_(lat,lng,box){if(!box)return false;if(Array.isArray(box.points)&&box.points.length>=3)return isInsidePolygon_(lat,lng,box.points);var minLat=Math.min(Number(box.minLat),Number(box.maxLat)),maxLat=Math.max(Number(box.minLat),Number(box.maxLat)),minLng=Math.min(Number(box.minLng),Number(box.maxLng)),maxLng=Math.max(Number(box.minLng),Number(box.maxLng));if(!isFinite(minLat)||!isFinite(maxLat)||!isFinite(minLng)||!isFinite(maxLng))return false;return lat>=minLat&&lat<=maxLat&&lng>=minLng&&lng<=maxLng;}
     function checkGeofence(lat,lng,idx){
-      var locs=(Array.isArray(idx)&&idx.length?idx.map(function(i){return ALLOWED_LOCATIONS[i];}):ALLOWED_LOCATIONS).filter(function(l){return !!l;});
-      if(!locs.length)locs=ALLOWED_LOCATIONS.slice();
-      for(var i=0;i<locs.length;i++){
-        var l=locs[i],dist=getDistanceMeters(lat,lng,l.lat,l.lng);
-        if(dist<=l.radius)return{inside:true,location:l.name,distance:Math.round(dist)};
+      var locs=[];
+      if(Array.isArray(idx)&&idx.length){
+        for(var ii=0;ii<idx.length;ii++){var x=idx[ii],lx=ALLOWED_LOCATIONS[x];if(lx)locs.push({index:x,loc:lx});}
+      }else{
+        for(var ai=0;ai<ALLOWED_LOCATIONS.length;ai++){if(ALLOWED_LOCATIONS[ai])locs.push({index:ai,loc:ALLOWED_LOCATIONS[ai]});}
       }
+      if(!locs.length){for(var fb=0;fb<ALLOWED_LOCATIONS.length;fb++){if(ALLOWED_LOCATIONS[fb])locs.push({index:fb,loc:ALLOWED_LOCATIONS[fb]});}}
+
+      for(var i=0;i<locs.length;i++){
+        var item=locs[i],l=item.loc,dist=getDistanceMeters(lat,lng,l.lat,l.lng),box=getLocationBox_(l,item.index);
+        if(box){
+          if(isInsideBox_(lat,lng,box))return{inside:true,location:l.name,distance:Math.round(dist),method:'box'};
+          continue;
+        }
+        if(dist<=l.radius)return{inside:true,location:l.name,distance:Math.round(dist),method:'radius'};
+      }
+
       var cl=null,cd=Infinity;
       for(var j=0;j<locs.length;j++){
-        var dd=getDistanceMeters(lat,lng,locs[j].lat,locs[j].lng);
-        if(dd<cd){cd=dd;cl=locs[j].name;}
+        var dd=getDistanceMeters(lat,lng,locs[j].loc.lat,locs[j].loc.lng);
+        if(dd<cd){cd=dd;cl=locs[j].loc.name;}
       }
       return{inside:false,closest:cl,distance:Math.round(cd)};
     }
