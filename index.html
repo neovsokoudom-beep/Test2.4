@@ -568,17 +568,18 @@
     function retryFaceScan(){stopCamera();if(pendingEmployee)openFaceScan(pendingEmployee.id,pendingEmployee.name);}
     function cancelFaceScan(){stopCamera();document.getElementById('faceScanModal').classList.remove('visible');pendingEmployee=null;}
     function onFaceVerified(){completeLogin(pendingEmployee.id);}
+    var DEVICE_LOCK_STORAGE_KEY='attendanceLock_pp';
     function getClosedReason(){if(isHoliday())return 'Public holiday';if(isBlockedDay())return 'Closed on '+['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date().getDay()];return '';}
     function showClosedPanel(){document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});document.getElementById('panelClosed').classList.add('active');document.getElementById('closedDate').textContent=getDateStr();var r=getClosedReason();if(r)document.querySelector('.closed-info').innerHTML='<strong>'+r+'</strong><br><br>Operating hours<br><strong>7:00 AM - 10:00 PM</strong><br><strong>Monday - Saturday</strong>';updateClosedTime();if(closedTimeInterval)clearInterval(closedTimeInterval);closedTimeInterval=setInterval(function(){updateClosedTime();if(isPortalOpen()){clearInterval(closedTimeInterval);location.reload();}},1000);}
     function updateClosedTime(){document.getElementById('closedCurrentTime').textContent=new Date().toLocaleTimeString('km-KH',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});}
     function startPortalCloseWatcher(){setInterval(function(){if(!isPortalOpen())showClosedPanel();},60000);}
-    function getDeviceLock(){try{var l=JSON.parse(localStorage.getItem('attendanceLock'));if(l&&l.date===getTodayISO())return l;localStorage.removeItem('attendanceLock');return null;}catch(e){return null;}}
-    function setDeviceLock(id,name){localStorage.setItem('attendanceLock',JSON.stringify({date:getTodayISO(),empId:id,empName:name}));}
+    function getDeviceLock(){try{var l=JSON.parse(localStorage.getItem(DEVICE_LOCK_STORAGE_KEY));if(l&&l.date===getTodayISO())return l;localStorage.removeItem(DEVICE_LOCK_STORAGE_KEY);return null;}catch(e){return null;}}
+    function setDeviceLock(id,name){localStorage.setItem(DEVICE_LOCK_STORAGE_KEY,JSON.stringify({date:getTodayISO(),empId:id,empName:name}));}
     function applyDeviceLock(){var lk=getDeviceLock(),bn=document.getElementById('deviceLockBanner'),sl=document.getElementById('loginEmployeeSelect');if(lk){bn.textContent='Device locked to '+lk.empName+' ('+lk.empId+')';bn.style.display='block';sl.value=lk.empId;sl.disabled=true;}else{bn.style.display='none';sl.disabled=false;}updatePinInputUi_();}
     var devTapCount=0,devTapTimer=null;
     document.addEventListener('click',function(e){if(e.target.closest('.lock-icon')){devTapCount++;if(devTapTimer)clearTimeout(devTapTimer);devTapTimer=setTimeout(function(){devTapCount=0;},3000);if(devTapCount>=7){devTapCount=0;document.getElementById('devPanel').classList.add('visible');populateDevSelect();}}});
     function closeDevPanel(){document.getElementById('devPanel').classList.remove('visible');}
-    function devClearDeviceLock(){localStorage.removeItem('attendanceLock');alert('Device lock cleared');closeDevPanel();location.reload();}
+    function devClearDeviceLock(){localStorage.removeItem(DEVICE_LOCK_STORAGE_KEY);alert('Device lock cleared');closeDevPanel();location.reload();}
     function devClearAllStorage(){localStorage.clear();alert('Storage cleared');closeDevPanel();location.reload();}
     function devTogglePortalOverride(){
       try{
